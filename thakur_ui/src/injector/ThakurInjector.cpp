@@ -118,6 +118,15 @@ InjectionResult ThakurInjector::inject(DWORD pid, const std::string& dllPath, In
         res.targetPid = pid;
     }
 
+    
+    HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+    if (!hProc) {
+        res.status = InjectionStatus::AccessDenied;
+        res.message = "Failed to open Roblox process. Run as Administrator.";
+        return res;
+    }
+    CloseHandle(hProc);
+
     if (method == InjectionMethod::LoadLibrary) {
         auto baseResult = InjectorEngine::injectDll(pid, dllPath);
         if (baseResult.status == Thakur::InjectionStatus::SUCCESS) {
@@ -125,6 +134,8 @@ InjectionResult ThakurInjector::inject(DWORD pid, const std::string& dllPath, In
             res.message = "DLL injected via LoadLibrary.";
             m_attached = true;
             m_attachedPid = pid;
+            
+            IpcBridge::instance().startServer();
         } else {
             res.status = InjectionStatus::MappingFailed;
             res.message = baseResult.message;
@@ -151,6 +162,8 @@ InjectionResult ThakurInjector::inject(DWORD pid, const std::string& dllPath, In
         res.message = "DLL injected cleanly via Thakur execution engine.";
         m_attached = true;
         m_attachedPid = pid;
+        
+        IpcBridge::instance().startServer();
     } else {
         res.status = InjectionStatus::MappingFailed;
         res.message = baseResult.message;
@@ -261,6 +274,40 @@ bool ThakurInjector::fixRelocations(BYTE* mappedBase, const IMAGE_NT_HEADERS64* 
     }
 
     
+    IMAGE_BASE_RELOCATION* reloc = reinterpret_cast<IMAGE_BASE_RELOCATION*>(
+        mappedBase + nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress
+    );
+    IMAGE_BASE_RELOCATION* end = reinterpret_cast<IMAGE_BASE_RELOCATION*>(
+        reinterpret_cast<BYTE*>(reloc) + nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size
+    );
+
+    while (reloc < end && reloc->SizeOfBlock > 0) {
+        WORD* entries = reinterpret_cast<WORD*>(reinterpret_cast<BYTE*>(reloc) + sizeof(IMAGE_BASE_RELOCATION));
+        WORD* entryEnd = reinterpret_cast<WORD*>(reinterpret_cast<BYTE*>(reloc) + reloc->SizeOfBlock);
+        
+        uintptr_t blockBase = mappedBase + reloc->VirtualAddress;
+        
+        while (entries < entryEnd) {
+            WORD entry = *entries++;
+            int type = (entry >> 12) & 0xF;
+            int offset = entry & 0xFFF;
+            
+            if (type == IMAGE_REL_BASED_ABSOLUTE) {
+                continue;
+            }
+            
+            if (type == IMAGE_REL_BASED_DIR64) {
+                uintptr_t* addr = reinterpret_cast<uintptr_t*>(blockBase + offset);
+                *addr += delta;
+            } else if (type == IMAGE_REL_BASED_HIGHLOW) {
+                DWORD* addr = reinterpret_cast<DWORD*>(blockBase + offset);
+                *addr += static_cast<DWORD>(delta);
+            }
+        }
+        
+        reloc = reinterpret_cast<IMAGE_BASE_RELOCATION*>(reinterpret_cast<BYTE*>(reloc) + reloc->SizeOfBlock);
+    }
+    
     return true;
 }
 
@@ -268,6 +315,49 @@ bool ThakurInjector::resolveImports(HANDLE hProcess, BYTE* mappedBase, const IMA
     if (nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size == 0) {
         return true;
     }
+
+    
+    IMAGE_IMPORT_DESCRIPTOR* importDir = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(
+        mappedBase + nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress
+    );
+
+    while (importDir->Name != 0) {
+        const char* dllName = reinterpret_cast<const char*>(mappedBase + importDir->Name);
+        HMODULE hMod = GetModuleHandleA(dllName);
+        
+        if (!hMod) {
+            hMod = LoadLibraryA(dllName);
+            if (!hMod) {
+                
+                ++importDir;
+                continue;
+            }
+        }
+
+        uintptr_t* thunk = reinterpret_cast<uintptr_t*>(mappedBase + importDir->OriginalFirstThunk);
+        uintptr_t* iat = reinterpret_cast<uintptr_t*>(mappedBase + importDir->FirstThunk);
+
+        while (*thunk != 0) {
+            if (*thunk & IMAGE_ORDINAL_FLAG64) {
+                
+                FARPROC func = GetProcAddress(hMod, reinterpret_cast<LPCSTR>(*thunk & 0xFFFF));
+                if (func) {
+                    *iat = reinterpret_cast<uintptr_t>(func);
+                }
+            } else {
+                IMAGE_IMPORT_BY_NAME* import = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(mappedBase + (*thunk));
+                FARPROC func = GetProcAddress(hMod, import->Name);
+                if (func) {
+                    *iat = reinterpret_cast<uintptr_t>(func);
+                }
+            }
+            ++thunk;
+            ++iat;
+        }
+
+        ++importDir;
+    }
+
     return true;
 }
 
@@ -317,7 +407,7 @@ InjectionResult ThakurInjector::processHollow(DWORD pid, const std::vector<BYTE>
 }
 
 bool ThakurInjector::isAttached() const {
-    return m_attached;
+    return m_attached && (m_attachedPid != 0);
 }
 
 DWORD ThakurInjector::attachedPid() const {
@@ -325,9 +415,13 @@ DWORD ThakurInjector::attachedPid() const {
 }
 
 bool ThakurInjector::detach() {
-    m_attached = false;
-    m_attachedPid = 0;
-    return true;
+    if (m_attached) {
+        IpcBridge::instance().disconnect();
+        m_attached = false;
+        m_attachedPid = 0;
+        return true;
+    }
+    return false;
 }
 
 void PatternScanner::parsePattern(const std::string& pattern, std::vector<BYTE>& bytes, std::vector<BYTE>& mask) {

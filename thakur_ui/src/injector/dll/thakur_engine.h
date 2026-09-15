@@ -1,3 +1,13 @@
+#pragma once
+#include <windows.h>
+#include <psapi.h>
+#include <cstdint>
+#include <string>
+#include <queue>
+#include <mutex>
+#include <atomic>
+#include <thread>
+#include <functional>
 
 
 namespace Thakur {
