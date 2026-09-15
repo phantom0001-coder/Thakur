@@ -1,0 +1,13 @@
+*.exe
+*.dll
+*.obj
+*.res
+*.log
+*.manifest
+packages/
+installer/
+*.WebView2/
+.vs/
+*.pdb
+*.suo
+*.user

@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1100</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>VOLTRO EXECUTOR v1.5.0</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QMainWindow { background-color: #07090c; color: #e8eef4; }
+    #titleBar { background-color: rgba(4, 6, 10, 0.95); border-bottom: 1px solid #1e2836; min-height: 38px; max-height: 38px; }
+    #sideBar { background-color: rgba(6, 9, 14, 0.85); border-right: 1px solid #1e2836; min-width: 210px; max-width: 210px; }
+    #topBar { background-color: rgba(6, 9, 14, 0.6); border-bottom: 1px solid #1e2836; min-height: 44px; max-height: 44px; }
+    #statusBar { background-color: rgba(3, 5, 8, 0.95); border-top: 1px solid #1e2836; min-height: 28px; max-height: 28px; }
+    QTabBar::tab { background: transparent; color: #8b9bb0; border-right: 1px solid #1e2836; padding: 6px 14px; font-family: 'Inter'; font-size: 11px; }
+    QTabBar::tab:selected { background: #0c1016; color: #00ff66; border-bottom: 2px solid #00ff66; font-weight: bold; }
+    QPlainTextEdit { background-color: #0c1016; color: #e8eef4; font-family: 'JetBrains Mono'; font-size: 13px; border: none; }
+    QPushButton.actionBtn { background: rgba(0,255,102,0.1); border: 1px solid rgba(0,255,102,0.3); color: #00ff66; border-radius: 6px; padding: 5px 12px; font-weight: bold; }
+    QPushButton.actionBtn:hover { background: rgba(0,255,102,0.2); }
+    QPushButton.navBtn { background: transparent; border: none; color: #8b9bb0; text-align: left; padding: 10px 16px; font-size: 12px; font-weight: 600; border-radius: 6px; }
+    QPushButton.navBtn:hover, QPushButton.navBtn:checked { background: rgba(0,255,102,0.08); color: #00ff66; }
+   </string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="mainVerticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+
+    <!-- Custom TitleBar -->
+    <item>
+     <widget class="QWidget" name="titleBar" native="true">
+      <layout class="QHBoxLayout" name="titleBarLayout">
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>6</number>
+       </property>
+        <item>
+         <widget class="QLabel" name="lblTitleLogoIcon">
+          <property name="minimumSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap>:/resources/images/voltro_logo.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblTitleLogo">
+          <property name="text">
+           <string>VOLTRO EXECUTOR</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-family: 'Orbitron'; font-weight: 900; color: #00d2ff; font-size: 12px; letter-spacing: 1px;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+          <widget class="QLabel" name="lblBadge">
+           <property name="text">
+            <string>v1.5.0 PRE-RELEASE</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background: rgba(0,255,102,0.1); color: #00ff66; border: 1px solid rgba(0,255,102,0.3); border-radius: 4px; padding: 2px 6px; font-size: 9px; font-weight: bold;</string>
+           </property>
+          </widget>
+        </item>
+       <item>
+        <spacer name="titleSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnMin">
+         <property name="text">
+          <string>—</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: none; color: #8b9bb0; padding: 4px 10px;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnMax">
+         <property name="text">
+          <string>▢</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: none; color: #8b9bb0; padding: 4px 10px;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnClose">
+         <property name="text">
+          <string>✕</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">border: none; color: #8b9bb0; padding: 4px 10px;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+
+    <!-- Main Body (Sidebar + Content Stack) -->
+    <item>
+     <widget class="QWidget" name="bodyWidget" native="true">
+      <layout class="QHBoxLayout" name="bodyLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+
+       <!-- Sidebar Navigation -->
+       <item>
+        <widget class="QWidget" name="sideBar" native="true">
+         <layout class="QVBoxLayout" name="sideBarLayout">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="leftMargin">
+           <number>10</number>
+          </property>
+          <property name="rightMargin">
+           <number>10</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="btnNavWorkspace">
+            <property name="text">
+             <string>⌨ Workspace</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnNavHub">
+            <property name="text">
+             <string>🌐 Script Hub</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnNavPlans">
+            <property name="text">
+             <string>👑 Store &amp; Keys</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnNavSettings">
+            <property name="text">
+             <string>⚙ Settings</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnNavCredits">
+            <property name="text">
+             <string>👥 Credits</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="navSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblSideStatus">
+            <property name="text">
+             <string>● Not Attached</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: #8b9bb0; font-size: 11px;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+
+       <!-- Main Stacked Content Pages -->
+       <item>
+        <widget class="QStackedWidget" name="pageStack">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+
+         <!-- Page 0: Workspace (Editor & Output) -->
+         <widget class="QWidget" name="pageWorkspace">
+          <layout class="QVBoxLayout" name="wsLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+
+           <!-- Top Action Controls -->
+           <item>
+            <widget class="QWidget" name="topBar" native="true">
+             <layout class="QHBoxLayout" name="topBarLayout">
+              <item>
+               <widget class="QPushButton" name="btnAttach">
+                <property name="text">
+                 <string>⚡ Attach</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00ff66, stop:1 #00cc52); color: #040608; border-radius: 6px; padding: 6px 14px; font-weight: bold;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnExecute">
+                <property name="text">
+                 <string>▶ Execute</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background: rgba(0,255,102,0.12); color: #00ff66; border: 1px solid rgba(0,255,102,0.3); border-radius: 6px; padding: 6px 14px; font-weight: bold;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnStop">
+                <property name="text">
+                 <string>⏹ Stop</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background: rgba(255,184,0,0.1); color: #ffb800; border: 1px solid rgba(255,184,0,0.3); border-radius: 6px; padding: 6px 12px; font-weight: bold;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnClear">
+                <property name="text">
+                 <string>🗑 Clear</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background: rgba(255,59,92,0.1); color: #ff3b5c; border: 1px solid rgba(255,59,92,0.3); border-radius: 6px; padding: 6px 12px; font-weight: bold;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnFpsBoost">
+                <property name="text">
+                 <string>⚡ FPS Boost [240]</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background: rgba(34,211,238,0.12); color: #22d3ee; border: 1px solid rgba(34,211,238,0.35); border-radius: 6px; padding: 6px 12px; font-weight: bold;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="tbSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btnNewTab">
+                <property name="text">
+                 <string>+ New Tab</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background: transparent; color: #8b9bb0; border: 1px solid #1e2836; border-radius: 6px; padding: 4px 10px;</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+
+           <!-- Multi-Tab Code Editor -->
+           <item>
+            <widget class="QTabWidget" name="editorTabs">
+             <property name="tabsClosable">
+              <bool>true</bool>
+             </property>
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="tabMain">
+              <attribute name="title">
+               <string>main.lua</string>
+              </attribute>
+              <layout class="QVBoxLayout" name="tabMainLayout">
+               <property name="margin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QPlainTextEdit" name="txtEditor">
+                 <property name="plainText">
+                  <string>-- [[ Voltro Executor v1.5.0 ]]
+printidentity()
+local name, ver = identifyexecutor()
+print("[VOLTRO] Injected runtime: " .. tostring(name) .. " " .. tostring(ver))
+print("[VOLTRO] Engine v1.5.0 Active")
+</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+
+           <!-- Console Output Panel -->
+           <item>
+            <widget class="QWidget" name="consolePanel" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>140</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>180</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: #040608; border-top: 1px solid #1e2836;</string>
+             </property>
+             <layout class="QVBoxLayout" name="consoleLayout">
+              <property name="margin">
+               <number>6</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="lblConsoleHeader">
+                <property name="text">
+                 <string>TERMINAL OUTPUT STREAM (IPC: \\.\pipe\VoltroIPC)</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font-size: 9px; font-weight: bold; color: #8b9bb0; letter-spacing: 1px;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPlainTextEdit" name="txtConsole">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="plainText">
+                 <string>[VOLTRO] System initialized. Voltro Virtual Sandbox ready.
+[IPC] Listening on \\.\pipe\VoltroIPC.
+</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background: transparent; border: none; font-family: 'JetBrains Mono'; font-size: 11px; color: #00ff66;</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+          </widget>
+
+          <!-- Page 1: Script Hub -->
+          <widget class="QWidget" name="pageHub">
+           <layout class="QVBoxLayout" name="hubMainLayout">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <property name="leftMargin">
+             <number>16</number>
+            </property>
+            <property name="topMargin">
+             <number>16</number>
+            </property>
+            <property name="rightMargin">
+             <number>16</number>
+            </property>
+            <property name="bottomMargin">
+             <number>16</number>
+            </property>
+
+            <!-- Hub Top Search & Hub Selector Bar -->
+            <item>
+             <widget class="QWidget" name="hubSearchBarWidget" native="true">
+              <layout class="QHBoxLayout" name="hubSearchLayout">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLineEdit" name="txtHubSearch">
+                 <property name="placeholderText">
+                  <string>🔍 Search exploit scripts across hubs (e.g. Infinite Yield, Aimbot, Blox Fruits)...</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background-color: #0c1016; border: 1px solid #1e2836; border-radius: 6px; padding: 8px 14px; font-family: 'Inter'; font-size: 13px; color: #e8eef4;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboHubSelector">
+                 <property name="minimumSize">
+                  <size>
+                   <width>190</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QComboBox { background-color: #0c1016; border: 1px solid #00ff66; border-radius: 6px; padding: 6px 12px; color: #00ff66; font-weight: bold; font-size: 12px; } QComboBox::drop-down { border: none; } QComboBox QAbstractItemView { background-color: #07090c; color: #e8eef4; selection-background-color: rgba(0,255,102,0.2); selection-color: #00ff66; }</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnHubRefresh">
+                 <property name="text">
+                  <string>🔄 Search</string>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background: rgba(0,255,102,0.15); color: #00ff66; border: 1px solid rgba(0,255,102,0.4); border-radius: 6px; padding: 8px 16px; font-weight: bold;</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+
+            <!-- Script Results List / Details Split -->
+            <item>
+             <widget class="QSplitter" name="hubSplitter">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <!-- Left: Scripts List -->
+              <widget class="QListWidget" name="listHubScripts">
+               <property name="styleSheet">
+                <string notr="true">QListWidget { background-color: #0c1016; border: 1px solid #1e2836; border-radius: 6px; padding: 6px; color: #e8eef4; } QListWidget::item { padding: 10px; border-bottom: 1px solid #141b24; border-radius: 4px; } QListWidget::item:hover { background-color: rgba(0,255,102,0.06); } QListWidget::item:selected { background-color: rgba(0,255,102,0.15); color: #00ff66; font-weight: bold; }</string>
+               </property>
+              </widget>
+              <!-- Right: Script Preview & Load Card -->
+              <widget class="QWidget" name="hubDetailsPanel" native="true">
+               <property name="styleSheet">
+                <string notr="true">background-color: #07090c; border: 1px solid #1e2836; border-radius: 6px; padding: 12px;</string>
+               </property>
+               <layout class="QVBoxLayout" name="hubDetailsLayout">
+                <item>
+                 <widget class="QLabel" name="lblScriptTitle">
+                  <property name="text">
+                   <string>Select a script from the list</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 15px; font-weight: bold; color: #00ff66;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="lblScriptMeta">
+                  <property name="text">
+                   <string>Hub Source: — | Author: —</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">color: #8b9bb0; font-size: 11px;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPlainTextEdit" name="txtScriptPreview">
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-color: #0c1016; border: 1px solid #1e2836; color: #e8eef4; font-family: 'JetBrains Mono'; font-size: 12px;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="hubActionButtonsLayout">
+                  <item>
+                   <widget class="QPushButton" name="btnLoadToEditor">
+                    <property name="text">
+                     <string>📥 Load into Editor</string>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">background: rgba(0,255,102,0.15); color: #00ff66; border: 1px solid rgba(0,255,102,0.4); border-radius: 6px; padding: 8px 16px; font-weight: bold;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnExecuteDirect">
+                    <property name="text">
+                     <string>⚡ Execute Instantly</string>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #00ff66, stop:1 #00cc52); color: #040608; border-radius: 6px; padding: 8px 16px; font-weight: bold;</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+
+         </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+
+    <!-- Bottom Status Bar -->
+    <item>
+     <widget class="QWidget" name="statusBar" native="true">
+      <layout class="QHBoxLayout" name="statusLayout">
+       <property name="leftMargin">
+        <number>12</number>
+       </property>
+       <property name="rightMargin">
+        <number>12</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="lblStatusDot">
+         <property name="text">
+          <string>● [Ready]</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: #00ff66; font-weight: bold;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblPlan">
+         <property name="text">
+          <string>Free Plan</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: #8b9bb0;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="statusSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+         <widget class="QLabel" name="lblRuntimeSpec">
+          <property name="text">
+           <string>Voltro Luau Runtime (v1.5.0)</string>
+          </property>
+         <property name="styleSheet">
+          <string notr="true">color: #8b9bb0; font-family: 'JetBrains Mono';</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

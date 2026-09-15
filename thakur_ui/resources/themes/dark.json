@@ -1,0 +1,22 @@
+{
+  "name": "Dark",
+  "id": "dark",
+  "colors": {
+    "background":  "
+    "background2": "
+    "card":        "
+    "border":      "
+    "foreground":  "
+    "foreground2": "
+    "muted":       "
+    "accent":      "
+    "accent2":     "
+    "accent3":     "
+    "ok":          "
+    "error":       "
+    "warning":     "
+    "info":        "
+  },
+  "glitched": false,
+  "animated": false
+}

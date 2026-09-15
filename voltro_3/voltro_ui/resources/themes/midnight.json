@@ -1,0 +1,22 @@
+{
+  "name": "Midnight",
+  "id": "midnight",
+  "colors": {
+    "background":  "#020208",
+    "background2": "#06040f",
+    "card":        "#0a0818",
+    "border":      "#1a1230",
+    "foreground":  "#e2dff8",
+    "foreground2": "#c4bfee",
+    "muted":       "#7a72a8",
+    "accent":      "#8b5cf6",
+    "accent2":     "#7c3aed",
+    "accent3":     "#a78bfa",
+    "ok":          "#34d399",
+    "error":       "#f87171",
+    "warning":     "#fbbf24",
+    "info":        "#38bdf8"
+  },
+  "glitched": false,
+  "animated": false
+}

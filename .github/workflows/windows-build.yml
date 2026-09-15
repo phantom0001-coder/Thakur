@@ -1,0 +1,153 @@
+﻿name: Voltro Windows Build
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build (Windows / Qt6 / MSVC)
+    runs-on: windows-latest
+
+    env:
+      BUILD_DIR: ${{ github.workspace }}/build
+      BIN_DIR:   ${{ github.workspace }}/build/bin
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # ── 2. Install Qt6 ───────────────────────────────────────────────────
+      - name: Install Qt6
+        uses: jurplel/install-qt-action@v3
+        with:
+          version:   '6.6.0'
+          host:      'windows'
+          target:    'desktop'
+          arch:      'win64_msvc2019_64'
+          modules:   'qtwebengine qtmultimedia'
+          cache:     true
+          cache-key-prefix: 'qt6-6.6.0-msvc2019_64'
+
+      # ── 3. Install Ninja ─────────────────────────────────────────────────
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v4
+
+      # ── 4. Set up MSVC Developer Environment ─────────────────────────────
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      # ── 5. Cache CMake build ──────────────────────────────────────────────
+      - name: Cache CMake build artifacts
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.BUILD_DIR }}
+          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'voltro_ui/src/**') }}
+          restore-keys: |
+            ${{ runner.os }}-cmake-
+
+      # ── 6. Configure CMake ────────────────────────────────────────────────
+      - name: Configure CMake
+        run: |
+          cmake -S . -B "${{ env.BUILD_DIR }}" `
+            -G Ninja `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}/../../../" `
+            -DCMAKE_RUNTIME_OUTPUT_DIRECTORY="${{ env.BIN_DIR }}"
+
+      # ── 7. Build ──────────────────────────────────────────────────────────
+      - name: Build
+        run: cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
+
+      # ── 8. Run windeployqt ────────────────────────────────────────────────
+      - name: Deploy Qt dependencies
+        run: |
+          $qtBin = "${{ env.Qt6_DIR }}\..\..\..\bin"
+          $deploy = Get-ChildItem -Path $qtBin -Filter "windeployqt*.exe" | Select-Object -First 1
+          if ($deploy) {
+            & $deploy.FullName `
+              --no-translations `
+              --no-system-d3d-compiler `
+              --no-opengl-sw `
+              --compiler-runtime `
+              "${{ env.BIN_DIR }}\voltro.exe"
+            Write-Host "windeployqt completed successfully."
+          } else {
+            Write-Warning "windeployqt not found in $qtBin"
+          }
+        shell: pwsh
+
+      # ── 9. Run Tests (if any) ─────────────────────────────────────────────
+      - name: Run tests
+        if: ${{ hashFiles('tests/CMakeLists.txt') != '' }}
+        working-directory: ${{ env.BUILD_DIR }}
+        run: ctest --output-on-failure -C Release
+
+      # ── 10. Collect artifact files ────────────────────────────────────────
+      - name: Collect deployment artifacts
+        run: |
+          $binDir = "${{ env.BIN_DIR }}"
+          $artifactDir = "${{ github.workspace }}/artifact"
+          New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
+          # Copy exe
+          if (Test-Path "$binDir\voltro.exe") {
+            Copy-Item "$binDir\voltro.exe" $artifactDir
+          }
+          # Copy all DLLs and supporting files deployed by windeployqt
+          Get-ChildItem -Path $binDir -Recurse |
+            Where-Object { $_.Extension -in @('.dll','.exe','.qm','.json','.pak') -or $_.PSIsContainer } |
+            ForEach-Object {
+              $dest = $_.FullName.Replace($binDir, $artifactDir)
+              if ($_.PSIsContainer) {
+                New-Item -ItemType Directory -Force -Path $dest | Out-Null
+              } else {
+                $destDir = Split-Path $dest -Parent
+                New-Item -ItemType Directory -Force -Path $destDir | Out-Null
+                Copy-Item $_.FullName $dest -Force
+              }
+            }
+          Write-Host "Artifact contents:"
+          Get-ChildItem -Path $artifactDir -Recurse | Select-Object -ExpandProperty Name
+        shell: pwsh
+
+      # ── 11. Upload artifact ───────────────────────────────────────────────
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltro-windows-${{ github.run_number }}
+          path: ${{ github.workspace }}/artifact/
+          if-no-files-found: error
+          retention-days: 30
+
+      # ── 12. Summary ───────────────────────────────────────────────────────
+      - name: Build summary
+        if: always()
+        run: |
+          echo "## Voltro Build Summary" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $env:GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Runner   | windows-latest |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Qt       | 6.6.0 (msvc2019_64) |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Config   | Release |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Commit   | ${{ github.sha }} |" >> $env:GITHUB_STEP_SUMMARY
+          $exeSize = ""
+          $exePath = "${{ env.BIN_DIR }}\voltro.exe"
+          if (Test-Path $exePath) {
+            $size = (Get-Item $exePath).Length
+            $sizeMb = [math]::Round($size / 1MB, 2)
+            $exeSize = "$sizeMb MB"
+          }
+          echo "| Exe Size | $exeSize |" >> $env:GITHUB_STEP_SUMMARY
+        shell: pwsh

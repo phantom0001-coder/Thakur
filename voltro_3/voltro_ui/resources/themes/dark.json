@@ -1,0 +1,22 @@
+{
+  "name": "Dark",
+  "id": "dark",
+  "colors": {
+    "background":  "#07090c",
+    "background2": "#0c1016",
+    "card":        "#10151c",
+    "border":      "#1e2836",
+    "foreground":  "#e8eef4",
+    "foreground2": "#c8d0dc",
+    "muted":       "#8b9bb0",
+    "accent":      "#00ff66",
+    "accent2":     "#00cc52",
+    "accent3":     "#39ff14",
+    "ok":          "#00ff66",
+    "error":       "#ff3b5c",
+    "warning":     "#ffb800",
+    "info":        "#00e5ff"
+  },
+  "glitched": false,
+  "animated": false
+}

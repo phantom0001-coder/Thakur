@@ -1,0 +1,629 @@
+// ============================================================
+//  Updater.cpp  -  Voltro Executor  (Phase 6)
+// ============================================================
+
+#include "Updater.h"
+
+#include <QCoreApplication>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
+#include <QFileInfo>
+#include <QDir>
+#include <QProcess>
+#include <QStandardPaths>
+#include <QSettings>
+#include <QCryptographicHash>
+#include <QDateTime>
+#include <QDebug>
+#include <QDirIterator>
+#include <QTimer>
+#include <QUrl>
+#include <QSaveFile>
+
+namespace {
+
+// ----------------------------------------------------------------
+// Endpoints
+// ----------------------------------------------------------------
+constexpr const char* kPrivateVersionUrl =
+    "https://api.voltro.gg/v1/version";
+
+constexpr const char* kGitHubReleasesUrl =
+    "https://api.github.com/repos/voltro-executor/voltro/releases/latest";
+
+constexpr const char* kUserAgent = "VoltroExecutor/1.5.0";
+
+// QSettings keys for offline version caching
+constexpr const char* kOrg         = "Voltro";
+constexpr const char* kApp         = "VoltroExecutor";
+constexpr const char* kLastVersion = "updater/lastKnownVersion";
+
+// ----------------------------------------------------------------
+// Semantic version comparison helper
+// ----------------------------------------------------------------
+QList<int> parseSemVer(const QString& v)
+{
+    // Strip leading 'v'
+    QString s = v;
+    if (s.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
+        s = s.mid(1);
+
+    QList<int> parts;
+    const QStringList tokens = s.split(QLatin1Char('.'));
+    for (const QString& t : tokens) {
+        bool ok = false;
+        const int n = t.toInt(&ok);
+        parts.append(ok ? n : 0);
+    }
+    // Normalise to at least 3 components
+    while (parts.size() < 3) parts.append(0);
+    return parts;
+}
+
+} // anonymous namespace
+
+// ================================================================
+// Singleton
+// ================================================================
+
+namespace Voltro {
+
+Updater& Updater::instance()
+{
+    static Updater s_instance;
+    return s_instance;
+}
+
+// ----------------------------------------------------------------
+// Constructor
+// ----------------------------------------------------------------
+Updater::Updater(QObject* parent)
+    : QObject(parent)
+    , m_nam(new QNetworkAccessManager(this))
+{
+    qRegisterMetaType<Voltro::ReleaseInfo>("Voltro::ReleaseInfo");
+}
+
+// ================================================================
+// Public API
+// ================================================================
+
+QString Updater::currentVersion() const
+{
+    return QCoreApplication::applicationVersion();
+}
+
+bool Updater::compareVersions(const QString& a, const QString& b) const
+{
+    // Returns true if a < b  (a is older)
+    const QList<int> va = parseSemVer(a);
+    const QList<int> vb = parseSemVer(b);
+
+    const int len = qMax(va.size(), vb.size());
+    for (int i = 0; i < len; ++i) {
+        const int ia = (i < va.size()) ? va[i] : 0;
+        const int ib = (i < vb.size()) ? vb[i] : 0;
+        if (ia < ib) return true;
+        if (ia > ib) return false;
+    }
+    return false; // equal
+}
+
+bool Updater::isUpdateAvailable() const
+{
+    return m_updateAvailable;
+}
+
+const ReleaseInfo& Updater::latestRelease() const
+{
+    return m_latest;
+}
+
+// ================================================================
+// checkForUpdates  -  try private server first, fall back to GitHub
+// ================================================================
+
+void Updater::checkForUpdates()
+{
+    qInfo() << "[Updater] Checking for updates. Current version:"
+            << currentVersion();
+
+    QNetworkRequest req((QUrl(QLatin1String(kPrivateVersionUrl))));
+    req.setRawHeader("User-Agent", kUserAgent);
+    req.setRawHeader("Accept",     "application/json");
+    req.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                     QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    QNetworkReply* reply = m_nam->get(req);
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        onPrivateVersionReply(reply);
+    });
+}
+
+// ----------------------------------------------------------------
+// onPrivateVersionReply
+// ----------------------------------------------------------------
+void Updater::onPrivateVersionReply(QNetworkReply* reply)
+{
+    reply->deleteLater();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning() << "[Updater] Private server unavailable:"
+                   << reply->errorString()
+                   << "– falling back to GitHub.";
+        // Fall back to GitHub
+        QNetworkRequest req((QUrl(QLatin1String(kGitHubReleasesUrl))));
+        req.setRawHeader("User-Agent", kUserAgent);
+        req.setRawHeader("Accept",     "application/vnd.github+json");
+        req.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                         QNetworkRequest::NoLessSafeRedirectPolicy);
+
+        QNetworkReply* ghReply = m_nam->get(req);
+        connect(ghReply, &QNetworkReply::finished, this, [this, ghReply]() {
+            onGitHubReply(ghReply);
+        });
+        return;
+    }
+
+    const QByteArray data = reply->readAll();
+    QJsonParseError pe;
+    const QJsonDocument doc = QJsonDocument::fromJson(data, &pe);
+
+    if (pe.error != QJsonParseError::NoError || !doc.isObject()) {
+        qWarning() << "[Updater] Private server returned invalid JSON – "
+                      "falling back to GitHub.";
+        QNetworkRequest req((QUrl(QLatin1String(kGitHubReleasesUrl))));
+        req.setRawHeader("User-Agent", kUserAgent);
+        req.setRawHeader("Accept",     "application/vnd.github+json");
+        req.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                         QNetworkRequest::NoLessSafeRedirectPolicy);
+
+        QNetworkReply* ghReply = m_nam->get(req);
+        connect(ghReply, &QNetworkReply::finished, this, [this, ghReply]() {
+            onGitHubReply(ghReply);
+        });
+        return;
+    }
+
+    // Private server response format:
+    // { "version": "1.5.2", "tag": "v1.5.2",
+    //   "download_url": "...", "sha256": "...",
+    //   "changelog": "...", "prerelease": false }
+    const QJsonObject obj = doc.object();
+
+    ReleaseInfo info;
+    info.version    = obj.value(QStringLiteral("version")).toString();
+    info.tagName    = obj.value(QStringLiteral("tag")).toString(
+                          QStringLiteral("v") + info.version);
+    info.downloadUrl= obj.value(QStringLiteral("download_url")).toString();
+    info.sha256     = obj.value(QStringLiteral("sha256")).toString();
+    info.changelog  = obj.value(QStringLiteral("changelog")).toString();
+    info.isPrerelease = obj.value(QStringLiteral("prerelease")).toBool(false);
+
+    const QString pubStr =
+        obj.value(QStringLiteral("published_at")).toString();
+    info.publishedAt = QDateTime::fromString(pubStr, Qt::ISODate);
+
+    if (info.version.isEmpty()) {
+        qWarning() << "[Updater] Private server returned empty version.";
+        // Fall back to GitHub
+        QNetworkRequest req2((QUrl(QLatin1String(kGitHubReleasesUrl))));
+        req2.setRawHeader("User-Agent", kUserAgent);
+        req2.setRawHeader("Accept",     "application/vnd.github+json");
+        req2.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                          QNetworkRequest::NoLessSafeRedirectPolicy);
+        QNetworkReply* ghReply = m_nam->get(req2);
+        connect(ghReply, &QNetworkReply::finished, this, [this, ghReply]() {
+            onGitHubReply(ghReply);
+        });
+        return;
+    }
+
+    // Cache version for offline comparison
+    QSettings s((QLatin1String(kOrg)), (QLatin1String(kApp)));
+    s.setValue(QLatin1String(kLastVersion), info.version);
+
+    if (compareVersions(currentVersion(), info.version)) {
+        m_latest          = info;
+        m_updateAvailable = true;
+        qInfo() << "[Updater] Update available (private):"
+                << info.version;
+        emit updateAvailable(m_latest);
+    } else {
+        m_updateAvailable = false;
+        qInfo() << "[Updater] Already up-to-date (private check).";
+        emit noUpdateAvailable();
+    }
+}
+
+// ----------------------------------------------------------------
+// onGitHubReply
+// ----------------------------------------------------------------
+void Updater::onGitHubReply(QNetworkReply* reply)
+{
+    reply->deleteLater();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        const QString err = reply->errorString();
+        qWarning() << "[Updater] GitHub API error:" << err;
+        emit updateError(QStringLiteral("Failed to reach update server: ") + err);
+        return;
+    }
+
+    const QByteArray data = reply->readAll();
+    const ReleaseInfo info = parseGitHubRelease(data);
+
+    if (info.version.isEmpty()) {
+        emit updateError(QStringLiteral("Could not parse GitHub release data."));
+        return;
+    }
+
+    // Cache for offline
+    QSettings s((QLatin1String(kOrg)), (QLatin1String(kApp)));
+    s.setValue(QLatin1String(kLastVersion), info.version);
+
+    if (compareVersions(currentVersion(), info.version)) {
+        m_latest          = info;
+        m_updateAvailable = true;
+        qInfo() << "[Updater] Update available (GitHub):" << info.version;
+        emit updateAvailable(m_latest);
+    } else {
+        m_updateAvailable = false;
+        qInfo() << "[Updater] Already up-to-date (GitHub check).";
+        emit noUpdateAvailable();
+    }
+}
+
+// ----------------------------------------------------------------
+// parseGitHubRelease
+// ----------------------------------------------------------------
+ReleaseInfo Updater::parseGitHubRelease(const QByteArray& json) const
+{
+    ReleaseInfo info;
+
+    QJsonParseError pe;
+    const QJsonDocument doc = QJsonDocument::fromJson(json, &pe);
+    if (pe.error != QJsonParseError::NoError || !doc.isObject())
+        return info;
+
+    const QJsonObject obj = doc.object();
+    info.tagName      = obj.value(QStringLiteral("tag_name")).toString();
+    info.changelog    = obj.value(QStringLiteral("body")).toString();
+    info.isPrerelease = obj.value(QStringLiteral("prerelease")).toBool(false);
+
+    // Strip leading 'v' for numeric version
+    info.version = info.tagName;
+    if (info.version.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
+        info.version = info.version.mid(1);
+
+    const QString pubStr =
+        obj.value(QStringLiteral("published_at")).toString();
+    info.publishedAt = QDateTime::fromString(pubStr, Qt::ISODate);
+
+    // Find the first zip asset
+    const QJsonArray assets = obj.value(QStringLiteral("assets")).toArray();
+    for (const QJsonValue& v : assets) {
+        const QJsonObject asset = v.toObject();
+        const QString name = asset.value(QStringLiteral("name")).toString();
+        if (name.endsWith(QLatin1String(".zip"), Qt::CaseInsensitive)) {
+            info.downloadUrl =
+                asset.value(QStringLiteral("browser_download_url")).toString();
+            // sha256 may be in a separate metadata field if the server adds it
+            info.sha256 =
+                asset.value(QStringLiteral("sha256")).toString();
+            break;
+        }
+    }
+
+    // If no zip found, fall back to zipball
+    if (info.downloadUrl.isEmpty())
+        info.downloadUrl =
+            obj.value(QStringLiteral("zipball_url")).toString();
+
+    return info;
+}
+
+// ================================================================
+// downloadUpdate
+// ================================================================
+
+void Updater::downloadUpdate(const ReleaseInfo& release)
+{
+    if (release.downloadUrl.isEmpty()) {
+        emit updateError(QStringLiteral("No download URL available for this release."));
+        return;
+    }
+
+    const QString tempDir =
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    m_downloadPath = tempDir + QStringLiteral("/voltro_update.zip");
+
+    // Remove any stale previous download
+    if (QFile::exists(m_downloadPath))
+        QFile::remove(m_downloadPath);
+
+    qInfo() << "[Updater] Downloading update from" << release.downloadUrl
+            << "-> " << m_downloadPath;
+
+    QNetworkRequest req((QUrl(release.downloadUrl)));
+    req.setRawHeader("User-Agent", kUserAgent);
+    req.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                     QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    QNetworkReply* reply = m_nam->get(req);
+
+    // Open output file
+    QFile* outFile = new QFile(m_downloadPath, reply); // parented to reply
+    if (!outFile->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        emit updateError(
+            QStringLiteral("Cannot open temp file for writing: ") +
+            m_downloadPath);
+        reply->abort();
+        reply->deleteLater();
+        return;
+    }
+
+    connect(reply, &QNetworkReply::readyRead, this, [reply, outFile]() {
+        outFile->write(reply->readAll());
+    });
+
+    connect(reply, &QNetworkReply::downloadProgress,
+            this, [this](qint64 received, qint64 total) {
+        emit downloadProgress(received, total);
+    });
+
+    const QString expectedSha = release.sha256;
+    connect(reply, &QNetworkReply::finished, this,
+            [this, reply, outFile, expectedSha]() {
+        outFile->flush();
+        outFile->close();
+        reply->deleteLater();
+
+        if (reply->error() != QNetworkReply::NoError) {
+            emit updateError(
+                QStringLiteral("Download failed: ") + reply->errorString());
+            QFile::remove(m_downloadPath);
+            return;
+        }
+
+        qInfo() << "[Updater] Download complete:" << m_downloadPath;
+
+        // Verify checksum if one was provided
+        if (!expectedSha.isEmpty()) {
+            if (!verifyChecksum(m_downloadPath, expectedSha)) {
+                // verifyChecksum already emitted updateError
+                QFile::remove(m_downloadPath);
+                return;
+            }
+        }
+
+        emit downloadComplete(m_downloadPath);
+    });
+}
+
+// ================================================================
+// verifyChecksum
+// ================================================================
+
+bool Updater::verifyChecksum(const QString& filePath, const QString& expected)
+{
+    QFile f(filePath);
+    if (!f.open(QIODevice::ReadOnly)) {
+        emit updateError(
+            QStringLiteral("Cannot open file for checksum verification: ") +
+            filePath);
+        return false;
+    }
+
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    if (!hash.addData(&f)) {
+        emit updateError(QStringLiteral("Failed to read file for checksum."));
+        return false;
+    }
+    f.close();
+
+    const QString computed =
+        QString::fromLatin1(hash.result().toHex()).toLower();
+    const QString exp      = expected.trimmed().toLower();
+
+    if (computed != exp) {
+        qCritical() << "[Updater] Checksum mismatch!"
+                    << "\n  Expected: " << exp
+                    << "\n  Computed: " << computed;
+        emit updateError(
+            QStringLiteral("Checksum mismatch – update package may be corrupt."));
+        return false;
+    }
+
+    qInfo() << "[Updater] Checksum verified OK:" << computed;
+    return true;
+}
+
+// ================================================================
+// extractAndReplace
+// ================================================================
+
+void Updater::extractAndReplace(const QString& zipPath)
+{
+    const QString exePath = QCoreApplication::applicationFilePath();
+    const QFileInfo exeInfo(exePath);
+    const QString exeDir   = exeInfo.absolutePath();
+    const QString exeName  = exeInfo.fileName();
+    const QString backupPath = exeDir + QStringLiteral("/voltro_backup.exe");
+
+    // 1. Remove stale backup
+    if (QFile::exists(backupPath))
+        QFile::remove(backupPath);
+
+    // 2. Backup current executable
+    if (!QFile::copy(exePath, backupPath)) {
+        emit updateError(
+            QStringLiteral("Failed to create backup of current executable."));
+        return;
+    }
+    qInfo() << "[Updater] Backup created:" << backupPath;
+
+    // 3. Extract zip using PowerShell Expand-Archive
+    //    Extract to a temp folder, then move the exe into exeDir
+    const QString extractDir =
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+        QStringLiteral("/voltro_extracted");
+
+    // Clean previous extraction
+    QDir(extractDir).removeRecursively();
+
+    QProcess psProc;
+    psProc.setProgram(QStringLiteral("powershell.exe"));
+    psProc.setArguments({
+        QStringLiteral("-NoProfile"),
+        QStringLiteral("-NonInteractive"),
+        QStringLiteral("-Command"),
+        QString(QStringLiteral(
+            "Expand-Archive -Force -LiteralPath '%1' -DestinationPath '%2'"))
+            .arg(zipPath, extractDir)
+    });
+
+    psProc.start();
+    if (!psProc.waitForFinished(60000)) { // 60-second timeout
+        psProc.kill();
+        // Restore backup
+        QFile::copy(backupPath, exePath);
+        emit updateError(QStringLiteral("Extraction timed out."));
+        return;
+    }
+
+    if (psProc.exitCode() != 0) {
+        const QString psErr =
+            QString::fromLocal8Bit(psProc.readAllStandardError());
+        qCritical() << "[Updater] Expand-Archive failed:" << psErr;
+        // Restore backup
+        QFile::copy(backupPath, exePath);
+        emit updateError(
+            QStringLiteral("Extraction failed: ") + psErr);
+        return;
+    }
+
+    // 4. Find the new exe in the extracted directory
+    //    Walk the extracted tree looking for exeName (case-insensitive)
+    QString newExePath;
+    QDirIterator it(extractDir,
+                    QStringList{exeName},
+                    QDir::Files,
+                    QDirIterator::Subdirectories);
+    if (it.hasNext())
+        newExePath = it.next();
+
+    if (newExePath.isEmpty()) {
+        // Fall back: try any .exe
+        QDirIterator it2(extractDir,
+                         QStringList{QStringLiteral("*.exe")},
+                         QDir::Files,
+                         QDirIterator::Subdirectories);
+        if (it2.hasNext())
+            newExePath = it2.next();
+    }
+
+    if (newExePath.isEmpty()) {
+        qCritical() << "[Updater] New executable not found in extracted archive.";
+        QFile::copy(backupPath, exePath);
+        emit updateError(
+            QStringLiteral("New executable not found in the update archive."));
+        return;
+    }
+
+    // 5. Replace the running executable
+    //    On Windows we cannot overwrite a running exe directly.
+    //    Schedule via MoveFileExW with MOVEFILE_DELAY_UNTIL_REBOOT as
+    //    a last resort, but prefer a detached helper script.
+
+    // Write a small PowerShell helper that waits for the current process
+    // to exit, replaces the binary, and re-launches.
+    const QString helperScript =
+        QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
+        QStringLiteral("/voltro_updater_helper.ps1");
+
+    const QString scriptContent = QString(
+        QStringLiteral(
+            "$pid_to_wait = %1\n"
+            "$maxWait = 30\n"
+            "for ($i = 0; $i -lt $maxWait; $i++) {\n"
+            "    $proc = Get-Process -Id $pid_to_wait -ErrorAction SilentlyContinue\n"
+            "    if (-not $proc) { break }\n"
+            "    Start-Sleep -Seconds 1\n"
+            "}\n"
+            "Copy-Item -Force -LiteralPath '%2' -Destination '%3'\n"
+            "Start-Process -FilePath '%3'\n"
+        ))
+        .arg(QCoreApplication::applicationPid())
+        .arg(newExePath, exePath);
+
+    {
+        QFile hf(helperScript);
+        if (!hf.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QFile::copy(backupPath, exePath);
+            emit updateError(
+                QStringLiteral("Failed to write updater helper script."));
+            return;
+        }
+        hf.write(scriptContent.toUtf8());
+        hf.close();
+    }
+
+    qInfo() << "[Updater] Replacement scheduled via helper script:" << helperScript;
+    qInfo() << "[Updater] New exe source:" << newExePath;
+
+    // Store download path for applyUpdate()
+    m_downloadPath = helperScript; // re-use field to pass script path
+}
+
+// ================================================================
+// applyUpdate
+// ================================================================
+
+void Updater::applyUpdate()
+{
+    if (m_downloadPath.isEmpty()) {
+        emit updateError(QStringLiteral(
+            "No update package ready. Call downloadUpdate() first."));
+        return;
+    }
+
+    // If m_downloadPath is still the zip, run extractAndReplace first
+    if (m_downloadPath.endsWith(QLatin1String(".zip"), Qt::CaseInsensitive)) {
+        extractAndReplace(m_downloadPath);
+        // After extractAndReplace, m_downloadPath is now the helper script
+        if (m_downloadPath.endsWith(QLatin1String(".zip"))) {
+            // extractAndReplace emitted the error itself
+            return;
+        }
+    }
+
+    // m_downloadPath is now the PowerShell helper script path
+    const bool launched = QProcess::startDetached(
+        QStringLiteral("powershell.exe"),
+        {
+            QStringLiteral("-NoProfile"),
+            QStringLiteral("-NonInteractive"),
+            QStringLiteral("-WindowStyle"), QStringLiteral("Hidden"),
+            QStringLiteral("-File"), m_downloadPath
+        });
+
+    if (!launched) {
+        emit updateError(QStringLiteral("Failed to launch updater helper process."));
+        return;
+    }
+
+    qInfo() << "[Updater] Helper launched. Exiting application for update.";
+    emit updateApplied();
+
+    // Give signal delivery a moment then exit
+    QTimer::singleShot(500, qApp, []() {
+        QCoreApplication::exit(0);
+    });
+}
+
+} // namespace Voltro

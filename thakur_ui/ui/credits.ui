@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CreditsDialog</class>
+ <widget class="QDialog" name="CreditsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>680</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>THAKUR Credits</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QDialog { background-color: 
+    QLabel
+    QLabel
+    QFrame.card { background-color: 
+    QPushButton { background-color: rgba(0,255,102,0.1); border: 1px solid rgba(0,255,102,0.3); color: 
+    QPushButton:hover { background-color: rgba(0,255,102,0.2); }
+   </string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QLabel" name="lblTitle">
+     <property name="text">
+      <string>THAKUR EXECUTOR</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblSubtitle">
+     <property name="text">
+      <string>Powered by Thakur Luau Engine • Owned by PixelBeatzz</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frameCredits">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="className" stdset="0">
+      <string>card</string>
+     </property>
+     <layout class="QVBoxLayout" name="creditsListLayout">
+      <item>
+       <widget class="QLabel" name="lblOwner">
+        <property name="text">
+         <string>&lt;b&gt;Owner &amp; Architect:&lt;/b&gt; PixelBeatzz</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblEngine">
+        <property name="text">
+         <string>&lt;b&gt;Runtime Environment:&lt;/b&gt; Thakur Luau Execution Engine</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblDiscord">
+        <property name="text">
+         <string>&lt;b&gt;Discord Community:&lt;/b&gt; https:
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblVersion">
+        <property name="text">
+         <string>&lt;b&gt;Release:&lt;/b&gt; v1.5.0 Beta</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="btnLayout">
+     <item>
+      <spacer name="spacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

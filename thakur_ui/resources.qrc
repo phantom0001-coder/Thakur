@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        
+        <file>resources/images/thakur_logo.png</file>
+
+        
+        <file>resources/themes/dark.json</file>
+        <file>resources/themes/midnight.json</file>
+        <file>resources/themes/glitched.json</file>
+        <file>resources/themes/custom.json</file>
+    </qresource>
+</RCC>

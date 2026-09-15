@@ -1,0 +1,29 @@
+{
+	"BUILD_DIR" : "C:/Users/Administrator/Desktop/voltro/voltro_3/build/voltro3_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/Administrator/Desktop/voltro/voltro_3/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/Administrator/Desktop/voltro/voltro_3/build",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/Administrator/Desktop/voltro/voltro_3",
+	"CMAKE_SOURCE_DIR" : "C:/Users/Administrator/Desktop/voltro/voltro_3",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/Users/Administrator/Desktop/voltro/voltro_3/build/voltro3_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/Users/Administrator/Desktop/voltro/voltro_3/voltro_ui/resources/images/voltro_logo.png",
+		"C:/Users/Administrator/Desktop/voltro/voltro_3/voltro_ui/resources/themes/glitched.json",
+		"C:/Users/Administrator/Desktop/voltro/voltro_3/voltro_ui/resources/themes/custom.json",
+		"C:/Users/Administrator/Desktop/voltro/voltro_3/voltro_ui/resources/themes/dark.json",
+		"C:/Users/Administrator/Desktop/voltro/voltro_3/voltro_ui/resources/themes/midnight.json"
+	],
+	"LOCK_FILE" : "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/voltro3_autogen.dir/AutoRcc_resources_HFXKN6TOLN_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "HFXKN6TOLN",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.4.3/msvc2019_64/./bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/voltro3_autogen.dir/AutoRcc_resources_HFXKN6TOLN_Used.txt",
+	"SOURCE" : "C:/Users/Administrator/Desktop/voltro/voltro_3/voltro_ui/resources.qrc",
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}

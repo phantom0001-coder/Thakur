@@ -1,0 +1,28 @@
+{
+  "name": "Glitched",
+  "id": "glitched",
+  "colors": {
+    "background":  "
+    "background2": "
+    "card":        "
+    "border":      "
+    "foreground":  "
+    "foreground2": "
+    "muted":       "
+    "accent":      "
+    "accent2":     "
+    "accent3":     "
+    "ok":          "
+    "error":       "
+    "warning":     "
+    "info":        "
+  },
+  "glitched": true,
+  "animated": true,
+  "glitchIntensity": 70,
+  "scanLines": true,
+  "titleFlicker": true,
+  "animatedBorders": true,
+  "glitchIntervalMs": 3000,
+  "glitchDurationMs": 150
+}

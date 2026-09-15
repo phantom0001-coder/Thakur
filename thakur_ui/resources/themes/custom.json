@@ -1,0 +1,67 @@
+{
+  "_comment": "Thakur Executor – Custom Theme Template",
+  "_instructions": [
+    "Copy this file, rename it, and replace the values below.",
+    "All color values must be valid hex strings: '
+    "Set 'glitched' and 'animated' to true to enable visual effects.",
+    "Load custom themes at runtime via ThemeManager::instance().addCustomTheme()."
+  ],
+
+  "name": "My Theme",
+  "id": "custom",
+
+  "colors": {
+    "_comment_bg":    "Main window / root background",
+    "background":     "
+
+    "_comment_bg2":   "Secondary / panel background",
+    "background2":    "
+
+    "_comment_card":  "Card / widget surface background",
+    "card":           "
+
+    "_comment_border":"Dividers, separators, outlines",
+    "border":         "
+
+    "_comment_fg":    "Primary text color",
+    "foreground":     "
+
+    "_comment_fg2":   "Secondary / label text color",
+    "foreground2":    "
+
+    "_comment_muted": "Placeholder / de-emphasized text",
+    "muted":          "
+
+    "_comment_acc":   "Primary accent / interactive highlight",
+    "accent":         "
+
+    "_comment_acc2":  "Darker accent (hover states)",
+    "accent2":        "
+
+    "_comment_acc3":  "Lighter accent (active / pressed states)",
+    "accent3":        "
+
+    "_comment_ok":    "Success / OK indicator",
+    "ok":             "
+
+    "_comment_err":   "Error / danger indicator",
+    "error":          "
+
+    "_comment_warn":  "Warning indicator",
+    "warning":        "
+
+    "_comment_info":  "Informational / cyan indicator",
+    "info":           "
+  },
+
+  "glitched": false,
+  "animated": false,
+
+  "_comment_effects": "The following fields are only used when 'glitched' or 'animated' are true.",
+  "glitchIntensity":  50,
+  "scanLines":        false,
+  "titleFlicker":     false,
+  "animatedBorders":  false,
+  "glitchIntervalMs": 4000,
+  "glitchDurationMs": 120
+}

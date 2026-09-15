@@ -1,0 +1,101 @@
+{
+  "version": "2026.09",
+  "description": "Thakur pattern scanner with extended fallbacks for current Roblox builds",
+  "patterns": {
+    "lua_State": {
+      "pattern": "48 8D 05 ? ? ? ? 48 8B D9 48 8B 00",
+      "offset": 0,
+      "type": "pointer",
+      "description": "Primary lua_State pointer (RIP-relative load)"
+    },
+    "luaL_dostring": {
+      "pattern": "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B F9",
+      "offset": 0,
+      "type": "function",
+      "description": "luaL_dostring entry (move args + setup)"
+    },
+    "lua_print": {
+      "pattern": "40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 48 8B 4B",
+      "offset": 0,
+      "type": "function",
+      "description": "Roblox print hook (push + alloc stack)"
+    },
+    "lua_warn": {
+      "pattern": "48 89 5C 24 ? 55 56 57 48 83 EC 30 48 8B EA",
+      "offset": 0,
+      "type": "function",
+      "description": "Roblox warn hook"
+    },
+    "task_scheduler": {
+      "pattern": "48 8B 0D ? ? ? ? 48 85 C9 74 ? 48 8B 01 FF 50",
+      "offset": 0,
+      "type": "pointer",
+      "description": "TaskScheduler pointer (mov + test + jz + mov + call)"
+    },
+    "identity_check": {
+      "pattern": "80 78 14 ? 7C ? 41 B8 ? ? ? ?",
+      "offset": 0,
+      "type": "function",
+      "description": "Identity/permission verification"
+    }
+  },
+  "fallback_patterns": {
+    "lua_State": [
+      "48 8D 05 ? ? ? ? 33 FF 48 8B D9",
+      "4C 8D 05 ? ? ? ? 4C 8B D9",
+      "48 8B 05 ? ? ? ? 48 89 44",
+      "4C 8B 05 ? ? ? ? 49 8B",
+      "48 8B 0D ? ? ? ? 48 89"
+    ],
+    "luaL_dostring": [
+      "48 89 4C 24 ? 55 53 56 57 41 54",
+      "48 89 5C 24 ? 48 89 74 24 ?",
+      "55 48 8B EC 48 83 EC 20",
+      "57 48 83 EC 20 48 8B F9"
+    ],
+    "lua_print": [
+      "40 53 48 83 EC 20 48 8B D9",
+      "55 48 8B EC 48 83 EC 30"
+    ],
+    "lua_warn": [
+      "48 89 5C 24 ? 55 56 57 48 83 EC 30"
+    ],
+    "task_scheduler": [
+      "48 8B 0D ? ? ? ? 48 85 C9",
+      "48 85 C9 74 ? 48 8B 01",
+      "48 8B 0D ? ? ? ? FF 50",
+      "48 8D 05 ? ? ? ? 48 8B D9"
+    ],
+    "identity_check": [
+      "80 78 14 ? 7C ? 41 B8",
+      "41 B8 ? ? ? ? 7C ? 80 78"
+    ]
+  },
+  "scan_settings": {
+    "max_scan_size": 33554432,
+    "page_validation": true,
+    "seh_guard": true,
+    "timeout_seconds": 10
+  },
+  "blocked_functions": [
+    "game:Shutdown",
+    "ffi.load",
+    "os.execute",
+    "io.open",
+    "debug.sethook",
+    "require"
+  ],
+  "safe_functions": [
+    "print",
+    "warn",
+    "error",
+    "tostring",
+    "tonumber",
+    "game.Players",
+    "game.Workspace",
+    "game:GetService",
+    "Instance.new",
+    "workspace",
+    "script"
+  ]
+}
