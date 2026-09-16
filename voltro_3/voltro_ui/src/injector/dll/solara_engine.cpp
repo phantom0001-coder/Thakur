@@ -158,6 +158,11 @@ void SolaraExecutionEngine::shutdown() {
 bool SolaraExecutionEngine::queueScript(const std::string& script) {
     if (script.empty()) return false;
 
+    // Lazy initialization: hook TaskScheduler on first script execution, not on DLL load
+    if (!m_hooked.load()) {
+        initialize();
+    }
+
     std::lock_guard<std::mutex> lock(m_queueMutex);
     m_scriptQueue.push(script);
     FramedIpcBridge::instance().sendOutput("[VOLTRO ENGINE] Enqueued script (" + std::to_string(script.length()) + " bytes) into Roblox TaskScheduler step cycle.", "info");

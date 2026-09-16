@@ -34,3 +34,11 @@
 2824	39789	8111728418631859	CMakeFiles/voltro3.dir/voltro_ui/src/mainwindow.cpp.obj	7d6da1c8dba5614e
 26237	40311	8111728652763889	CMakeFiles/voltro3.dir/voltro_ui/src/injector/VoltroInjector.cpp.obj	9f08d219157f20e8
 40311	42541	8111728793507142	bin/voltro3.exe	66a385f17806345f
+313	847	8111949022636216	voltro_runtime_autogen/timestamp	cf4d037c352944a0
+313	847	8111949022636216	voltro_runtime_autogen/mocs_compilation.cpp	cf4d037c352944a0
+313	847	8111949022636216	C:/Users/Administrator/Desktop/voltro/voltro_3/build/voltro_runtime_autogen/timestamp	cf4d037c352944a0
+313	847	8111949022636216	C:/Users/Administrator/Desktop/voltro/voltro_3/build/voltro_runtime_autogen/mocs_compilation.cpp	cf4d037c352944a0
+925	8549	8111949028744064	CMakeFiles/voltro_runtime.dir/voltro_ui/src/injector/dll/solara_engine.cpp.obj	456d68bf7c025870
+851	13292	8111949028009059	CMakeFiles/voltro_runtime.dir/voltro_ui/src/injector/dll/voltro_runtime.cpp.obj	c09df378acd282eb
+13292	14151	8111949152413289	bin/voltro_runtime.dll	67844fb6ae68cb38
+13292	14151	8111949152413289	voltro_runtime.lib	67844fb6ae68cb38

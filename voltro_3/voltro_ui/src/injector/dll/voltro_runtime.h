@@ -33,6 +33,7 @@ private:
     LuaHookEngine() = default;
     ~LuaHookEngine();
 
+    bool resolveOffsets();
     bool scanSignatures();
     bool validateScriptSafety(const std::string& script, std::string& outReason);
 

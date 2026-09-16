@@ -531,10 +531,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        // Start runtime initialization on a separate worker thread so loader lock is released immediately
+        // Start IPC only — defer TaskScheduler hooking until first script execution
         std::thread([]() {
-            // Modern Solara-like TaskScheduler and Framed IPC
-            Voltro::Runtime::SolaraExecutionEngine::instance().initialize();
             Voltro::Runtime::FramedIpcBridge::instance().start();
         }).detach();
         break;
