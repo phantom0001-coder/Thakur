@@ -248,16 +248,60 @@
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QLabel" name="lblSideStatus">
-            <property name="text">
-             <string>● Not Attached</string>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: #8b9bb0; font-size: 11px;</string>
-            </property>
-           </widget>
-          </item>
+           <item>
+            <widget class="QWidget" name="statusPanel" native="true">
+             <property name="styleSheet">
+              <string notr="true">background: rgba(0,255,102,0.05); border: 1px solid rgba(0,255,102,0.15); border-radius: 6px; padding: 6px;</string>
+             </property>
+             <layout class="QVBoxLayout" name="statusPanelLayout">
+              <property name="spacing">
+               <number>4</number>
+              </property>
+              <property name="leftMargin">
+               <number>8</number>
+              </property>
+              <property name="rightMargin">
+               <number>8</number>
+              </property>
+              <property name="topMargin">
+               <number>6</number>
+              </property>
+              <property name="bottomMargin">
+               <number>6</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="lblSideStatus">
+                <property name="text">
+                 <string>● Not Attached</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">color: #ff3b5c; font-size: 11px; font-weight: bold;</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblEngineVersion">
+                <property name="text">
+                 <string>RVA Engine v2.0 | Build 2026.09</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">color: #8b9bb0; font-size: 9px; font-family: 'JetBrains Mono';</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblRobloxVersion">
+                <property name="text">
+                 <string>Roblox: Waiting...</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">color: #8b9bb0; font-size: 9px; font-family: 'JetBrains Mono';</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
          </layout>
         </widget>
        </item>
@@ -436,19 +480,14 @@ print("[VOLTRO] Engine v1.5.0 Active")
                </widget>
               </item>
               <item>
-               <widget class="QPlainTextEdit" name="txtConsole">
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-                <property name="plainText">
-                 <string>[VOLTRO] System initialized. Voltro Virtual Sandbox ready.
-[IPC] Listening on \\.\pipe\VoltroIPC.
-</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">background: transparent; border: none; font-family: 'JetBrains Mono'; font-size: 11px; color: #00ff66;</string>
-                </property>
-               </widget>
+                <widget class="QTextBrowser" name="txtConsole">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">background: transparent; border: none; font-family: 'JetBrains Mono'; font-size: 11px;</string>
+                 </property>
+                </widget>
               </item>
              </layout>
             </widget>

@@ -1,6 +1,28 @@
 {
-  "version": "2026.09.1",
-  "description": "Voltro pattern scanner with extended fallbacks for current Roblox builds (Sept 2026)",
+  "version": "2026.09.16",
+  "description": "Voltro pattern scanner with RVA offsets (primary) + byte patterns (fallback) for Roblox Sept 2026 build",
+  "rva_offsets": {
+    "description": "Community-sourced RVA offsets from Roblox-Offsets-Website (version c5aecda2245e4fae). Use base + offset.",
+    "luaL_dostring": {
+      "rva": "0x41B3B50",
+      "alt_name": "LuaVM_Load",
+      "description": "Lua VM load/execute function"
+    },
+    "lua_State": {
+      "rva": "0x8B5CEE8",
+      "alt_name": "TaskSchedulerPointer",
+      "description": "Pointer to global lua_State inside TaskScheduler"
+    },
+    "script_context_resume": {
+      "rva": "0x4260F50",
+      "alt_name": "ScriptContextResume",
+      "description": "ScriptContext resume function"
+    },
+    "task_scheduler_constructor": {
+      "rva": "0x2AD5F50",
+      "description": "TaskScheduler constructor (for locating scheduler instance)"
+    }
+  },
   "patterns": {
     "lua_State": {
       "pattern": "48 8D 05 ? ? ? ? 48 8B D9 48 8B 00",

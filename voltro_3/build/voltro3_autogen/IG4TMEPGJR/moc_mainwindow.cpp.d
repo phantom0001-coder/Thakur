@@ -145,6 +145,7 @@ C:/Users/Administrator/Desktop/voltro/voltro_3/build/voltro3_autogen/IG4TMEPGJR/
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/QPushButton \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/QStackedWidget \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/QTabWidget \
+  C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/QTextBrowser \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qabstractbutton.h \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qabstractscrollarea.h \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qframe.h \
@@ -156,6 +157,7 @@ C:/Users/Administrator/Desktop/voltro/voltro_3/build/voltro3_autogen/IG4TMEPGJR/
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qsizepolicy.h \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qstackedwidget.h \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qtabwidget.h \
+  C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qtextbrowser.h \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qtextedit.h \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qtwidgets-config.h \
   C:/Qt/6.4.3/msvc2019_64/include/QtWidgets/qtwidgetsexports.h \

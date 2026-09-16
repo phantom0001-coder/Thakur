@@ -46,6 +46,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -227,6 +228,15 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/samu.com"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/samu.exe"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/samu"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/ninja-build.com"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/ninja-build.exe"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/ninja-build"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/ninja.com"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/ninja.exe"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/ninja"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/samu.com"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/samu.exe"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/samu"
       - "C:/Python314/Scripts/ninja-build.com"
       - "C:/Python314/Scripts/ninja-build.exe"
       - "C:/Python314/Scripts/ninja-build"
@@ -250,6 +260,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -314,6 +325,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -368,6 +380,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -438,6 +451,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -557,6 +571,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -605,6 +620,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -668,6 +684,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -738,6 +755,9 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/lld-link.com"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/lld-link.exe"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/lld-link"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/lld-link.com"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/lld-link.exe"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/lld-link"
       - "C:/Python314/Scripts/lld-link.com"
       - "C:/Python314/Scripts/lld-link.exe"
       - "C:/Python314/Scripts/lld-link"
@@ -838,6 +858,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -899,6 +920,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -947,6 +969,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -1008,6 +1031,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -1080,6 +1104,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -1141,6 +1166,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -1189,6 +1215,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -1256,6 +1283,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -1349,6 +1377,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -1391,8 +1420,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-ps6pna"
-      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-ps6pna"
+      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-8yv4zp"
+      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-8yv4zp"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1403,42 +1432,45 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: false
       stdout: |
-        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-ps6pna'
+        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-8yv4zp'
         
-        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_21ed2
-        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_21ed2.dir\\CMakeCXXCompilerABI.cpp.obj /FdCMakeFiles\\cmTC_21ed2.dir\\ /FS -c "C:\\Program Files\\CMake\\share\\cmake-4.4\\Modules\\CMakeCXXCompilerABI.cpp"
-        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_21ed2.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_21ed2.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_21ed2.exe /implib:cmTC_21ed2.lib /pdb:cmTC_21ed2.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_dc90a
+        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_dc90a.dir\\CMakeCXXCompilerABI.cpp.obj /FdCMakeFiles\\cmTC_dc90a.dir\\ /FS -c "C:\\Program Files\\CMake\\share\\cmake-4.4\\Modules\\CMakeCXXCompilerABI.cpp"
+        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_dc90a.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_dc90a.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_dc90a.exe /implib:cmTC_dc90a.lib /pdb:cmTC_dc90a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: [code=4294967295] cmTC_dc90a.exe 
+        C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_dc90a.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_dc90a.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_dc90a.exe /implib:cmTC_dc90a.lib /pdb:cmTC_dc90a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FINAL LINK: command "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_dc90a.dir\\CMakeCXXCompilerABI.cpp.obj /out:cmTC_dc90a.exe /implib:cmTC_dc90a.lib /pdb:cmTC_dc90a.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_dc90a.dir/intermediate.manifest CMakeFiles\\cmTC_dc90a.dir/manifest.res" failed (exit code 1168) with the following output:
+        LINK : fatal error LNK1168: cannot open cmTC_dc90a.exe for writing\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: -1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.4/Modules/CMakeTestCXXCompiler.cmake:56 (try_compile)"
+      - "CMakeLists.txt:3 (project)"
+    checks:
+      - "Check for working CXX compiler: C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/cl.exe"
+    directories:
+      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-s5qusj"
+      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-s5qusj"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_CXX_COMPILER_WORKS"
+      cached: false
+      stdout: |
+        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-s5qusj'
+        
+        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_30792
+        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_30792.dir\\testCXXCompiler.cxx.obj /FdCMakeFiles\\cmTC_30792.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-s5qusj\\testCXXCompiler.cxx
+        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_30792.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_30792.dir\\testCXXCompiler.cxx.obj  /out:cmTC_30792.exe /implib:cmTC_30792.lib /pdb:cmTC_30792.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
         
       exitCode: 0
-  -
-    kind: "message-v1"
-    backtrace:
-      - "C:/Program Files/CMake/share/cmake-4.4/Modules/CMakeDetermineCompilerABI.cmake:291 (message)"
-      - "C:/Program Files/CMake/share/cmake-4.4/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
-      - "CMakeLists.txt:3 (project)"
-    message: |
-      Parsed CXX implicit link information:
-        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
-        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
-        link line: [[2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_21ed2.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_21ed2.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_21ed2.exe /implib:cmTC_21ed2.lib /pdb:cmTC_21ed2.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."] ==> linker [C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe]
-        linker tool for 'CXX': C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/link.exe 
-        implicit libs: []
-        implicit objs: []
-        implicit dirs: []
-        implicit fwks: []
-      
-      
-  -
-    kind: "message-v1"
-    backtrace:
-      - "C:/Program Files/CMake/share/cmake-4.4/Modules/Internal/CMakeDetermineLinkerId.cmake:41 (message)"
-      - "C:/Program Files/CMake/share/cmake-4.4/Modules/CMakeDetermineCompilerABI.cmake:337 (cmake_determine_linker_id)"
-      - "C:/Program Files/CMake/share/cmake-4.4/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
-      - "CMakeLists.txt:3 (project)"
-    message: |
-      Running the CXX compiler's linker: "C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.51.36231/bin/Hostx64/x64/link.exe" "-v"
-      Microsoft (R) Incremental Linker Version 14.51.36256.0
-      Copyright (C) Microsoft Corporation.  All rights reserved.
   -
     kind: "try_compile-v1"
     backtrace:
@@ -1455,8 +1487,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-fo3ea4"
-      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-fo3ea4"
+      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-vyi4t9"
+      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-vyi4t9"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1467,13 +1499,13 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-fo3ea4'
+        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-vyi4t9'
         
-        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_485e8
-        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCMAKE_HAVE_LIBC_PTHREAD -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_485e8.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_485e8.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-fo3ea4\\src.cxx
-        FAILED: [code=2] CMakeFiles/cmTC_485e8.dir/src.cxx.obj 
-        "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCMAKE_HAVE_LIBC_PTHREAD -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_485e8.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_485e8.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-fo3ea4\\src.cxx
-        C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-fo3ea4\\src.cxx(1): fatal error C1083: Cannot open include file: 'pthread.h': No such file or directory
+        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_333c9
+        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCMAKE_HAVE_LIBC_PTHREAD -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_333c9.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_333c9.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vyi4t9\\src.cxx
+        FAILED: [code=2] CMakeFiles/cmTC_333c9.dir/src.cxx.obj 
+        "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCMAKE_HAVE_LIBC_PTHREAD -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_333c9.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_333c9.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vyi4t9\\src.cxx
+        C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-vyi4t9\\src.cxx(1): fatal error C1083: Cannot open include file: 'pthread.h': No such file or directory
         ninja: build stopped: subcommand failed.
         
       exitCode: 2
@@ -1492,8 +1524,8 @@ events:
     checks:
       - "Looking for pthread_create in pthreads"
     directories:
-      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-2vl1bj"
-      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-2vl1bj"
+      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-82k6tz"
+      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-82k6tz"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1504,14 +1536,14 @@ events:
       variable: "CMAKE_HAVE_PTHREADS_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-2vl1bj'
+        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-82k6tz'
         
-        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_2b10c
-        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCHECK_FUNCTION_EXISTS=pthread_create -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_2b10c.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_2b10c.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-2vl1bj\\CheckFunctionExists.cxx
-        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_2b10c.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_2b10c.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_2b10c.exe /implib:cmTC_2b10c.lib /pdb:cmTC_2b10c.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        FAILED: [code=4294967295] cmTC_2b10c.exe 
-        C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_2b10c.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_2b10c.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_2b10c.exe /implib:cmTC_2b10c.lib /pdb:cmTC_2b10c.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        LINK Pass 1: command "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2b10c.dir\\CheckFunctionExists.cxx.obj /out:cmTC_2b10c.exe /implib:cmTC_2b10c.lib /pdb:cmTC_2b10c.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_2b10c.dir/intermediate.manifest CMakeFiles\\cmTC_2b10c.dir/manifest.res" failed (exit code 1104) with the following output:
+        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_36549
+        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCHECK_FUNCTION_EXISTS=pthread_create -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_36549.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_36549.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-82k6tz\\CheckFunctionExists.cxx
+        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_36549.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_36549.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_36549.exe /implib:cmTC_36549.lib /pdb:cmTC_36549.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: [code=4294967295] cmTC_36549.exe 
+        C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_36549.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_36549.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_36549.exe /implib:cmTC_36549.lib /pdb:cmTC_36549.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_36549.dir\\CheckFunctionExists.cxx.obj /out:cmTC_36549.exe /implib:cmTC_36549.lib /pdb:cmTC_36549.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_36549.dir/intermediate.manifest CMakeFiles\\cmTC_36549.dir/manifest.res" failed (exit code 1104) with the following output:
         LINK : fatal error LNK1104: cannot open file 'pthreads.lib'\x0d
         ninja: build stopped: subcommand failed.
         
@@ -1531,8 +1563,8 @@ events:
     checks:
       - "Looking for pthread_create in pthread"
     directories:
-      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-we8fhz"
-      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-we8fhz"
+      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-3ujiwk"
+      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-3ujiwk"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1543,14 +1575,14 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-we8fhz'
+        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-3ujiwk'
         
-        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_c8441
-        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCHECK_FUNCTION_EXISTS=pthread_create -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_c8441.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_c8441.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-we8fhz\\CheckFunctionExists.cxx
-        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_c8441.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_c8441.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_c8441.exe /implib:cmTC_c8441.lib /pdb:cmTC_c8441.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        FAILED: [code=4294967295] cmTC_c8441.exe 
-        C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_c8441.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_c8441.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_c8441.exe /implib:cmTC_c8441.lib /pdb:cmTC_c8441.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
-        LINK Pass 1: command "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_c8441.dir\\CheckFunctionExists.cxx.obj /out:cmTC_c8441.exe /implib:cmTC_c8441.lib /pdb:cmTC_c8441.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_c8441.dir/intermediate.manifest CMakeFiles\\cmTC_c8441.dir/manifest.res" failed (exit code 1104) with the following output:
+        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_ea63f
+        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DCHECK_FUNCTION_EXISTS=pthread_create -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_ea63f.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_ea63f.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-3ujiwk\\CheckFunctionExists.cxx
+        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_ea63f.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_ea63f.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_ea63f.exe /implib:cmTC_ea63f.lib /pdb:cmTC_ea63f.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: [code=4294967295] cmTC_ea63f.exe 
+        C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_ea63f.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_ea63f.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_ea63f.exe /implib:cmTC_ea63f.lib /pdb:cmTC_ea63f.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_ea63f.dir\\CheckFunctionExists.cxx.obj /out:cmTC_ea63f.exe /implib:cmTC_ea63f.lib /pdb:cmTC_ea63f.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_ea63f.dir/intermediate.manifest CMakeFiles\\cmTC_ea63f.dir/manifest.res" failed (exit code 1104) with the following output:
         LINK : fatal error LNK1104: cannot open file 'pthread.lib'\x0d
         ninja: build stopped: subcommand failed.
         
@@ -1571,8 +1603,8 @@ events:
     checks:
       - "Performing Test HAVE_STDATOMIC"
     directories:
-      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-89roe8"
-      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-89roe8"
+      source: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-f5afnc"
+      binary: "C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-f5afnc"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1583,11 +1615,11 @@ events:
       variable: "HAVE_STDATOMIC"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-89roe8'
+        Change Dir: 'C:/Users/Administrator/Desktop/voltro/voltro_3/build/CMakeFiles/CMakeScratch/TryCompile-f5afnc'
         
-        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_ba2f3
-        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DHAVE_STDATOMIC -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_ba2f3.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_ba2f3.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-89roe8\\src.cxx
-        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_ba2f3.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_ba2f3.dir\\src.cxx.obj  /out:cmTC_ba2f3.exe /implib:cmTC_ba2f3.lib /pdb:cmTC_ba2f3.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        Run Build Command(s): C:/Python314/Scripts/ninja.exe -v cmTC_cbecd
+        [1/2] "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\cl.exe"  /nologo /TP -DHAVE_STDATOMIC -D_MBCS  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_cbecd.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_cbecd.dir\\ /FS -c C:\\Users\\Administrator\\Desktop\\voltro\\voltro_3\\build\\CMakeFiles\\CMakeScratch\\TryCompile-f5afnc\\src.cxx
+        [2/2] C:\\Windows\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\CMake\\bin\\cmake.exe" -E vs_link_exe --msvc-ver=1951 --intdir=CMakeFiles\\cmTC_cbecd.dir --rc="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\rc.exe" --mt="C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe" --manifests  -- "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.51.36231\\bin\\Hostx64\\x64\\link.exe" /nologo CMakeFiles\\cmTC_cbecd.dir\\src.cxx.obj  /out:cmTC_cbecd.exe /implib:cmTC_cbecd.lib /pdb:cmTC_cbecd.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
         
       exitCode: 0
   -
@@ -1710,6 +1742,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -1902,6 +1935,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -2094,6 +2128,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -2167,6 +2202,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -2227,6 +2263,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -2376,6 +2413,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -2458,6 +2496,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -2519,6 +2558,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/vulkan/vulkan.h"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/vulkan/vulkan.h"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/vulkan/vulkan.h"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/vulkan/vulkan.h"
       - "C:/Python314/Scripts/vulkan/vulkan.h"
       - "C:/Python314/vulkan/vulkan.h"
       - "C:/Windows/System32/vulkan/vulkan.h"
@@ -2573,6 +2613,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -2661,6 +2702,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -2720,6 +2762,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -2776,6 +2819,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -2860,6 +2904,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -2951,6 +2996,9 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/glslc.com"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/glslc.exe"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/glslc"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/glslc.com"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/glslc.exe"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/glslc"
       - "C:/Python314/Scripts/glslc.com"
       - "C:/Python314/Scripts/glslc.exe"
       - "C:/Python314/Scripts/glslc"
@@ -3087,6 +3135,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -3161,6 +3210,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -3252,6 +3302,9 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/glslangValidator.com"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/glslangValidator.exe"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/glslangValidator"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/glslangValidator.com"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/glslangValidator.exe"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/glslangValidator"
       - "C:/Python314/Scripts/glslangValidator.com"
       - "C:/Python314/Scripts/glslangValidator.exe"
       - "C:/Python314/Scripts/glslangValidator"
@@ -3388,6 +3441,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -3541,6 +3595,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -3682,6 +3737,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -3835,6 +3891,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -3976,6 +4033,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -4109,6 +4167,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -4976,6 +5035,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -5056,6 +5116,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -5119,6 +5180,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/webview2.h"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/webview2.h"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/webview2.h"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/webview2.h"
       - "C:/Python314/Scripts/webview2.h"
       - "C:/Python314/webview2.h"
       - "C:/Windows/System32/webview2.h"
@@ -5175,6 +5237,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -5257,6 +5320,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -5339,6 +5403,8 @@ events:
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
@@ -5436,6 +5502,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -5522,6 +5589,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/"
       - "C:/Python314/Scripts/"
       - "C:/Python314/"
       - "C:/Windows/System32/"
@@ -5587,6 +5655,7 @@ events:
       - "C:/Windows/Microsoft.NET/Framework64/v4.0.30319/WebView2Loader.dll"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/IDE/WebView2Loader.dll"
       - "C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/WebView2Loader.dll"
+      - "C:/Program Files/Eclipse Adoptium/jdk-25.0.4.101-hotspot/bin/WebView2Loader.dll"
       - "C:/Python314/Scripts/WebView2Loader.dll"
       - "C:/Python314/WebView2Loader.dll"
       - "C:/Windows/System32/WebView2Loader.dll"
@@ -5615,6 +5684,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"
@@ -5702,6 +5772,7 @@ events:
         - "C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\"
         - "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\Tools\\"
+        - "C:\\Program Files\\Eclipse Adoptium\\jdk-25.0.4.101-hotspot\\bin"
         - "C:\\Python314\\Scripts\\"
         - "C:\\Python314\\"
         - "C:\\Windows\\system32"

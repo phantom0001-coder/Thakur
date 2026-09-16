@@ -23,6 +23,7 @@
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -52,7 +53,11 @@ public:
     QPushButton *btnNavSettings;
     QPushButton *btnNavCredits;
     QSpacerItem *navSpacer;
+    QWidget *statusPanel;
+    QVBoxLayout *statusPanelLayout;
     QLabel *lblSideStatus;
+    QLabel *lblEngineVersion;
+    QLabel *lblRobloxVersion;
     QStackedWidget *pageStack;
     QWidget *pageWorkspace;
     QVBoxLayout *wsLayout;
@@ -72,7 +77,7 @@ public:
     QWidget *consolePanel;
     QVBoxLayout *consoleLayout;
     QLabel *lblConsoleHeader;
-    QPlainTextEdit *txtConsole;
+    QTextBrowser *txtConsole;
     QWidget *pageHub;
     QVBoxLayout *hubMainLayout;
     QWidget *hubSearchBarWidget;
@@ -221,11 +226,33 @@ public:
 
         sideBarLayout->addItem(navSpacer);
 
-        lblSideStatus = new QLabel(sideBar);
+        statusPanel = new QWidget(sideBar);
+        statusPanel->setObjectName("statusPanel");
+        statusPanel->setStyleSheet(QString::fromUtf8("background: rgba(0,255,102,0.05); border: 1px solid rgba(0,255,102,0.15); border-radius: 6px; padding: 6px;"));
+        statusPanelLayout = new QVBoxLayout(statusPanel);
+        statusPanelLayout->setSpacing(4);
+        statusPanelLayout->setObjectName("statusPanelLayout");
+        statusPanelLayout->setContentsMargins(8, 6, 8, 6);
+        lblSideStatus = new QLabel(statusPanel);
         lblSideStatus->setObjectName("lblSideStatus");
-        lblSideStatus->setStyleSheet(QString::fromUtf8("color: #8b9bb0; font-size: 11px;"));
+        lblSideStatus->setStyleSheet(QString::fromUtf8("color: #ff3b5c; font-size: 11px; font-weight: bold;"));
 
-        sideBarLayout->addWidget(lblSideStatus);
+        statusPanelLayout->addWidget(lblSideStatus);
+
+        lblEngineVersion = new QLabel(statusPanel);
+        lblEngineVersion->setObjectName("lblEngineVersion");
+        lblEngineVersion->setStyleSheet(QString::fromUtf8("color: #8b9bb0; font-size: 9px; font-family: 'JetBrains Mono';"));
+
+        statusPanelLayout->addWidget(lblEngineVersion);
+
+        lblRobloxVersion = new QLabel(statusPanel);
+        lblRobloxVersion->setObjectName("lblRobloxVersion");
+        lblRobloxVersion->setStyleSheet(QString::fromUtf8("color: #8b9bb0; font-size: 9px; font-family: 'JetBrains Mono';"));
+
+        statusPanelLayout->addWidget(lblRobloxVersion);
+
+
+        sideBarLayout->addWidget(statusPanel);
 
 
         bodyLayout->addWidget(sideBar);
@@ -316,10 +343,10 @@ public:
 
         consoleLayout->addWidget(lblConsoleHeader);
 
-        txtConsole = new QPlainTextEdit(consolePanel);
+        txtConsole = new QTextBrowser(consolePanel);
         txtConsole->setObjectName("txtConsole");
         txtConsole->setReadOnly(true);
-        txtConsole->setStyleSheet(QString::fromUtf8("background: transparent; border: none; font-family: 'JetBrains Mono'; font-size: 11px; color: #00ff66;"));
+        txtConsole->setStyleSheet(QString::fromUtf8("background: transparent; border: none; font-family: 'JetBrains Mono'; font-size: 11px;"));
 
         consoleLayout->addWidget(txtConsole);
 
@@ -475,6 +502,8 @@ public:
         btnNavSettings->setText(QCoreApplication::translate("MainWindow", "\342\232\231 Settings", nullptr));
         btnNavCredits->setText(QCoreApplication::translate("MainWindow", "\360\237\221\245 Credits", nullptr));
         lblSideStatus->setText(QCoreApplication::translate("MainWindow", "\342\227\217 Not Attached", nullptr));
+        lblEngineVersion->setText(QCoreApplication::translate("MainWindow", "RVA Engine v2.0 | Build 2026.09", nullptr));
+        lblRobloxVersion->setText(QCoreApplication::translate("MainWindow", "Roblox: Waiting...", nullptr));
         btnAttach->setText(QCoreApplication::translate("MainWindow", "\342\232\241 Attach", nullptr));
         btnExecute->setText(QCoreApplication::translate("MainWindow", "\342\226\266 Execute", nullptr));
         btnStop->setText(QCoreApplication::translate("MainWindow", "\342\217\271 Stop", nullptr));
@@ -489,9 +518,6 @@ public:
 "", nullptr));
         editorTabs->setTabText(editorTabs->indexOf(tabMain), QCoreApplication::translate("MainWindow", "main.lua", nullptr));
         lblConsoleHeader->setText(QCoreApplication::translate("MainWindow", "TERMINAL OUTPUT STREAM (IPC: \\\\.\\pipe\\VoltroIPC)", nullptr));
-        txtConsole->setPlainText(QCoreApplication::translate("MainWindow", "[VOLTRO] System initialized. Voltro Virtual Sandbox ready.\n"
-"[IPC] Listening on \\\\.\\pipe\\VoltroIPC.\n"
-"", nullptr));
         txtHubSearch->setPlaceholderText(QCoreApplication::translate("MainWindow", "\360\237\224\215 Search exploit scripts across hubs (e.g. Infinite Yield, Aimbot, Blox Fruits)...", nullptr));
         btnHubRefresh->setText(QCoreApplication::translate("MainWindow", "\360\237\224\204 Search", nullptr));
         lblScriptTitle->setText(QCoreApplication::translate("MainWindow", "Select a script from the list", nullptr));

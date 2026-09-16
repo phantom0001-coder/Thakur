@@ -1,4 +1,5 @@
 #include "voltro_runtime.h"
+#include "roblox_offsets.h"
 #include "solara_engine.h"
 #include <sstream>
 #include <iostream>
@@ -24,10 +25,9 @@ LuaHookEngine::~LuaHookEngine() {
     stopExecution();
 }
 
-void LuaHookEngine::parsePattern(const std::string& pattern, std::vector<BYTE>& bytes, std::vector<BYTE>& mask) {
+static void ParsePatternToRaw(const std::string& pattern, std::vector<BYTE>& bytes, std::vector<BYTE>& mask) {
     bytes.clear();
     mask.clear();
-
     std::stringstream ss(pattern);
     std::string token;
     while (ss >> token) {
@@ -35,114 +35,192 @@ void LuaHookEngine::parsePattern(const std::string& pattern, std::vector<BYTE>& 
             bytes.push_back(0);
             mask.push_back(0x00);
         } else {
-            BYTE val = static_cast<BYTE>(std::stoul(token, nullptr, 16));
-            bytes.push_back(val);
+            bytes.push_back(static_cast<BYTE>(std::stoul(token, nullptr, 16)));
             mask.push_back(0xFF);
         }
     }
 }
 
-uintptr_t LuaHookEngine::scanMemory(uintptr_t start, size_t size, const std::string& pattern) {
-    std::vector<BYTE> patternBytes;
-    std::vector<BYTE> patternMask;
-    parsePattern(pattern, patternBytes, patternMask);
+static uintptr_t SafeScanRegion(uintptr_t start, size_t size, const BYTE* patBytes, const BYTE* patMask, size_t patLen) {
+    if (!patBytes || !patMask || patLen == 0 || size < patLen) return 0;
 
-    if (patternBytes.empty() || size < patternBytes.size()) {
-        return 0;
-    }
+    uintptr_t current = start;
+    uintptr_t end = start + size;
 
-    const BYTE* memory = reinterpret_cast<const BYTE*>(start);
-    size_t scanLength = size - patternBytes.size();
+    while (current < end) {
+        MEMORY_BASIC_INFORMATION mbi;
+        if (!VirtualQuery(reinterpret_cast<LPCVOID>(current), &mbi, sizeof(mbi)))
+            break;
 
-    for (size_t i = 0; i < scanLength; ++i) {
-        bool match = true;
-        for (size_t j = 0; j < patternBytes.size(); ++j) {
-            if (patternMask[j] == 0xFF && memory[i + j] != patternBytes[j]) {
-                match = false;
-                break;
+        bool readable = (mbi.State == MEM_COMMIT) &&
+                        !(mbi.Protect & PAGE_NOACCESS) &&
+                        !(mbi.Protect & PAGE_GUARD) &&
+                        (mbi.Protect & (PAGE_READONLY | PAGE_READWRITE |
+                                        PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE));
+
+        if (readable) {
+            uintptr_t blockStart = current;
+            uintptr_t blockEnd = current + mbi.RegionSize;
+            if (blockEnd > end) blockEnd = end;
+
+            size_t blockAvail = blockEnd - blockStart;
+            if (blockAvail >= patLen) {
+                uintptr_t result = 0;
+                __try {
+                    const BYTE* mem = reinterpret_cast<const BYTE*>(blockStart);
+                    size_t scanLen = blockAvail - patLen;
+                    for (size_t i = 0; i <= scanLen; ++i) {
+                        bool match = true;
+                        for (size_t j = 0; j < patLen; ++j) {
+                            if (patMask[j] == 0xFF && mem[i + j] != patBytes[j]) {
+                                match = false;
+                                break;
+                            }
+                        }
+                        if (match) {
+                            result = blockStart + i;
+                            break;
+                        }
+                    }
+                } __except (EXCEPTION_EXECUTE_HANDLER) {
+                    result = 0;
+                }
+                if (result) return result;
             }
         }
-        if (match) {
-            return start + i;
-        }
+
+        current += mbi.RegionSize;
     }
     return 0;
 }
 
-bool LuaHookEngine::scanSignatures() {
-    HMODULE hModule = GetModuleHandleA(NULL);
-    if (!hModule) {
+static uintptr_t ResolveRipRelative32(uintptr_t matchAddr, int dispOffset, int instrSize) {
+    uintptr_t result = 0;
+    __try {
+        int32_t rel = *reinterpret_cast<const int32_t*>(matchAddr + dispOffset);
+        uintptr_t target = matchAddr + instrSize + rel;
+
+        MEMORY_BASIC_INFORMATION mbi;
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(target), &mbi, sizeof(mbi)) &&
+            (mbi.State == MEM_COMMIT) &&
+            !(mbi.Protect & PAGE_NOACCESS) &&
+            !(mbi.Protect & PAGE_GUARD)) {
+            result = target;
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        result = 0;
+    }
+    return result;
+}
+
+static uintptr_t SafeReadPtrUintptr(uintptr_t addr) {
+    uintptr_t result = 0;
+    __try {
+        result = *reinterpret_cast<volatile uintptr_t*>(addr);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        result = 0;
+    }
+    return result;
+}
+
+static lua_State_t SafeReadPtrLuaState(uintptr_t addr) {
+    lua_State_t result = nullptr;
+    __try {
+        result = *reinterpret_cast<volatile lua_State_t*>(addr);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        result = nullptr;
+    }
+    return result;
+}
+
+static bool ValidateLuaStateCandidate(lua_State_t candidate) {
+    if (!candidate) return false;
+    MEMORY_BASIC_INFORMATION mbi;
+    if (!VirtualQuery(reinterpret_cast<LPCVOID>(candidate), &mbi, sizeof(mbi)))
         return false;
-    }
+    if (mbi.State != MEM_COMMIT) return false;
+    if (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) return false;
 
-    MODULEINFO modInfo = { 0 };
-    if (!GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(modInfo))) {
+    uintptr_t firstField = SafeReadPtrUintptr(reinterpret_cast<uintptr_t>(candidate));
+    if (!firstField) return false;
+
+    MEMORY_BASIC_INFORMATION mbi2;
+    if (!VirtualQuery(reinterpret_cast<LPCVOID>(firstField), &mbi2, sizeof(mbi2)))
         return false;
-    }
+    return (mbi2.State == MEM_COMMIT) && !(mbi2.Protect & PAGE_NOACCESS);
+}
 
-    uintptr_t baseAddr = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
-    size_t imageSize = modInfo.SizeOfImage;
+// All scan logic in one static function — no __try here, only in helpers above
+static bool RunSignatureScan(uintptr_t baseAddr, size_t imageSize, luaL_dostring_t& outDoString, lua_State_t& outState) {
+    // --- Find luaL_dostring via pattern ---
+    if (!outDoString) {
+        const char* dostringPats[] = {
+            "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B F9",
+            "48 89 4C 24 ? 55 53 56 57 41 54",
+            "48 89 5C 24 ? 48 89 74 24 ?",
+            "55 48 8B EC 48 83 EC 20",
+            "57 48 83 EC 20 48 8B F9",
+        };
 
-    // Try multiple patterns for luaL_dostring with fallbacks
-    const std::vector<std::string> dostringPatterns = {
-        "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B F9",
-        "48 89 4C 24 ? 55 53 56 57 41 54",
-        "48 89 5C 24 ? 48 89 74 24 ?",
-        "55 48 8B EC 48 83 EC 20",
-        "57 48 83 EC 20 48 8B F9",
-        "48 89 54 24 ? 48 89 4C 24 ? 57 48 83 EC",
-        "48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78",
-    };
-
-    uintptr_t doStringAddr = 0;
-    for (const auto& pat : dostringPatterns) {
-        doStringAddr = scanMemory(baseAddr, imageSize, pat);
-        if (doStringAddr) break;
-    }
-
-    if (doStringAddr) {
-        m_pfnDoString = reinterpret_cast<luaL_dostring_t>(doStringAddr);
-    }
-
-    // Try multiple patterns for lua_State / task_scheduler with fallbacks
-    const std::vector<std::string> statePatterns = {
-        "48 8D 05 ? ? ? ? 48 8B D9 48 8B 00",
-        "48 8B 05 ? ? ? ? 48 89 44 24",
-        "4C 8D 05 ? ? ? ? 49 8B",
-        "48 8B 0D ? ? ? ? 48 89",
-        "4C 8B 05 ? ? ? ? 48 89",
-        "48 8B 15 ? ? ? ? 48 85 D2",
-    };
-
-    uintptr_t stateAddr = 0;
-    for (const auto& pat : statePatterns) {
-        stateAddr = scanMemory(baseAddr, imageSize, pat);
-        if (stateAddr) {
-            // Resolve RIP-relative offset: *(stateAddr + 3) + stateAddr + 7
-            int32_t relOffset = *reinterpret_cast<const int32_t*>(stateAddr + 3);
-            uintptr_t targetPtr = stateAddr + 7 + relOffset;
-
-            // Validate the pointer is readable
-            MEMORY_BASIC_INFORMATION mbi;
-            if (VirtualQuery(reinterpret_cast<LPCVOID>(targetPtr), &mbi, sizeof(mbi)) &&
-                (mbi.State == MEM_COMMIT) &&
-                !(mbi.Protect & PAGE_NOACCESS) &&
-                !(mbi.Protect & PAGE_GUARD)) {
-                m_luaState = *reinterpret_cast<lua_State_t*>(targetPtr);
-                if (m_luaState) break;
+        for (const char* pat : dostringPats) {
+            std::vector<BYTE> pb, pm;
+            ParsePatternToRaw(pat, pb, pm);
+            uintptr_t found = SafeScanRegion(baseAddr, imageSize, pb.data(), pm.data(), pb.size());
+            if (found) {
+                outDoString = reinterpret_cast<luaL_dostring_t>(found);
+                break;
             }
         }
     }
 
-    // Only mark hooked if valid pointers were actually resolved
-    if (m_pfnDoString && m_luaState) {
-        m_hooked = true;
-    } else {
-        m_hooked = false;
-        m_pfnDoString = nullptr;
-        m_luaState = nullptr;
+    // --- Find lua_State via pattern ---
+    if (!outState) {
+        const char* statePats[] = {
+            "48 8D 05 ? ? ? ? 48 8B D9 48 8B 00",
+            "48 8B 05 ? ? ? ? 48 89 44 24",
+            "4C 8D 05 ? ? ? ? 49 8B",
+            "48 8B 0D ? ? ? ? 48 89",
+            "4C 8B 05 ? ? ? ? 48 89",
+            "48 8B 15 ? ? ? ? 48 85 D2",
+            "48 89 05 ? ? ? ? 48 89",
+            "48 8B 35 ? ? ? ? 48 85 F6",
+        };
+
+        for (const char* pat : statePats) {
+            std::vector<BYTE> pb, pm;
+            ParsePatternToRaw(pat, pb, pm);
+
+            uintptr_t matchAddr = SafeScanRegion(baseAddr, imageSize, pb.data(), pm.data(), pb.size());
+            if (!matchAddr) continue;
+
+            uintptr_t targetPtr = ResolveRipRelative32(matchAddr, 3, 7);
+            if (!targetPtr) continue;
+
+            lua_State_t candidate = SafeReadPtrLuaState(targetPtr);
+            if (ValidateLuaStateCandidate(candidate)) {
+                outState = candidate;
+                break;
+            }
+        }
     }
-    return m_hooked;
+
+    return (outDoString != nullptr && outState != nullptr);
+}
+
+bool LuaHookEngine::scanSignatures() {
+    HMODULE hModule = GetModuleHandleA(NULL);
+    if (!hModule) return false;
+
+    MODULEINFO modInfo = { 0 };
+    if (!GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(modInfo)))
+        return false;
+
+    uintptr_t baseAddr = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
+    size_t imageSize = modInfo.SizeOfImage;
+
+    bool ok = RunSignatureScan(baseAddr, imageSize, m_pfnDoString, m_luaState);
+    m_hooked = ok;
+    return ok;
 }
 
 bool LuaHookEngine::validateScriptSafety(const std::string& script, std::string& outReason) {
@@ -169,19 +247,198 @@ bool LuaHookEngine::validateScriptSafety(const std::string& script, std::string&
     return true;
 }
 
+// SEH-protected static helpers (cannot use __try in C++ member functions)
+static bool ResolveRvaDoString(uintptr_t base, luaL_dostring_t& outDoString) {
+    outDoString = nullptr;
+    uintptr_t addr = base + RobloxOffsets::Engine::LuaVM_Load;
+
+    __try {
+        MEMORY_BASIC_INFORMATION mbi;
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(addr), &mbi, sizeof(mbi)) &&
+            (mbi.State == MEM_COMMIT) &&
+            !(mbi.Protect & PAGE_NOACCESS) &&
+            !(mbi.Protect & PAGE_GUARD)) {
+
+            BYTE* code = reinterpret_cast<BYTE*>(addr);
+            if (code[0] != 0x00 && code[0] != 0xCC && code[0] != 0xC3) {
+                outDoString = reinterpret_cast<luaL_dostring_t>(addr);
+            }
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        outDoString = nullptr;
+    }
+    return outDoString != nullptr;
+}
+
+static bool ResolveLuaStateViaTaskScheduler(uintptr_t base, lua_State_t& outState) {
+    outState = nullptr;
+
+    // Read the global TaskScheduler pointer
+    uintptr_t tsPtrAddr = base + RobloxOffsets::Pointer::TaskScheduler;
+    __try {
+        MEMORY_BASIC_INFORMATION mbi;
+        if (!VirtualQuery(reinterpret_cast<LPCVOID>(tsPtrAddr), &mbi, sizeof(mbi)) ||
+            (mbi.State != MEM_COMMIT) ||
+            (mbi.Protect & PAGE_NOACCESS) ||
+            (mbi.Protect & PAGE_GUARD)) {
+            return false;
+        }
+
+        uintptr_t scheduler = *reinterpret_cast<volatile uintptr_t*>(tsPtrAddr);
+        if (!scheduler) return false;
+
+        // Validate TaskScheduler is readable
+        if (!VirtualQuery(reinterpret_cast<LPCVOID>(scheduler), &mbi, sizeof(mbi)) ||
+            (mbi.State != MEM_COMMIT) ||
+            (mbi.Protect & PAGE_NOACCESS)) {
+            return false;
+        }
+
+        // Walk the TaskScheduler's job list
+        // JobStart and JobEnd offsets from structured offsets (version-9d412f44a6fe4081)
+        // These offsets define the range of the jobs vector
+        constexpr uintptr_t JOB_START_OFFSET = 0xC8;
+        constexpr uintptr_t JOB_END_OFFSET = 0xD0;
+        constexpr uintptr_t JOB_VFTABLE_OFFSET = 0x00;
+        constexpr uintptr_t JOB_SIZE = 0x48;  // approximate size per job entry
+
+        uintptr_t jobStart = 0, jobEnd = 0;
+        __try {
+            jobStart = *reinterpret_cast<volatile uintptr_t*>(scheduler + JOB_START_OFFSET);
+            jobEnd = *reinterpret_cast<volatile uintptr_t*>(scheduler + JOB_END_OFFSET);
+        } __except (EXCEPTION_EXECUTE_HANDLER) {
+            return false;
+        }
+
+        if (!jobStart || !jobEnd || jobEnd <= jobStart || (jobEnd - jobStart) > 0x100000) {
+            return false;
+        }
+
+        // Iterate through jobs looking for one with a lua_State-like pointer
+        // Each job is a structure; scan for readable pointer fields that look like lua_State
+        uintptr_t numJobs = (jobEnd - jobStart) / JOB_SIZE;
+        if (numJobs > 1000) numJobs = 1000;  // sanity limit
+
+        for (uintptr_t i = 0; i < numJobs; ++i) {
+            uintptr_t jobAddr = jobStart + i * JOB_SIZE;
+
+            MEMORY_BASIC_INFORMATION mbiJob;
+            if (!VirtualQuery(reinterpret_cast<LPCVOID>(jobAddr), &mbiJob, sizeof(mbiJob)))
+                continue;
+            if (mbiJob.State != MEM_COMMIT || (mbiJob.Protect & PAGE_NOACCESS))
+                continue;
+
+            __try {
+                // Read vftable of this job
+                uintptr_t vftable = *reinterpret_cast<volatile uintptr_t*>(jobAddr + JOB_VFTABLE_OFFSET);
+                if (!vftable) continue;
+
+                // Scan job structure for a pointer that looks like a lua_State
+                // lua_State is a heap allocation, typically aligned, in committed memory
+                for (uintptr_t off = 0x08; off < JOB_SIZE; off += sizeof(uintptr_t)) {
+                    uintptr_t field = *reinterpret_cast<volatile uintptr_t*>(jobAddr + off);
+                    if (!field) continue;
+
+                    MEMORY_BASIC_INFORMATION mbiField;
+                    if (!VirtualQuery(reinterpret_cast<LPCVOID>(field), &mbiField, sizeof(mbiField)))
+                        continue;
+                    if (mbiField.State != MEM_COMMIT || (mbiField.Protect & PAGE_NOACCESS))
+                        continue;
+
+                    // Check if this looks like a lua_State:
+                    // First field should be a valid pointer (to global_State or similar)
+                    uintptr_t inner = *reinterpret_cast<volatile uintptr_t*>(field);
+                    if (!inner) continue;
+
+                    MEMORY_BASIC_INFORMATION mbiInner;
+                    if (VirtualQuery(reinterpret_cast<LPCVOID>(inner), &mbiInner, sizeof(mbiInner)) &&
+                        (mbiInner.State == MEM_COMMIT) &&
+                        !(mbiInner.Protect & PAGE_NOACCESS)) {
+
+                        outState = reinterpret_cast<lua_State_t>(field);
+                        return true;
+                    }
+                }
+            } __except (EXCEPTION_EXECUTE_HANDLER) {
+                continue;
+            }
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return false;
+    }
+
+    return false;
+}
+
+bool LuaHookEngine::resolveOffsets() {
+    HMODULE hModule = GetModuleHandleA(NULL);
+    if (!hModule) return false;
+
+    MODULEINFO modInfo = { 0 };
+    if (!GetModuleInformation(GetCurrentProcess(), hModule, &modInfo, sizeof(modInfo)))
+        return false;
+
+    uintptr_t base = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
+    char buf[256];
+
+    // Step 1: RVA offset for luaL_dostring
+    sprintf_s(buf, "[OFFSET ENGINE] Trying RVA luaL_dostring at base+%p...", (void*)RobloxOffsets::Engine::LuaVM_Load);
+    FramedIpcBridge::instance().sendOutput(buf, "info");
+
+    if (ResolveRvaDoString(base, m_pfnDoString)) {
+        sprintf_s(buf, "[OFFSET ENGINE] luaL_dostring = %p (via RVA)", (void*)m_pfnDoString);
+        FramedIpcBridge::instance().sendOutput(buf, "ok");
+    } else {
+        FramedIpcBridge::instance().sendOutput("[OFFSET ENGINE] RVA luaL_dostring failed.", "warn");
+    }
+
+    // Step 2: Find lua_State via TaskScheduler RVA
+    sprintf_s(buf, "[OFFSET ENGINE] Trying TaskScheduler RVA at base+%p...", (void*)RobloxOffsets::Pointer::TaskScheduler);
+    FramedIpcBridge::instance().sendOutput(buf, "info");
+
+    if (ResolveLuaStateViaTaskScheduler(base, m_luaState)) {
+        sprintf_s(buf, "[OFFSET ENGINE] lua_State = %p (via TaskScheduler walk)", (void*)m_luaState);
+        FramedIpcBridge::instance().sendOutput(buf, "ok");
+    } else {
+        FramedIpcBridge::instance().sendOutput("[OFFSET ENGINE] TaskScheduler walk failed. Trying pattern scan...", "warn");
+    }
+
+    // Step 3: Pattern scan fallback for anything still missing
+    if (!m_pfnDoString || !m_luaState) {
+        FramedIpcBridge::instance().sendOutput("[OFFSET ENGINE] Running pattern scan for missing pointers...", "info");
+        scanSignatures();
+    }
+
+    // Final result
+    if (m_pfnDoString && m_luaState) {
+        sprintf_s(buf, "[OFFSET ENGINE] READY: dostring=%p, lua_State=%p", (void*)m_pfnDoString, (void*)m_luaState);
+        FramedIpcBridge::instance().sendOutput(buf, "ok");
+        m_hooked = true;
+        return true;
+    }
+
+    sprintf_s(buf, "[OFFSET ENGINE] FAILED: dostring=%s, lua_State=%s",
+        m_pfnDoString ? "OK" : "NULL", m_luaState ? "OK" : "NULL");
+    FramedIpcBridge::instance().sendOutput(buf, "error");
+
+    m_pfnDoString = nullptr;
+    m_luaState = nullptr;
+    m_hooked = false;
+    return false;
+}
+
 bool LuaHookEngine::initialize() {
-    // Evasion & Anti-Debug check
     if (IsDebuggerPresent()) {
-        IpcClientBridge::instance().sendOutput("[SECURITY] Debugger detected via IsDebuggerPresent", "warn");
+        FramedIpcBridge::instance().sendOutput("[SECURITY] Debugger detected via IsDebuggerPresent", "warn");
     }
 
     BOOL remoteDebugger = FALSE;
     CheckRemoteDebuggerPresent(GetCurrentProcess(), &remoteDebugger);
     if (remoteDebugger) {
-        IpcClientBridge::instance().sendOutput("[SECURITY] Remote debugger detected", "warn");
+        FramedIpcBridge::instance().sendOutput("[SECURITY] Remote debugger detected", "warn");
     }
 
-    return scanSignatures();
+    return resolveOffsets();
 }
 
 static int SafeCallDoString(luaL_dostring_t pfn, lua_State_t L, const char* str, bool& faultOccurred) {
@@ -420,8 +677,18 @@ void IpcClientBridge::communicationLoop() {
         sendStatus(true, "Voltro DLL hooked and connected to Roblox process.");
         sendOutput("[IPC BRIDGE] Connected to Voltro UI host.", "ok");
 
-        // Trigger in-game "V" animation dropping from above
-        LuaHookEngine::instance().playAttachAnimation();
+        // Wait for Roblox Lua VM to initialize before attempting execution
+        sendOutput("[IPC BRIDGE] Waiting for Lua VM initialization...", "info");
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+        // Initialize Lua engine (resolve offsets + pattern scan)
+        bool initOk = LuaHookEngine::instance().initialize();
+        if (initOk) {
+            sendOutput("[IPC BRIDGE] Lua engine initialized. Playing attach animation.", "ok");
+            LuaHookEngine::instance().playAttachAnimation();
+        } else {
+            sendOutput("[IPC BRIDGE] Lua engine init FAILED. Script execution will use TaskScheduler fallback.", "warn");
+        }
 
         char buffer[8192];
         DWORD bytesRead = 0;

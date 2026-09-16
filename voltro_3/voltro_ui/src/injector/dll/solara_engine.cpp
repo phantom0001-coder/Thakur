@@ -1,5 +1,6 @@
 #include "solara_engine.h"
 #include "voltro_runtime.h"
+#include "roblox_offsets.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -39,7 +40,53 @@ uintptr_t SolaraExecutionEngine::findTaskScheduler() {
     uintptr_t base = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
     size_t size = modInfo.SizeOfImage;
 
-    // Scan for TaskScheduler pointer signature safely with page boundary validation:
+    // Method 1: RVA offset from community repo (Roblox-Offsets-Website, version c5aecda2245e4fae)
+    uintptr_t tsPtrAddr = base + RobloxOffsets::Pointer::TaskScheduler;
+
+    __try {
+        MEMORY_BASIC_INFORMATION mbi;
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(tsPtrAddr), &mbi, sizeof(mbi)) &&
+            (mbi.State == MEM_COMMIT) &&
+            !(mbi.Protect & PAGE_NOACCESS) &&
+            !(mbi.Protect & PAGE_GUARD)) {
+
+            uintptr_t scheduler = *reinterpret_cast<uintptr_t*>(tsPtrAddr);
+            if (scheduler) {
+                MEMORY_BASIC_INFORMATION mbiSched;
+                if (VirtualQuery(reinterpret_cast<LPCVOID>(scheduler), &mbiSched, sizeof(mbiSched)) &&
+                    (mbiSched.State == MEM_COMMIT) &&
+                    !(mbiSched.Protect & PAGE_NOACCESS)) {
+                    return scheduler;
+                }
+            }
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        // RVA offset failed, fall through to pattern scan
+    }
+
+    // Method 2: Also try the other TaskScheduler pointer offset from offsets.hpp
+    uintptr_t tsPtrAddr2 = base + 0x8B5CEE8;
+    __try {
+        MEMORY_BASIC_INFORMATION mbi;
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(tsPtrAddr2), &mbi, sizeof(mbi)) &&
+            (mbi.State == MEM_COMMIT) &&
+            !(mbi.Protect & PAGE_NOACCESS) &&
+            !(mbi.Protect & PAGE_GUARD)) {
+
+            uintptr_t scheduler = *reinterpret_cast<uintptr_t*>(tsPtrAddr2);
+            if (scheduler) {
+                MEMORY_BASIC_INFORMATION mbiSched;
+                if (VirtualQuery(reinterpret_cast<LPCVOID>(scheduler), &mbiSched, sizeof(mbiSched)) &&
+                    (mbiSched.State == MEM_COMMIT) &&
+                    !(mbiSched.Protect & PAGE_NOACCESS)) {
+                    return scheduler;
+                }
+            }
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+    }
+
+    // Method 3: Pattern scan fallback
     // 48 8B 0D ? ? ? ? 48 85 C9 74 ? 48 8B 01 FF 50
     const BYTE* memory = reinterpret_cast<const BYTE*>(base);
     uintptr_t current = base;

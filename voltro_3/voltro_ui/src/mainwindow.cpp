@@ -15,6 +15,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QDateTime>
+#include <QTextBrowser>
 
 namespace Voltro {
 
@@ -66,7 +67,9 @@ MainWindow::MainWindow(QWidget *parent)
     setupScriptHub();
 
     addOutputLog("[VOLTRO CORE] Native Qt GUI initialized successfully.", "ok");
-    addOutputLog("[RUNTIME] Voltro Virtual Engine loaded.", "info");
+    addOutputLog("[RUNTIME] Voltro RVA Engine v2.0 loaded (Sept 2026 build offsets).", "info");
+    addOutputLog("[ENGINE] Using community-sourced RVA offsets from Roblox-Offsets-Website.", "info");
+    addOutputLog("[IPC] Listening on \\\\.\\pipe\\VoltroIPC.", "info");
 }
 
 MainWindow::~MainWindow() {
@@ -194,13 +197,18 @@ void MainWindow::onAttachClicked() {
     if (targets.empty()) {
         addOutputLog("[ATTACH] Target Roblox process not found. Please launch Roblox first.", "error");
         ui->lblSideStatus->setText(QString::fromUtf8("● Not Attached"));
-        ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px;");
+        ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px; font-weight: bold;");
+        ui->lblRobloxVersion->setText("Roblox: Not found");
         m_isAttached = false;
         return;
     }
 
     DWORD pid = targets[0].pid;
-    addOutputLog(QString("[ATTACH] Target detected: PID %1. Attempting injection...").arg(pid), "info");
+    QString processName = QString::fromStdWString(targets[0].processName);
+    addOutputLog(QString("[ATTACH] Target detected: %1 (PID %2). Attempting injection...").arg(processName, QString::number(pid)), "info");
+
+    // Update Roblox version display
+    ui->lblRobloxVersion->setText(QString("Roblox: PID %1").arg(pid));
 
     std::string absDllPath = InjectorEngine::getDllAbsolutePath("voltro_runtime.dll");
     addOutputLog(QString("[ATTACH] DLL path: %1").arg(QString::fromStdString(absDllPath)), "info");
@@ -208,13 +216,18 @@ void MainWindow::onAttachClicked() {
     auto result = InjectorEngine::injectDll(pid, absDllPath);
     if (result.status == InjectionStatus::SUCCESS) {
         addOutputLog(QString("[ATTACH SUCCESS] Attached to PID %1! Memory bridge established.").arg(pid), "ok");
+        addOutputLog("[OFFSET ENGINE] Using community RVA offsets (Roblox-Offsets-Website, Sept 2026 build).", "info");
         ui->lblSideStatus->setText(QString::fromUtf8("● Attached (PID: %1)").arg(pid));
-        ui->lblSideStatus->setStyleSheet("color: #00ff66; font-size: 11px;");
+        ui->lblSideStatus->setStyleSheet("color: #00ff66; font-size: 11px; font-weight: bold;");
+        ui->lblEngineVersion->setText("RVA Engine v2.0 | ACTIVE");
+        ui->lblEngineVersion->setStyleSheet("color: #00ff66; font-size: 9px; font-family: 'JetBrains Mono';");
         m_isAttached = true;
     } else {
         addOutputLog(QString("[ATTACH FAILED] %1").arg(QString::fromStdString(result.message)), "error");
         ui->lblSideStatus->setText(QString::fromUtf8("● Not Attached"));
-        ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px;");
+        ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px; font-weight: bold;");
+        ui->lblEngineVersion->setText("RVA Engine v2.0 | Build 2026.09");
+        ui->lblEngineVersion->setStyleSheet("color: #8b9bb0; font-size: 9px; font-family: 'JetBrains Mono';");
         m_isAttached = false;
         return;
     }
@@ -225,11 +238,15 @@ void MainWindow::onAttachClicked() {
             if (exitCode != 0) {
                 addOutputLog(QString("[WATCHDOG ALERT] %1").arg(QString::fromStdString(diag)), "error");
                 ui->lblSideStatus->setText(QString::fromUtf8("● Not Attached (Crashed)"));
-                ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px;");
+                ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px; font-weight: bold;");
+                ui->lblEngineVersion->setText("RVA Engine v2.0 | Build 2026.09");
+                ui->lblEngineVersion->setStyleSheet("color: #8b9bb0; font-size: 9px; font-family: 'JetBrains Mono';");
             } else {
                 addOutputLog("[WATCHDOG] Roblox closed cleanly.", "info");
                 ui->lblSideStatus->setText(QString::fromUtf8("● Not Attached"));
-                ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px;");
+                ui->lblSideStatus->setStyleSheet("color: #ff3b5c; font-size: 11px; font-weight: bold;");
+                ui->lblEngineVersion->setText("RVA Engine v2.0 | Build 2026.09");
+                ui->lblEngineVersion->setStyleSheet("color: #8b9bb0; font-size: 9px; font-family: 'JetBrains Mono';");
             }
             m_isAttached = false;
         }, Qt::QueuedConnection);
@@ -531,20 +548,19 @@ void MainWindow::addOutputLog(const QString& message, const QString& level) {
     if (!ui->txtConsole) return;
 
     QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
-    QString prefix = QString("[%1] ").arg(timestamp);
     QString coloredMsg;
 
     if (level == "ok") {
-        coloredMsg = QString("%1[SUCCESS] %2").arg(prefix, message);
+        coloredMsg = QString("<span style='color:#6b7280'>[%1]</span> <span style='color:#00ff66'>%2</span>").arg(timestamp, message);
     } else if (level == "warn") {
-        coloredMsg = QString("%1[WARNING] %2").arg(prefix, message);
+        coloredMsg = QString("<span style='color:#6b7280'>[%1]</span> <span style='color:#ffb800'>%2</span>").arg(timestamp, message);
     } else if (level == "error") {
-        coloredMsg = QString("%1[ERROR] %2").arg(prefix, message);
+        coloredMsg = QString("<span style='color:#6b7280'>[%1]</span> <span style='color:#ff3b5c'>%2</span>").arg(timestamp, message);
     } else {
-        coloredMsg = QString("%1%2").arg(prefix, message);
+        coloredMsg = QString("<span style='color:#6b7280'>[%1]</span> <span style='color:#8b9bb0'>%2</span>").arg(timestamp, message);
     }
 
-    ui->txtConsole->appendPlainText(coloredMsg);
+    ui->txtConsole->append(coloredMsg);
 }
 
 } // namespace Voltro
