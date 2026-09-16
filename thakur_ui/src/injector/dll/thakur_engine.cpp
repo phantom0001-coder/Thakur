@@ -1,3 +1,14 @@
+#include "thakur_engine.h"
+#include "thakur_runtime.h"
+#include <windows.h>
+#include <psapi.h>
+#include <cstdint>
+#include <string>
+#include <queue>
+#include <mutex>
+#include <atomic>
+#include <thread>
+#include <functional>
 
 
 namespace Thakur {
@@ -129,10 +140,33 @@ bool ThakurExecutionEngine::hookSchedulerJob(uintptr_t scheduler) {
 }
 
 bool ThakurExecutionEngine::initialize() {
+    if (m_hooked) {
+        return true;
+    }
     
+    uintptr_t scheduler = findTaskScheduler();
+    if (!scheduler) {
+        FramedIpcBridge::instance().sendOutput("[THAKUR ENGINE] Failed to locate TaskScheduler instance.", "error");
+        m_hooked = false;
+        return false;
+    }
     
-    m_hooked = false;
-    return false;
+    m_scriptContext = scheduler;
+    
+    if (!hookSchedulerJob(scheduler)) {
+        FramedIpcBridge::instance().sendOutput("[THAKUR ENGINE] Failed to hook TaskScheduler job step.", "error");
+        m_hooked = false;
+        return false;
+    }
+    
+    if (LuaHookEngine::instance().isHooked()) {
+        m_luaState = LuaHookEngine::instance().getState();
+        FramedIpcBridge::instance().sendOutput("[THAKUR ENGINE] Lua state acquired from LuaHookEngine.", "ok");
+    }
+    
+    m_running = true;
+    FramedIpcBridge::instance().sendOutput("[THAKUR ENGINE] Successfully hooked into Roblox TaskScheduler.", "ok");
+    return true;
 }
 
 void ThakurExecutionEngine::shutdown() {
@@ -187,6 +221,13 @@ void ThakurExecutionEngine::setupLuauEnvironment(lua_State_t L) {
 }
 
 void ThakurExecutionEngine::onJobStep() {
+    if (!m_running) {
+        if (m_originalJobStep && m_targetJob) {
+            SafeCallOriginalStep(m_originalJobStep, reinterpret_cast<void*>(m_targetJob));
+        }
+        return;
+    }
+
     std::string scriptToExec;
     {
         std::lock_guard<std::mutex> lock(m_queueMutex);
@@ -196,9 +237,41 @@ void ThakurExecutionEngine::onJobStep() {
         }
     }
 
-    if (!scriptToExec.empty()) {
-        FramedIpcBridge::instance().sendOutput("[TASK SCHEDULER] Executing on Roblox main thread step...", "ok");
-        FramedIpcBridge::instance().sendOutput("[THAKUR ENGINE] Executed script block cleanly (" + std::to_string(scriptToExec.length()) + " bytes).", "ok");
+    if (!scriptToExec.empty() && m_luaState) {
+        FramedIpcBridge::instance().sendOutput("[TASK SCHEDULER] Executing on Roblox main thread step...", "info");
+        
+        __try {
+            uintptr_t extraSpaceAddr = reinterpret_cast<uintptr_t>(m_luaState) - 0x78;
+            MEMORY_BASIC_INFORMATION mbi;
+            if (VirtualQuery(reinterpret_cast<LPCVOID>(extraSpaceAddr), &mbi, sizeof(mbi)) &&
+                (mbi.State == MEM_COMMIT) &&
+                (mbi.Protect & (PAGE_READWRITE | PAGE_EXECUTE_READWRITE))) {
+                
+                auto* extra = reinterpret_cast<RobloxExtraSpace*>(extraSpaceAddr);
+                extra->capabilities = CAPABILITIES_ALL;
+                extra->identity = 8;
+            }
+        } __except (EXCEPTION_EXECUTE_HANDLER) {
+        }
+        
+        luaL_dostring_t doString = nullptr;
+        if (LuaHookEngine::instance().isHooked()) {
+            doString = reinterpret_cast<luaL_dostring_t>(LuaHookEngine::instance().getDoStringPtr());
+        }
+        
+        if (doString) {
+            bool fault = false;
+            int status = SafeCallDoString(doString, m_luaState, scriptToExec.c_str(), fault);
+            if (fault) {
+                FramedIpcBridge::instance().sendOutput("[EXCEPTION] Crash guard intercepted memory fault during execution.", "error");
+            } else if (status == 0) {
+                FramedIpcBridge::instance().sendOutput("[THAKUR ENGINE] Executed script block cleanly (" + std::to_string(scriptToExec.length()) + " bytes).", "ok");
+            } else {
+                FramedIpcBridge::instance().sendOutput("[LUA ERROR] Execution returned status: " + std::to_string(status), "error");
+            }
+        } else {
+            FramedIpcBridge::instance().sendOutput("[WARN] LuaHookEngine not ready - using fallback execution path.", "warn");
+        }
     }
 
     

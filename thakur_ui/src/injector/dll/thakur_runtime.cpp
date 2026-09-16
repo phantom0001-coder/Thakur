@@ -1,3 +1,16 @@
+#include "thakur_runtime.h"
+#include "thakur_engine.h"
+#include <windows.h>
+#include <psapi.h>
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <atomic>
+#include <thread>
+#include <functional>
+#include <algorithm>
+#include <chrono>
 
 
 namespace Thakur {
