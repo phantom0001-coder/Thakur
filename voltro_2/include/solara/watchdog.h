@@ -31,7 +31,7 @@ private:
     std::thread m_workerThread;
 };
 
-} // namespace Supervisor
-} // namespace Solara
+} 
+} 
 
-#endif // SOLARA_WATCHDOG_H
+#endif 

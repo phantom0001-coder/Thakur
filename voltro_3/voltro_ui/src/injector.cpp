@@ -1,14 +1,14 @@
 #include "injector.h"
 #include "injector/Inj1Injector.h"
 #include <windows.h>
-// Undefine Windows 'get' macro to avoid conflicts with Qt's QNetworkAccessManager::get()
+
 #undef get
 #include <fstream>
 #include <sstream>
 
 namespace Voltro {
 
-// Get absolute path for DLL
+
 std::string InjectorEngine::getDllAbsolutePath(const std::string& dllName) {
     char buffer[MAX_PATH];
     GetModuleFileNameA(NULL, buffer, MAX_PATH);
@@ -20,7 +20,7 @@ std::string InjectorEngine::getDllAbsolutePath(const std::string& dllName) {
     return dllName;
 }
 
-// Read PE file into memory
+
 bool InjectorEngine::readPeFile(const std::string& filePath, std::vector<BYTE>& outData) {
     std::ifstream file(filePath, std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
@@ -43,14 +43,14 @@ bool InjectorEngine::readPeFile(const std::string& filePath, std::vector<BYTE>& 
     return true;
 }
 
-// Get NtSetIoCompletion from ntdll
+
 FARPROC InjectorEngine::getNtSetIoCompletion() {
     HMODULE hNtdll = GetModuleHandleA("ntdll.dll");
     if (!hNtdll) {
         return nullptr;
     }
     
-    // Try both ANSI and Wide versions
+    
     FARPROC pFunc = GetProcAddress(hNtdll, "NtSetIoCompletion");
     if (pFunc) {
         return pFunc;
@@ -59,7 +59,7 @@ FARPROC InjectorEngine::getNtSetIoCompletion() {
     return GetProcAddress(hNtdll, "NtSetIoCompletionEx");
 }
 
-// Find section for RVA
+
 const IMAGE_SECTION_HEADER* InjectorEngine::findSectionForRva(
     const IMAGE_SECTION_HEADER* sections, DWORD numSections, DWORD rva) {
     
@@ -72,13 +72,13 @@ const IMAGE_SECTION_HEADER* InjectorEngine::findSectionForRva(
     return nullptr;
 }
 
-// Resolve imports for manually mapped module
+
 bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
                                    DWORD importRva, DWORD importSize,
                                    const std::vector<BYTE>& peData) {
     
     if (importRva == 0 || importSize == 0) {
-        return true; // No imports to resolve
+        return true; 
     }
     
     const BYTE* peBase = peData.data();
@@ -86,13 +86,13 @@ bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
         reinterpret_cast<const IMAGE_IMPORT_DESCRIPTOR*>(peBase + importRva);
     
     while (pImportDesc->Name != 0) {
-        // Get DLL name
+        
         const char* dllName = reinterpret_cast<const char*>(peBase + pImportDesc->Name);
         
-        // Load the DLL in our own process first
+        
         HMODULE hDll = LoadLibraryA(dllName);
         if (!hDll) {
-            // Try again with absolute path
+            
             std::string dllPath = getDllAbsolutePath(dllName);
             hDll = LoadLibraryA(dllPath.c_str());
         }
@@ -101,13 +101,13 @@ bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
             return false;
         }
         
-        // Process thunk data (OriginalFirstThunk for IAT, FirstThunk for INT)
+        
         const IMAGE_THUNK_DATA* pThunk = 
             reinterpret_cast<const IMAGE_THUNK_DATA*>(peBase + pImportDesc->OriginalFirstThunk);
         const IMAGE_THUNK_DATA* pThunkIAT = 
             reinterpret_cast<const IMAGE_THUNK_DATA*>(peBase + pImportDesc->FirstThunk);
         
-        // Allocate memory for IAT in remote process
+        
         LPVOID remoteThunk = VirtualAllocEx(hProcess, NULL, importSize, 
                                            MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (!remoteThunk) {
@@ -115,10 +115,10 @@ bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
             return false;
         }
         
-        // Walk the thunk chain
+        
         while (pThunk->u1.AddressOfData != 0) {
             if (pThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG) {
-                // Import by ordinal
+                
                 WORD ordinal = IMAGE_ORDINAL(pThunk->u1.Ordinal);
                 FARPROC funcAddr = GetProcAddress(hDll, reinterpret_cast<const char*>(ordinal));
                 
@@ -127,7 +127,7 @@ bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
                     return false;
                 }
                 
-                // Write the function address to the IAT
+                
                 ULONGLONG addr = reinterpret_cast<ULONGLONG>(funcAddr);
                 SIZE_T written = 0;
                 if (!WriteProcessMemory(hProcess, 
@@ -138,7 +138,7 @@ bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
                     return false;
                 }
             } else {
-                // Import by name
+                
                 const IMAGE_IMPORT_BY_NAME* pImportByName = 
                     reinterpret_cast<const IMAGE_IMPORT_BY_NAME*>(peBase + pThunk->u1.AddressOfData);
                 const char* funcName = reinterpret_cast<const char*>(pImportByName->Name);
@@ -149,7 +149,7 @@ bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
                     return false;
                 }
                 
-                // Write the function address to the IAT
+                
                 ULONGLONG addr = reinterpret_cast<ULONGLONG>(funcAddr);
                 SIZE_T written = 0;
                 if (!WriteProcessMemory(hProcess,
@@ -172,13 +172,13 @@ bool InjectorEngine::resolveImports(HANDLE hProcess, LPVOID mappedBase,
     return true;
 }
 
-// Apply relocations
+
 bool InjectorEngine::applyRelocations(HANDLE hProcess, LPVOID mappedBase,
                                      ULONGLONG delta, DWORD relocRva, DWORD relocSize,
                                      const std::vector<BYTE>& peData) {
     
     if (relocRva == 0 || relocSize == 0 || delta == 0) {
-        return true; // No relocations needed
+        return true; 
     }
     
     const BYTE* peBase = peData.data();
@@ -205,11 +205,11 @@ bool InjectorEngine::applyRelocations(HANDLE hProcess, LPVOID mappedBase,
             
             switch (type) {
                 case IMAGE_REL_BASED_ABSOLUTE: {
-                    // Skip
+                    
                     break;
                 }
                 case IMAGE_REL_BASED_HIGHLOW: {
-                    // 32-bit relative address
+                    
                     ULONGLONG* pPatch = reinterpret_cast<ULONGLONG*>(
                         reinterpret_cast<ULONGLONG>(mappedBase) + 
                         pRelocBlock->VirtualAddress + offset);
@@ -230,7 +230,7 @@ bool InjectorEngine::applyRelocations(HANDLE hProcess, LPVOID mappedBase,
                     break;
                 }
                 case IMAGE_REL_BASED_DIR64: {
-                    // 64-bit relative address
+                    
                     ULONGLONG* pPatch = reinterpret_cast<ULONGLONG*>(
                         reinterpret_cast<ULONGLONG>(mappedBase) + 
                         pRelocBlock->VirtualAddress + offset);
@@ -261,43 +261,43 @@ bool InjectorEngine::applyRelocations(HANDLE hProcess, LPVOID mappedBase,
     return true;
 }
 
-// Create shellcode for DllMain/EntryPoint execution
+
 std::vector<BYTE> InjectorEngine::createEntryPointShellcode(ULONGLONG entryPoint, ULONGLONG baseAddress) {
     std::vector<BYTE> shellcode;
     shellcode.reserve(128);
     
-    // x64 shellcode to call entry point with proper arguments
-    // DllMain(HINSTANCE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
-    // For DLL_PROCESS_ATTACH: rcx = baseAddress, rdx = 1 (DLL_PROCESS_ATTACH), r8 = 0
     
-    // mov rcx, baseAddress
+    
+    
+    
+    
     shellcode.push_back(0x48); shellcode.push_back(0xB9);
     BYTE* pBase = reinterpret_cast<BYTE*>(&baseAddress);
     shellcode.insert(shellcode.end(), pBase, pBase + 8);
     
-    // mov edx, 1 (DLL_PROCESS_ATTACH)
+    
     shellcode.push_back(0xBA);
     shellcode.push_back(0x01); shellcode.push_back(0x00);
     shellcode.push_back(0x00); shellcode.push_back(0x00);
     
-    // xor r8, r8 (NULL for lpReserved)
+    
     shellcode.push_back(0x4D); shellcode.push_back(0x31); shellcode.push_back(0xC0);
     
-    // mov rax, entryPoint
+    
     shellcode.push_back(0x48); shellcode.push_back(0xB8);
     BYTE* pEntry = reinterpret_cast<BYTE*>(&entryPoint);
     shellcode.insert(shellcode.end(), pEntry, pEntry + 8);
     
-    // call rax
+    
     shellcode.push_back(0xFF); shellcode.push_back(0xD0);
     
-    // ret
+    
     shellcode.push_back(0xC3);
     
     return shellcode;
 }
 
-// Perform manual mapping
+
 InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std::vector<BYTE>& peData) {
     InjectionResult res;
     res.targetPid = GetProcessId(hProcess);
@@ -330,7 +330,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         return res;
     }
     
-    // Allocate memory for the entire image in the remote process
+    
     LPVOID remoteBase = VirtualAllocEx(hProcess, 
                                       reinterpret_cast<LPVOID>(pNtHeaders->OptionalHeader.ImageBase),
                                       pNtHeaders->OptionalHeader.SizeOfImage,
@@ -350,12 +350,12 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         return res;
     }
     
-    // Calculate delta between preferred base and actual base
+    
     ULONGLONG preferredBase = pNtHeaders->OptionalHeader.ImageBase;
     ULONGLONG actualBase = reinterpret_cast<ULONGLONG>(remoteBase);
     ULONGLONG delta = actualBase - preferredBase;
     
-    // Copy PE headers
+    
     SIZE_T headersSize = pNtHeaders->OptionalHeader.SizeOfHeaders;
     SIZE_T bytesWritten = 0;
     if (!WriteProcessMemory(hProcess, remoteBase, peData.data(), headersSize, &bytesWritten) 
@@ -366,7 +366,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         return res;
     }
     
-    // Copy sections
+    
     const IMAGE_SECTION_HEADER* pSectionHeaders = IMAGE_FIRST_SECTION(pNtHeaders);
     for (WORD i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++) {
         const IMAGE_SECTION_HEADER& section = pSectionHeaders[i];
@@ -387,7 +387,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         }
     }
     
-    // Apply relocations if needed
+    
     if (delta != 0 && pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].Size > 0) {
         if (!applyRelocations(hProcess, remoteBase, delta,
                               pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress,
@@ -400,7 +400,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         }
     }
     
-    // Resolve imports
+    
     if (pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size > 0) {
         if (!resolveImports(hProcess, remoteBase,
                             pNtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress,
@@ -413,11 +413,11 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         }
     }
     
-    // Create entry point shellcode
+    
     ULONGLONG entryPoint = preferredBase + pNtHeaders->OptionalHeader.AddressOfEntryPoint;
     std::vector<BYTE> entryShellcode = createEntryPointShellcode(entryPoint, actualBase);
     
-    // Allocate memory for shellcode
+    
     LPVOID shellcodeMem = VirtualAllocEx(hProcess, NULL, entryShellcode.size(),
                                         MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!shellcodeMem) {
@@ -427,7 +427,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         return res;
     }
     
-    // Write shellcode
+    
     if (!WriteProcessMemory(hProcess, shellcodeMem, entryShellcode.data(), 
                            entryShellcode.size(), &bytesWritten) || 
         bytesWritten != entryShellcode.size()) {
@@ -438,10 +438,10 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         return res;
     }
     
-    // Use NtSetIoCompletion for thread creation (inj-1)
+    
     FARPROC pNtSetIoCompletion = getNtSetIoCompletion();
     if (!pNtSetIoCompletion) {
-        // Fallback to CreateRemoteThread
+        
         HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0,
                                            reinterpret_cast<LPTHREAD_START_ROUTINE>(shellcodeMem),
                                            remoteBase, 0, NULL);
@@ -456,14 +456,14 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         WaitForSingleObject(hThread, INFINITE);
         CloseHandle(hThread);
     } else {
-        // Use NtSetIoCompletion for stealthier execution
+        
         typedef NTSTATUS(NTAPI* PNtSetIoCompletion)(
             HANDLE, HANDLE, PVOID, NTSTATUS, ULONG_PTR, PULONG_PTR);
         
         HANDLE hIoCompletion = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
         if (hIoCompletion) {
-            // This is a simplified approach - actual inj-1 uses more sophisticated techniques
-            // Create a thread that will call the shellcode
+            
+            
             DWORD threadId = 0;
             HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0,
                                                reinterpret_cast<LPTHREAD_START_ROUTINE>(shellcodeMem),
@@ -474,7 +474,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
             }
             CloseHandle(hIoCompletion);
         } else {
-            // Fallback
+            
             HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0,
                                                reinterpret_cast<LPTHREAD_START_ROUTINE>(shellcodeMem),
                                                remoteBase, 0, NULL);
@@ -491,7 +491,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
         }
     }
     
-    // Clean up shellcode memory (optional, can be left for persistence)
+    
     VirtualFreeEx(hProcess, shellcodeMem, 0, MEM_RELEASE);
     
     res.status = InjectionStatus::SUCCESS;
@@ -499,7 +499,7 @@ InjectionResult InjectorEngine::performManualMapping(HANDLE hProcess, const std:
     return res;
 }
 
-// inj-1: Section Stomping injection
+
 InjectionResult InjectorEngine::sectionStompingInject(DWORD pid, const std::string& dllPath) {
     InjectionResult res;
     res.targetPid = pid;
@@ -515,7 +515,7 @@ InjectionResult InjectorEngine::sectionStompingInject(DWORD pid, const std::stri
         targetDllPath = getDllAbsolutePath(dllPath);
     }
     
-    // Read the DLL
+    
     std::vector<BYTE> peData;
     if (!readPeFile(targetDllPath, peData)) {
         res.status = InjectionStatus::PE_PARSING_FAILED;
@@ -523,7 +523,7 @@ InjectionResult InjectorEngine::sectionStompingInject(DWORD pid, const std::stri
         return res;
     }
     
-    // Open target process
+    
     HANDLE hProcess = OpenProcess(
         PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_CREATE_THREAD,
         FALSE,
@@ -536,14 +536,14 @@ InjectionResult InjectorEngine::sectionStompingInject(DWORD pid, const std::stri
         return res;
     }
     
-    // inj-1: Section Stomping - Hide DLL in a legitimate system DLL section
-    // For simplicity, we'll use manual mapping with section stomping technique
-    // The actual section stomping would involve:
-    // 1. Finding a writable section in a system DLL (e.g., user32.dll, ntdll.dll)
-    // 2. Overwriting that section with our DLL code
-    // 3. Using NtSetIoCompletion to trigger execution
     
-    // For now, use manual mapping which is the core of inj-1
+    
+    
+    
+    
+    
+    
+    
     res = performManualMapping(hProcess, peData);
     CloseHandle(hProcess);
     
@@ -554,7 +554,7 @@ InjectionResult InjectorEngine::sectionStompingInject(DWORD pid, const std::stri
     return res;
 }
 
-// Main injection method - inj-1 Manual Mapping + Section Stomping
+
 InjectionResult InjectorEngine::injectDll(DWORD pid, const std::string& dllPath) {
     InjectionResult res;
     res.targetPid = pid;
@@ -570,7 +570,7 @@ InjectionResult InjectorEngine::injectDll(DWORD pid, const std::string& dllPath)
         targetDllPath = getDllAbsolutePath(dllPath);
     }
     
-    // Read the DLL
+    
     std::vector<BYTE> peData;
     if (!readPeFile(targetDllPath, peData)) {
         res.status = InjectionStatus::PE_PARSING_FAILED;
@@ -578,14 +578,14 @@ InjectionResult InjectorEngine::injectDll(DWORD pid, const std::string& dllPath)
         return res;
     }
     
-    // Attempt inj-1 Section Stomping + NtSetIoCompletion injection first
+    
     if (Voltro::Injector::Inj1Injector::Get()->Inject(pid, targetDllPath)) {
         res.status = InjectionStatus::SUCCESS;
         res.message = "inj-1 Stealth Injection (Section Stomping + NtSetIoCompletion) successful into PID " + std::to_string(pid);
         return res;
     }
     
-    // Fallback: Open target process for manual mapping
+    
     HANDLE hProcess = OpenProcess(
         PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_CREATE_THREAD,
         FALSE,
@@ -608,7 +608,7 @@ InjectionResult InjectorEngine::injectDll(DWORD pid, const std::string& dllPath)
     return res;
 }
 
-// Manual mapping from raw PE bytes
+
 InjectionResult InjectorEngine::manualMapInject(DWORD pid, const std::vector<BYTE>& peData) {
     InjectionResult res;
     res.targetPid = pid;
@@ -619,7 +619,7 @@ InjectionResult InjectorEngine::manualMapInject(DWORD pid, const std::vector<BYT
         return res;
     }
     
-    // Open target process
+    
     HANDLE hProcess = OpenProcess(
         PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ | PROCESS_CREATE_THREAD,
         FALSE,
@@ -642,4 +642,4 @@ InjectionResult InjectorEngine::manualMapInject(DWORD pid, const std::vector<BYT
     return res;
 }
 
-} // namespace Voltro
+} 

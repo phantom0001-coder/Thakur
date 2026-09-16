@@ -9,9 +9,9 @@
 namespace Solara {
 namespace Engine {
 
-// -----------------------------------------------------------------------------
-// Solara Execution Engine (TaskScheduler Hooking & Luau Main-Thread Stepper)
-// -----------------------------------------------------------------------------
+
+
+
 
 class SolaraEngine {
 public:
@@ -48,12 +48,12 @@ private:
     std::queue<std::string> m_scriptQueue;
     std::mutex m_queueMutex;
 
-    // Simulation / Standalone fallback thread when not inside Roblox address space
+    
     std::thread m_fallbackThread;
     void fallbackStepLoop();
 };
 
-} // namespace Engine
-} // namespace Solara
+} 
+} 
 
-#endif // SOLARA_ENGINE_H
+#endif 

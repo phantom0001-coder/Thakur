@@ -43,7 +43,7 @@ bool NamedPipeBridge::startServer(const std::wstring& pipeName) {
                 m_clientConnected = true;
 
                 while (m_running && m_clientConnected) {
-                    // Try reading 4-byte framed length
+                    
                     uint32_t packetLen = 0;
                     DWORD bytesRead = 0;
                     BOOL ok = ReadFile(m_pipeHandle, &packetLen, sizeof(uint32_t), &bytesRead, NULL);
@@ -69,7 +69,7 @@ bool NamedPipeBridge::startServer(const std::wstring& pipeName) {
                             m_payloadHandler(msg);
                         }
                     } else if (bytesRead > 0) {
-                        // Raw string fallback
+                        
                         char rawBuf[2048];
                         memcpy(rawBuf, &packetLen, bytesRead);
                         DWORD extraRead = 0;
@@ -131,7 +131,7 @@ bool NamedPipeBridge::sendLogMessage(const std::string& level, const std::string
 bool NamedPipeBridge::sendScriptPayload(const std::string& script) {
     if (!m_running || m_pipeHandle == INVALID_HANDLE_VALUE || !m_clientConnected) return false;
 
-    // Send payload formatted for the attached Luau execution engine
+    
     std::string escaped;
     escaped.reserve(script.size() + 32);
     for (char c : script) {
@@ -145,7 +145,7 @@ bool NamedPipeBridge::sendScriptPayload(const std::string& script) {
 
     std::string payload = "{\"type\":\"EXECUTE_SCRIPT\",\"code\":\"" + escaped + "\"}";
 
-    // Single deterministic 4-byte length framed packet (Solara architecture)
+    
     uint32_t len = static_cast<uint32_t>(payload.size());
     std::vector<BYTE> framedPacket(sizeof(uint32_t) + len);
     memcpy(framedPacket.data(), &len, sizeof(uint32_t));
@@ -159,4 +159,4 @@ void NamedPipeBridge::setPayloadHandler(std::function<void(const IpcMessage&)> h
     m_payloadHandler = handler;
 }
 
-} // namespace Voltro
+} 

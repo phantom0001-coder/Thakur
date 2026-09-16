@@ -9,7 +9,7 @@
 
 namespace Voltro {
 
-// Voltro Unified Naming Convention (UNC) environment
+
 class VoltroEnvironment {
 public:
     static VoltroEnvironment& getInstance() {
@@ -17,9 +17,9 @@ public:
         return instance;
     }
 
-    // Register all standard Voltro UNC globals & callbacks
+    
     void initializeEnvironment() {
-        // Core Identity
+        
         m_globals["identifyexecutor"] = [](const std::vector<std::string>& args) -> std::string {
             return "Voltro, v1.5.0";
         };
@@ -30,7 +30,7 @@ public:
             return "true";
         };
 
-        // Clipboard
+        
         m_globals["setclipboard"] = [this](const std::vector<std::string>& args) -> std::string {
             if (!args.empty()) {
                 this->setClipboardText(args[0]);
@@ -38,7 +38,7 @@ public:
             return "true";
         };
 
-        // File System (Virtual Workspace)
+        
         m_globals["writefile"] = [this](const std::vector<std::string>& args) -> std::string {
             if (args.size() >= 2) {
                 m_virtualFs[args[0]] = args[1];
@@ -66,7 +66,7 @@ public:
             return "false";
         };
 
-        // UNC In-Game FPS Booster & Cap Controller
+        
         m_globals["setfpscap"] = [this](const std::vector<std::string>& args) -> std::string {
             if (!args.empty()) {
                 try {
@@ -83,7 +83,7 @@ public:
         };
     }
 
-    // Safe clipboard setter using Win32 API
+    
     bool setClipboardText(const std::string& text) {
         if (!OpenClipboard(NULL)) return false;
         EmptyClipboard();
@@ -109,7 +109,7 @@ public:
         return "";
     }
 
-    // Generate the in-game Luau FPS Booster payload
+    
     static std::string generateFpsBoostScript(int targetFps = 240) {
         return 
             "-- [[ Voltro Universal In-Game FPS Booster & Optimizer ]]\n"
@@ -144,4 +144,4 @@ private:
     int m_fpsCap = 240;
 };
 
-} // namespace Voltro
+} 

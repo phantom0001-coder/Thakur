@@ -1,10 +1,10 @@
 #pragma once
 
-// ============================================================
-//  Inj1Injector.h  --  inj-1 Manual Mapping Injection Engine
-//  Integrated from original inj-1 project
-//  Uses Section Stomping + NtSetIoCompletion for stealth injection
-// ============================================================
+
+
+
+
+
 
 #include <windows.h>
 #include <winternl.h>
@@ -37,7 +37,7 @@
 namespace Voltro {
 namespace Injector {
 
-// NT Function Type Definitions
+
 typedef NTSTATUS(NTAPI* NtCreateSection_t)(
     PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES, PLARGE_INTEGER, ULONG, ULONG, HANDLE);
 
@@ -128,10 +128,10 @@ public:
         return &Instance;
     }
 
-    // Main injection method - inject DLL into process
+    
     bool Inject(DWORD Pid, const std::string& dllPath);
 
-    // Find Roblox process by name
+    
     static DWORD GetProcessPidByName(const char* Name);
 
 private:
@@ -152,7 +152,7 @@ private:
                        ULONG64 TlsRVA, ULONG64 TlsSize);
     bool ExecuteShellcode(HANDLE hProcess, const NtFunctions& Nt, DWORD Pid, PVOID TramAddr);
 
-    // Loader shellcode
+    
     static constexpr uint8_t LoaderShellcode[] = {
         0x48,0x89,0x4C,0x24,0x08,0x48,0x81,0xEC,0xD8,0x00,0x00,0x00,0x48,0x83,0xBC,0x24,
         0xE0,0x00,0x00,0x00,0x00,0x75,0x0A,0xB8,0x01,0x00,0x00,0x00,0xE9,0xC8,0x03,0x00,
@@ -224,5 +224,5 @@ private:
     std::string m_dllPath;
 };
 
-} // namespace Injector
-} // namespace Voltro
+} 
+} 

@@ -1,7 +1,7 @@
-// ============================================================
-//  test_main.cpp  --  Standalone test for Inj1Injector
-//  Compile with: cl.exe test_main.cpp Inj1Injector_standalone.cpp /EHsc /std:c++17
-// ============================================================
+
+
+
+
 
 #include "Inj1Injector_standalone.h"
 #include <iostream>
@@ -12,7 +12,7 @@ int main()
     std::cout << "=== Inj1Injector Standalone Test ===" << std::endl;
     std::cout << "Testing injection into Roblox..." << std::endl;
     
-    // Find Roblox process
+    
     DWORD robloxPid = Inj1Injector::GetProcessPidByName("RobloxPlayerBeta.exe");
     
     if (robloxPid == 0)
@@ -20,7 +20,7 @@ int main()
         std::cout << "[!] Roblox process not found! Make sure Roblox is running." << std::endl;
         std::cout << "    Process name searched: RobloxPlayerBeta.exe" << std::endl;
         
-        // Try alternative names
+        
         robloxPid = Inj1Injector::GetProcessPidByName("Roblox.exe");
         if (robloxPid == 0)
         {
@@ -38,7 +38,7 @@ int main()
         std::cout << "[+] Found RobloxPlayerBeta.exe with PID: " << robloxPid << std::endl;
     }
     
-    // Ask user for DLL path
+    
     std::string dllPath;
     std::cout << "\n[?] Enter path to DLL to inject: ";
     std::getline(std::cin, dllPath);
@@ -49,7 +49,7 @@ int main()
         return 1;
     }
     
-    // Remove quotes if present
+    
     if (!dllPath.empty() && dllPath.front() == '"' && dllPath.back() == '"')
     {
         dllPath = dllPath.substr(1, dllPath.size() - 2);
@@ -58,7 +58,7 @@ int main()
     std::cout << "[+] Attempting to inject: " << dllPath << std::endl;
     std::cout << "[+] Target PID: " << robloxPid << std::endl;
     
-    // Perform injection
+    
     auto* injector = Inj1Injector::Get();
     bool success = injector->Inject(robloxPid, dllPath);
     

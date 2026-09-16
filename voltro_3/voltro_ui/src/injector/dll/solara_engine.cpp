@@ -10,12 +10,12 @@
 namespace Voltro {
 namespace Runtime {
 
-// Static pointer for the hooked hook callback
+
 static SolaraExecutionEngine* g_solaraEngine = nullptr;
 
-// -----------------------------------------------------------------------------
-// SolaraExecutionEngine Implementation
-// -----------------------------------------------------------------------------
+
+
+
 
 SolaraExecutionEngine& SolaraExecutionEngine::instance() {
     static SolaraExecutionEngine inst;
@@ -39,8 +39,8 @@ uintptr_t SolaraExecutionEngine::findTaskScheduler() {
     uintptr_t base = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
     size_t size = modInfo.SizeOfImage;
 
-    // Scan for TaskScheduler pointer signature safely with page boundary validation:
-    // 48 8B 0D ? ? ? ? 48 85 C9 74 ? 48 8B 01 FF 50
+    
+    
     const BYTE* memory = reinterpret_cast<const BYTE*>(base);
     uintptr_t current = base;
     uintptr_t end = base + size;
@@ -83,14 +83,14 @@ uintptr_t SolaraExecutionEngine::findTaskScheduler() {
                     }
                 }
             } __except (EXCEPTION_EXECUTE_HANDLER) {
-                // Page access exception handled safely
+                
             }
         }
 
         current += mbi.RegionSize;
     }
 
-    // Return 0 if not found — never return raw machine code offsets which crash on dereference
+    
     return 0;
 }
 
@@ -103,7 +103,7 @@ static void __fastcall HookedJobStep(void* thisPtr, void* stats) {
 bool SolaraExecutionEngine::hookSchedulerJob(uintptr_t scheduler) {
     if (!scheduler) return false;
 
-    // Validate scheduler pointer readability via SEH
+    
     __try {
         MEMORY_BASIC_INFORMATION mbi;
         if (!VirtualQuery(reinterpret_cast<LPCVOID>(scheduler), &mbi, sizeof(mbi)) ||
@@ -138,7 +138,7 @@ bool SolaraExecutionEngine::hookSchedulerJob(uintptr_t scheduler) {
 bool SolaraExecutionEngine::initialize() {
     uintptr_t scheduler = findTaskScheduler();
     if (!scheduler) {
-        // Scheduler not matched yet — Solara runtime stays safe without crashing
+        
         return false;
     }
 
@@ -174,11 +174,11 @@ static void SafeElevateCapabilities(lua_State_t L) {
             (mbi.Protect & (PAGE_READWRITE | PAGE_EXECUTE_READWRITE))) {
             
             auto* extra = reinterpret_cast<RobloxExtraSpace*>(extraSpaceAddr);
-            extra->capabilities = CAPABILITIES_ALL; // Elevate all privileges
-            extra->identity = 8;                   // Identity 8
+            extra->capabilities = CAPABILITIES_ALL; 
+            extra->identity = 8;                   
         }
     } __except (EXCEPTION_EXECUTE_HANDLER) {
-        // Trapped safely
+        
     }
 }
 
@@ -209,7 +209,7 @@ void SolaraExecutionEngine::onJobStep() {
     if (!scriptToExec.empty()) {
         FramedIpcBridge::instance().sendOutput("[TASK SCHEDULER] Executing on Roblox main thread step...", "ok");
 
-        // Execute via LuaHookEngine which has the resolved luaL_dostring + lua_State
+        
         auto& engine = LuaHookEngine::instance();
         if (engine.isHooked() && engine.getState()) {
             bool success = engine.executeScript(scriptToExec);
@@ -219,22 +219,22 @@ void SolaraExecutionEngine::onJobStep() {
                 FramedIpcBridge::instance().sendOutput("[SOLARA ENGINE] Script execution failed — LuaVM not ready or script blocked.", "error");
             }
         } else {
-            // Fallback: queue will be picked up next cycle when engine is ready
+            
             std::lock_guard<std::mutex> lock(m_queueMutex);
             m_scriptQueue.push(scriptToExec);
             FramedIpcBridge::instance().sendOutput("[SOLARA ENGINE] LuaVM not hooked yet — script re-queued.", "warn");
         }
     }
 
-    // Call original step protected by SEH so Roblox main game loop never crashes
+    
     if (m_originalJobStep && m_targetJob) {
         SafeCallOriginalStep(m_originalJobStep, reinterpret_cast<void*>(m_targetJob));
     }
 }
 
-// -----------------------------------------------------------------------------
-// FramedIpcBridge Implementation (4-byte length-prefix framing)
-// -----------------------------------------------------------------------------
+
+
+
 
 FramedIpcBridge& FramedIpcBridge::instance() {
     static FramedIpcBridge inst;
@@ -328,13 +328,13 @@ void FramedIpcBridge::communicationLoop() {
         sendOutput("[IPC] Connected to Voltro Host (Framed Protocol Active).", "ok");
 
         while (m_running) {
-            // Read 4-byte length prefix
+            
             uint32_t payloadLength = 0;
             if (!readExact(m_pipe, &payloadLength, sizeof(uint32_t))) {
-                break; // Disconnected
+                break; 
             }
 
-            if (payloadLength == 0 || payloadLength > 100 * 1024 * 1024) { // 100 MB max guard
+            if (payloadLength == 0 || payloadLength > 100 * 1024 * 1024) { 
                 break;
             }
 
@@ -343,7 +343,7 @@ void FramedIpcBridge::communicationLoop() {
                 break;
             }
 
-            // Route payload
+            
             if (m_scriptHandler) {
                 m_scriptHandler(payload);
             } else {
@@ -357,5 +357,5 @@ void FramedIpcBridge::communicationLoop() {
     }
 }
 
-} // namespace Runtime
-} // namespace Voltro
+} 
+} 

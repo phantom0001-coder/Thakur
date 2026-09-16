@@ -1,10 +1,10 @@
-// ============================================================
-//  PremiumManager.cpp  -  Voltro Executor  (Phase 5)
-// ============================================================
+
+
+
 
 #include "PremiumManager.h"
 
-// Qt headers
+
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QJsonDocument>
@@ -14,7 +14,7 @@
 #include <QCryptographicHash>
 #include <QDebug>
 
-// Win32 headers (order matters)
+
 #ifndef WIN32_LEAN_AND_MEAN
 #  define WIN32_LEAN_AND_MEAN
 #endif
@@ -22,35 +22,35 @@
 #include <iphlpapi.h>
 #pragma comment(lib, "iphlpapi.lib")
 
-// ----------------------------------------------------------------
-// Internal constants
-// ----------------------------------------------------------------
+
+
+
 namespace {
 
-// QSettings organisation / application identifiers
+
 constexpr const char* kOrg          = "Voltro";
 constexpr const char* kApp          = "VoltroExecutor";
 
-// Settings keys
+
 constexpr const char* kKeyStored    = "premium/key";
 constexpr const char* kKeyTier      = "premium/tier";
 constexpr const char* kKeyExpiry    = "premium/expiry";
 constexpr const char* kKeyLastOnline= "premium/lastOnline";
 
-// Network endpoints
-constexpr const char* kValidateUrl  = "https://api.voltro.gg/v1/validate";
 
-// The built-in test / trial key
+constexpr const char* kValidateUrl  = "https:
+
+
 constexpr const char* kTestKey      = "373438";
 
-// Offline grace period in days
+
 constexpr int kGracePeriodDays      = 7;
 
-} // anonymous namespace
+} 
 
-// ================================================================
-// Singleton
-// ================================================================
+
+
+
 
 namespace Voltro {
 
@@ -60,43 +60,43 @@ PremiumManager& PremiumManager::instance()
     return s_instance;
 }
 
-// ----------------------------------------------------------------
-// Constructor
-// ----------------------------------------------------------------
+
+
+
 PremiumManager::PremiumManager(QObject* parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
 {
-    // Register PlanInfo for queued connections
+    
     qRegisterMetaType<Voltro::PlanInfo>("Voltro::PlanInfo");
 
-    // Build HWID once and cache it
+    
     m_hwid = generateHWID();
 
-    // Start with a free-tier plan
+    
     m_plan = makePlanInfo(PlanTier::Free);
 }
 
-// ================================================================
-// HWID generation
-// ================================================================
+
+
+
 
 QString PremiumManager::generateHWID() const
 {
-    // 1. C-drive volume serial number
+    
     DWORD volumeSerial = 0;
     ::GetVolumeInformationW(
         L"C:\\",
-        nullptr, 0,          // volume name  (not needed)
+        nullptr, 0,          
         &volumeSerial,
-        nullptr,             // max component length (not needed)
-        nullptr,             // file system flags   (not needed)
-        nullptr, 0           // file system name    (not needed)
+        nullptr,             
+        nullptr,             
+        nullptr, 0           
     );
 
-    // 2. First non-loopback MAC address via GetAdaptersInfo
+    
     QString macString;
-    ULONG   bufLen = 15 * 1024; // start with 15 KiB, typical for most machines
+    ULONG   bufLen = 15 * 1024; 
     QByteArray adapterBuf(static_cast<int>(bufLen), '\0');
 
     DWORD ret = ::GetAdaptersInfo(
@@ -115,14 +115,14 @@ QString PremiumManager::generateHWID() const
             reinterpret_cast<PIP_ADAPTER_INFO>(adapterBuf.data());
 
         for (const IP_ADAPTER_INFO* a = pAdapter; a != nullptr; a = a->Next) {
-            // Skip loopback adapters (MAC = all zeros)
+            
             bool allZero = true;
             for (UINT i = 0; i < a->AddressLength; ++i) {
                 if (a->Address[i] != 0) { allZero = false; break; }
             }
             if (allZero) continue;
 
-            // Format MAC as XX:XX:XX:XX:XX:XX
+            
             QByteArray macBytes;
             for (UINT i = 0; i < a->AddressLength && i < 6; ++i) {
                 if (i) macBytes.append(':');
@@ -134,7 +134,7 @@ QString PremiumManager::generateHWID() const
         }
     }
 
-    // 3. Combine and SHA-256 hash
+    
     const QString combined = QString::number(volumeSerial, 16).toUpper()
                            + QStringLiteral("|")
                            + macString;
@@ -145,7 +145,7 @@ QString PremiumManager::generateHWID() const
             QCryptographicHash::Sha256
         ).toHex().toUpper();
 
-    // 4. Format as HWID-XXXX-XXXX-XXXX-XXXX  (first 16 hex chars)
+    
     const QString h = QString::fromLatin1(hash.left(16));
     return QStringLiteral("HWID-")
            + h.mid(0, 4) + QStringLiteral("-")
@@ -156,9 +156,9 @@ QString PremiumManager::generateHWID() const
 
 
 
-// NOTE: The above decryptLocal is overridden by a cleaner inline
-//       approach.  Implemented properly below by re-using encryptLocal
-//       on the raw cipher QByteArray converted through a helper:
+
+
+
 
 namespace {
     QByteArray xorBytes(const QByteArray& data, const QByteArray& keyBytes)
@@ -172,13 +172,13 @@ namespace {
         }
         return out;
     }
-} // namespace
+} 
 
-// ================================================================
-// Static plan presets
-// ================================================================
 
-/*static*/
+
+
+
+
 PlanInfo PremiumManager::makePlanInfo(PlanTier tier)
 {
     PlanInfo p;
@@ -240,15 +240,15 @@ PlanInfo PremiumManager::makePlanInfo(PlanTier tier)
     return p;
 }
 
-// ================================================================
-// Storage helpers
-// ================================================================
+
+
+
 
 void PremiumManager::saveToStorage(const QString& key, const PlanInfo& plan)
 {
     QSettings s((QLatin1String(kOrg)), (QLatin1String(kApp)));
 
-    // Encrypt the key and store as base64
+    
     const QByteArray encKey = xorBytes(key.toUtf8(), m_hwid.toUtf8());
     s.setValue(QLatin1String(kKeyStored),     encKey.toBase64());
     s.setValue(QLatin1String(kKeyTier),       static_cast<int>(plan.tier));
@@ -263,7 +263,7 @@ bool PremiumManager::checkLocalKey()
 
     if (!s.contains(QLatin1String(kKeyStored))) return false;
 
-    // Decrypt stored key
+    
     const QByteArray enc =
         QByteArray::fromBase64(s.value(QLatin1String(kKeyStored)).toByteArray());
     const QByteArray decBytes = xorBytes(enc, m_hwid.toUtf8());
@@ -271,7 +271,7 @@ bool PremiumManager::checkLocalKey()
 
     if (storedKey.isEmpty()) return false;
 
-    // Check expiry
+    
     const QString expiryStr = s.value(QLatin1String(kKeyExpiry)).toString();
     const QDateTime expiry  = QDateTime::fromString(expiryStr, Qt::ISODate);
 
@@ -279,7 +279,7 @@ bool PremiumManager::checkLocalKey()
 
     const QDateTime now = QDateTime::currentDateTimeUtc();
 
-    // Hard-expired - check grace period
+    
     if (now > expiry) {
         const QString lastOnlineStr =
             s.value(QLatin1String(kKeyLastOnline)).toString();
@@ -288,7 +288,7 @@ bool PremiumManager::checkLocalKey()
 
         if (!lastOnline.isValid()) return false;
 
-        // Grace period: allow kGracePeriodDays days after last online check
+        
         const qint64 daysSinceOnline = lastOnline.daysTo(now);
         if (daysSinceOnline > kGracePeriodDays) {
             qInfo() << "[PremiumManager] Key expired and grace period elapsed.";
@@ -299,7 +299,7 @@ bool PremiumManager::checkLocalKey()
                 << (kGracePeriodDays - daysSinceOnline) << "days left.";
     }
 
-    // Restore plan
+    
     int tierInt = s.value(QString::fromLatin1(kKeyTier), QVariant(0)).toInt();
     const PlanTier tier = static_cast<PlanTier>(
         qBound(0, tierInt, static_cast<int>(PlanTier::Annual365Day)));
@@ -312,9 +312,9 @@ bool PremiumManager::checkLocalKey()
     return true;
 }
 
-// ================================================================
-// loadFromStorage  -  called on startup
-// ================================================================
+
+
+
 
 void PremiumManager::loadFromStorage()
 {
@@ -328,9 +328,9 @@ void PremiumManager::loadFromStorage()
     }
 }
 
-// ================================================================
-// clearKey
-// ================================================================
+
+
+
 
 void PremiumManager::clearKey()
 {
@@ -344,9 +344,9 @@ void PremiumManager::clearKey()
     qInfo() << "[PremiumManager] Key cleared.";
 }
 
-// ================================================================
-// validateKey  -  main entry point
-// ================================================================
+
+
+
 
 void PremiumManager::validateKey(const QString& key)
 {
@@ -355,7 +355,7 @@ void PremiumManager::validateKey(const QString& key)
         return;
     }
 
-    // ---- Built-in test key "373438" -> Free 7-day trial --------
+    
     if (key.trimmed() == QLatin1String(kTestKey)) {
         PlanInfo plan    = makePlanInfo(PlanTier::Free);
         plan.isActive    = true;
@@ -369,8 +369,8 @@ void PremiumManager::validateKey(const QString& key)
         return;
     }
 
-    // ---- Check local cache first --------------------------------
-    // If the stored key matches what was entered, use the cache.
+    
+    
     {
         QSettings s((QLatin1String(kOrg)), (QLatin1String(kApp)));
         if (s.contains(QLatin1String(kKeyStored))) {
@@ -388,7 +388,7 @@ void PremiumManager::validateKey(const QString& key)
         }
     }
 
-    // ---- Remote validation -------------------------------------
+    
     QUrl url = QUrl(QLatin1String(kValidateUrl));
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::ContentTypeHeader,
@@ -408,9 +408,9 @@ void PremiumManager::validateKey(const QString& key)
     });
 }
 
-// ----------------------------------------------------------------
-// onValidationReply
-// ----------------------------------------------------------------
+
+
+
 void PremiumManager::onValidationReply(QNetworkReply* reply, const QString& key)
 {
     reply->deleteLater();
@@ -419,7 +419,7 @@ void PremiumManager::onValidationReply(QNetworkReply* reply, const QString& key)
         const QString errStr = reply->errorString();
         qWarning() << "[PremiumManager] Network error:" << errStr;
 
-        // Fall back to local cache with grace period
+        
         if (checkLocalKey() && m_activeKey == key) {
             qInfo() << "[PremiumManager] Using grace-period local cache.";
             emit keyValidated(true, m_plan);
@@ -451,18 +451,18 @@ void PremiumManager::onValidationReply(QNetworkReply* reply, const QString& key)
         return;
     }
 
-    // Parse tier
+    
     const int tierInt =
         obj.value(QStringLiteral("tier")).toInt(0);
     const PlanTier tier = static_cast<PlanTier>(
         qBound(0, tierInt, static_cast<int>(PlanTier::Annual365Day)));
 
-    // Parse expiry
+    
     const QString expiryStr =
         obj.value(QStringLiteral("expires_at")).toString();
     QDateTime expiry = QDateTime::fromString(expiryStr, Qt::ISODate);
     if (!expiry.isValid()) {
-        // Compute from duration if server does not provide absolute date
+        
         const PlanInfo preset = makePlanInfo(tier);
         expiry = QDateTime::currentDateTimeUtc().addDays(preset.durationDays);
     }
@@ -481,15 +481,15 @@ void PremiumManager::onValidationReply(QNetworkReply* reply, const QString& key)
     emit keyValidated(true, m_plan);
 }
 
-// ================================================================
-// Queries
-// ================================================================
+
+
+
 
 bool PremiumManager::isKeyValid() const
 {
     if (!m_plan.isActive) return false;
     if (m_plan.tier == PlanTier::Free) {
-        // Free trial validity is still tied to expiresAt
+        
         if (m_plan.expiresAt.isValid())
             return QDateTime::currentDateTimeUtc() <= m_plan.expiresAt;
         return false;
@@ -524,9 +524,9 @@ QString PremiumManager::hwid() const
     return m_hwid;
 }
 
-// Suppress the erroneous decryptLocal stub - the real implementation
-// uses xorBytes() directly in checkLocalKey() / saveToStorage().
-// decryptLocal is retained for API completeness:
+
+
+
 
 QString PremiumManager::decryptLocal(const QByteArray& data) const
 {
@@ -534,10 +534,10 @@ QString PremiumManager::decryptLocal(const QByteArray& data) const
     return QString::fromUtf8(xorBytes(enc, m_hwid.toUtf8()));
 }
 
-// encryptLocal - thin wrapper around xorBytes + base64
+
 QByteArray PremiumManager::encryptLocal(const QString& data) const
 {
     return xorBytes(data.toUtf8(), m_hwid.toUtf8()).toBase64();
 }
 
-} // namespace Voltro
+} 

@@ -1,16 +1,16 @@
-﻿// ============================================================
-//  ScriptCard.cpp - Voltro Script Hub (Phase 3)
-//  Full implementation of the script card widget.
-//
-//  Voltro dark theme:
-//    Background  : #07090c
-//    Card surface: #0d1117
-//    Border idle : #1e2530
-//    Border hover: #00ff66 (accent)
-//    Text primary: #e6edf3
-//    Text muted  : #7d8590
-//    Accent      : #00ff66
-// ============================================================
+﻿
+
+
+
+
+
+
+
+
+
+
+
+
 
 #include "ScriptCard.h"
 
@@ -27,9 +27,9 @@
 
 namespace Voltro {
 
-// ============================================================
-//  Constructor
-// ============================================================
+
+
+
 ScriptCard::ScriptCard(const ScriptMeta& meta, QWidget* parent)
     : QFrame(parent)
     , m_meta(meta)
@@ -44,29 +44,29 @@ ScriptCard::ScriptCard(const ScriptMeta& meta, QWidget* parent)
     updateSafetyBadge();
     updateFavoriteButton();
 
-    // Drop-shadow effect
+    
     m_shadow = new QGraphicsDropShadowEffect(this);
     m_shadow->setBlurRadius(10);
     m_shadow->setOffset(0, 2);
     m_shadow->setColor(QColor(0, 0, 0, 80));
     setGraphicsEffect(m_shadow);
 
-    // Border color animation
+    
     m_borderAnim = new QPropertyAnimation(this, "borderColor", this);
     m_borderAnim->setDuration(180);
     m_borderAnim->setEasingCurve(QEasingCurve::OutCubic);
 }
 
-// ============================================================
-//  buildUi
-// ============================================================
+
+
+
 void ScriptCard::buildUi()
 {
     auto* rootLayout = new QVBoxLayout(this);
     rootLayout->setContentsMargins(14, 12, 14, 12);
     rootLayout->setSpacing(6);
 
-    // --- Row 1: name + hub badge + safety badge + favorite ----
+    
     auto* row1 = new QHBoxLayout;
     row1->setSpacing(8);
 
@@ -94,13 +94,13 @@ void ScriptCard::buildUi()
     row1->addWidget(m_safetyBadge);
     row1->addWidget(m_favoriteBtn);
 
-    // --- Row 2: description (elided) ---------------------------
+    
     m_descLabel = new QLabel(this);
     m_descLabel->setObjectName(QStringLiteral("cardDesc"));
     m_descLabel->setWordWrap(false);
     m_descLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    // --- Row 3: author + views + category tag ------------------
+    
     auto* row3 = new QHBoxLayout;
     row3->setSpacing(10);
 
@@ -119,7 +119,7 @@ void ScriptCard::buildUi()
     row3->addStretch();
     row3->addWidget(m_categoryTag);
 
-    // --- Row 4: action buttons ---------------------------------
+    
     auto* row4 = new QHBoxLayout;
     row4->setSpacing(8);
 
@@ -143,27 +143,27 @@ void ScriptCard::buildUi()
     row4->addWidget(m_inspectBtn);
     row4->addWidget(m_executeBtn);
 
-    // --- Assemble ----------------------------------------------
+    
     rootLayout->addLayout(row1);
     rootLayout->addWidget(m_descLabel);
     rootLayout->addLayout(row3);
     rootLayout->addStretch();
     rootLayout->addLayout(row4);
 
-    // --- Fill initial values ----------------------------------
-    // Author
+    
+    
     m_authorLabel->setText(
         m_meta.author.isEmpty()
             ? QStringLiteral("Unknown")
             : QStringLiteral("\u270e ") + m_meta.author);
 
-    // Views
+    
     m_viewsLabel->setText(
         m_meta.views > 0
             ? QStringLiteral("\U0001f441 ") + QString::number(m_meta.views)
             : QString());
 
-    // Category tag
+    
     if (!m_meta.category.isEmpty()) {
         m_categoryTag->setText(m_meta.category);
         m_categoryTag->setVisible(true);
@@ -171,11 +171,11 @@ void ScriptCard::buildUi()
         m_categoryTag->setVisible(false);
     }
 
-    // Hub badge text
+    
     const HubSource src = HubManager::instance().hubById(m_meta.hub);
     m_hubBadge->setText(src.displayName.isEmpty() ? m_meta.hub : src.displayName);
 
-    // Hub badge color (use source iconColor or fallback)
+    
     const QColor hubColor = src.iconColor.isValid() ? src.iconColor : QColor("#4fc3f7");
     m_hubBadge->setStyleSheet(
         QStringLiteral("QLabel {"
@@ -187,7 +187,7 @@ void ScriptCard::buildUi()
                         "  padding: 1px 6px;"
                         "}").arg(hubColor.name()));
 
-    // Elided description
+    
     {
         const QFontMetrics fm(m_descLabel->font());
         const QString elided = fm.elidedText(m_meta.description, Qt::ElideRight, 560);
@@ -195,7 +195,7 @@ void ScriptCard::buildUi()
         m_descLabel->setToolTip(m_meta.description);
     }
 
-    // --- Signals -----------------------------------------------
+    
     connect(m_favoriteBtn,   &QPushButton::clicked, this, [this]() {
         m_meta.favorited = !m_meta.favorited;
         HubManager::instance().setFavorite(m_meta.id, m_meta.favorited);
@@ -216,9 +216,9 @@ void ScriptCard::buildUi()
     });
 }
 
-// ============================================================
-//  applyTheme – base stylesheet (borders drawn in paintEvent)
-// ============================================================
+
+
+
 void ScriptCard::applyTheme()
 {
     setStyleSheet(QStringLiteral(R"(
@@ -308,14 +308,14 @@ void ScriptCard::applyTheme()
     )"));
 }
 
-// ============================================================
-//  updateFavoriteButton
-// ============================================================
+
+
+
 void ScriptCard::updateFavoriteButton()
 {
     m_favoriteBtn->setText(m_meta.favorited
-        ? QStringLiteral("\u2605")   // filled star
-        : QStringLiteral("\u2606")); // hollow star
+        ? QStringLiteral("\u2605")   
+        : QStringLiteral("\u2606")); 
     m_favoriteBtn->setStyleSheet(
         m_meta.favorited
             ? QStringLiteral("#favoriteBtn { background:transparent; border:none; color:#f0a500; font-size:16px; }")
@@ -323,9 +323,9 @@ void ScriptCard::updateFavoriteButton()
     );
 }
 
-// ============================================================
-//  updateSafetyBadge
-// ============================================================
+
+
+
 void ScriptCard::updateSafetyBadge()
 {
     const QColor  col  = safetyColor(m_meta.safetyVerdict);
@@ -347,9 +347,9 @@ void ScriptCard::updateSafetyBadge()
             .arg(col.name()));
 }
 
-// ============================================================
-//  Safety helpers
-// ============================================================
+
+
+
 QString ScriptCard::safetyLabel(SafetyVerdict v)
 {
     switch (v) {
@@ -375,17 +375,17 @@ QColor ScriptCard::safetyColor(SafetyVerdict v)
 QString ScriptCard::verdictIcon(SafetyVerdict v)
 {
     switch (v) {
-        case SafetyVerdict::Clean:      return QStringLiteral("\u2714"); // checkmark
-        case SafetyVerdict::Caution:    return QStringLiteral("\u26a0"); // warning
-        case SafetyVerdict::Danger:     return QStringLiteral("\u2620"); // skull
-        case SafetyVerdict::Obfuscated: return QStringLiteral("\u26d4"); // no-entry
+        case SafetyVerdict::Clean:      return QStringLiteral("\u2714"); 
+        case SafetyVerdict::Caution:    return QStringLiteral("\u26a0"); 
+        case SafetyVerdict::Danger:     return QStringLiteral("\u2620"); 
+        case SafetyVerdict::Obfuscated: return QStringLiteral("\u26d4"); 
     }
     return QStringLiteral("\u2714");
 }
 
-// ============================================================
-//  meta accessors
-// ============================================================
+
+
+
 const ScriptMeta& ScriptCard::meta() const { return m_meta; }
 
 void ScriptCard::updateMeta(const ScriptMeta& meta)
@@ -412,9 +412,9 @@ void ScriptCard::updateMeta(const ScriptMeta& meta)
     update();
 }
 
-// ============================================================
-//  borderColor property
-// ============================================================
+
+
+
 QColor ScriptCard::borderColor() const { return m_borderColor; }
 
 void ScriptCard::setBorderColor(const QColor& color)
@@ -424,9 +424,9 @@ void ScriptCard::setBorderColor(const QColor& color)
     update();
 }
 
-// ============================================================
-//  Hover events
-// ============================================================
+
+
+
 void ScriptCard::enterEvent(QEnterEvent* event)
 {
     QFrame::enterEvent(event);
@@ -448,16 +448,16 @@ void ScriptCard::startHoverAnimation(bool hovering)
     m_borderAnim->setEndValue(hovering ? QColor("#00ff66") : QColor("#1e2530"));
     m_borderAnim->start();
 
-    // Adjust shadow on hover
+    
     if (m_shadow) {
         m_shadow->setBlurRadius(hovering ? 22 : 10);
         m_shadow->setColor(hovering ? QColor(0, 255, 102, 60) : QColor(0, 0, 0, 80));
     }
 }
 
-// ============================================================
-//  paintEvent - draw rounded border with animated color
-// ============================================================
+
+
+
 void ScriptCard::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event)
@@ -467,16 +467,16 @@ void ScriptCard::paintEvent(QPaintEvent* event)
 
     const QRectF r = rect().adjusted(1, 1, -1, -1);
 
-    // Background fill
+    
     p.setPen(Qt::NoPen);
     p.setBrush(QColor("#0d1117"));
     p.drawRoundedRect(r, 8, 8);
 
-    // Animated border
+    
     QPen pen(m_borderColor, 1.4);
     p.setPen(pen);
     p.setBrush(Qt::NoBrush);
     p.drawRoundedRect(r, 8, 8);
 }
 
-} // namespace Voltro
+} 

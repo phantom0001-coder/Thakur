@@ -1,3 +1,16 @@
+#include "thakur_runtime.h"
+#include "thakur_engine.h"
+#include <windows.h>
+#include <psapi.h>
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <atomic>
+#include <thread>
+#include <functional>
+#include <algorithm>
+#include <chrono>
 
 
 namespace Thakur {
@@ -71,29 +84,39 @@ bool LuaHookEngine::scanSignatures() {
     uintptr_t baseAddr = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
     size_t imageSize = modInfo.SizeOfImage;
 
-    
-    
-    uintptr_t doStringAddr = scanMemory(baseAddr, imageSize, "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B F9");
+    uintptr_t doStringAddr = scanMemory(baseAddr, imageSize, "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 48 8B F9 48 8D 4C 24");
     if (!doStringAddr) {
-        
-        doStringAddr = scanMemory(baseAddr, imageSize, "48 89 4C 24 ? 55 53 56 57 41 54");
+        doStringAddr = scanMemory(baseAddr, imageSize, "48 89 4C 24 ?? 55 53 56 57 41 54 41 55 41 56 41 57");
+    }
+    if (!doStringAddr) {
+        doStringAddr = scanMemory(baseAddr, imageSize, "48 8B C4 48 89 58 ?? 48 89 68 ?? 48 89 70 ?? 57 48 83 EC 20");
+    }
+    if (!doStringAddr) {
+        doStringAddr = scanMemory(baseAddr, imageSize, "4C 8B DC 49 89 5B ?? 49 89 6B ?? 49 89 73 ?? 57 48 83 EC 20");
     }
 
     if (doStringAddr) {
         m_pfnDoString = reinterpret_cast<luaL_dostring_t>(doStringAddr);
     }
 
-    
-    
-    uintptr_t stateAddr = scanMemory(baseAddr, imageSize, "48 8D 05 ? ? ? ? 48 8B D9 48 8B 00");
+
+    uintptr_t stateAddr = scanMemory(baseAddr, imageSize, "48 8D 05 ?? ?? ?? ?? 48 8B D9 48 8B 00 48 8D 54 24");
+    if (!stateAddr) {
+        stateAddr = scanMemory(baseAddr, imageSize, "48 8B 05 ?? ?? ?? ?? 48 8B D9 48 8B 48 ?? 48 8B 01");
+    }
+    if (!stateAddr) {
+        stateAddr = scanMemory(baseAddr, imageSize, "48 8B 15 ?? ?? ?? ?? 48 8B D9 48 8B 42 ?? 48 8B 08");
+    }
     if (stateAddr) {
-        
         int32_t relOffset = *reinterpret_cast<const int32_t*>(stateAddr + 3);
         uintptr_t targetPtr = stateAddr + 7 + relOffset;
-        m_luaState = *reinterpret_cast<lua_State_t*>(targetPtr);
+        MEMORY_BASIC_INFORMATION mbi;
+        if (VirtualQuery(reinterpret_cast<LPCVOID>(targetPtr), &mbi, sizeof(mbi)) &&
+            (mbi.State == MEM_COMMIT) &&
+            !(mbi.Protect & PAGE_NOACCESS)) {
+            m_luaState = *reinterpret_cast<lua_State_t*>(targetPtr);
+        }
     }
-
-    
     if (m_pfnDoString && m_luaState) {
         m_hooked = true;
     } else {

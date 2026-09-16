@@ -1,6 +1,6 @@
-// ============================================================
-//  Updater.cpp  -  Voltro Executor  (Phase 6)
-// ============================================================
+
+
+
 
 #include "Updater.h"
 
@@ -26,28 +26,28 @@
 
 namespace {
 
-// ----------------------------------------------------------------
-// Endpoints
-// ----------------------------------------------------------------
+
+
+
 constexpr const char* kPrivateVersionUrl =
-    "https://api.voltro.gg/v1/version";
+    "https:
 
 constexpr const char* kGitHubReleasesUrl =
-    "https://api.github.com/repos/voltro-executor/voltro/releases/latest";
+    "https:
 
 constexpr const char* kUserAgent = "VoltroExecutor/1.5.0";
 
-// QSettings keys for offline version caching
+
 constexpr const char* kOrg         = "Voltro";
 constexpr const char* kApp         = "VoltroExecutor";
 constexpr const char* kLastVersion = "updater/lastKnownVersion";
 
-// ----------------------------------------------------------------
-// Semantic version comparison helper
-// ----------------------------------------------------------------
+
+
+
 QList<int> parseSemVer(const QString& v)
 {
-    // Strip leading 'v'
+    
     QString s = v;
     if (s.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
         s = s.mid(1);
@@ -59,16 +59,16 @@ QList<int> parseSemVer(const QString& v)
         const int n = t.toInt(&ok);
         parts.append(ok ? n : 0);
     }
-    // Normalise to at least 3 components
+    
     while (parts.size() < 3) parts.append(0);
     return parts;
 }
 
-} // anonymous namespace
+} 
 
-// ================================================================
-// Singleton
-// ================================================================
+
+
+
 
 namespace Voltro {
 
@@ -78,9 +78,9 @@ Updater& Updater::instance()
     return s_instance;
 }
 
-// ----------------------------------------------------------------
-// Constructor
-// ----------------------------------------------------------------
+
+
+
 Updater::Updater(QObject* parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
@@ -88,9 +88,9 @@ Updater::Updater(QObject* parent)
     qRegisterMetaType<Voltro::ReleaseInfo>("Voltro::ReleaseInfo");
 }
 
-// ================================================================
-// Public API
-// ================================================================
+
+
+
 
 QString Updater::currentVersion() const
 {
@@ -99,7 +99,7 @@ QString Updater::currentVersion() const
 
 bool Updater::compareVersions(const QString& a, const QString& b) const
 {
-    // Returns true if a < b  (a is older)
+    
     const QList<int> va = parseSemVer(a);
     const QList<int> vb = parseSemVer(b);
 
@@ -110,7 +110,7 @@ bool Updater::compareVersions(const QString& a, const QString& b) const
         if (ia < ib) return true;
         if (ia > ib) return false;
     }
-    return false; // equal
+    return false; 
 }
 
 bool Updater::isUpdateAvailable() const
@@ -123,9 +123,9 @@ const ReleaseInfo& Updater::latestRelease() const
     return m_latest;
 }
 
-// ================================================================
-// checkForUpdates  -  try private server first, fall back to GitHub
-// ================================================================
+
+
+
 
 void Updater::checkForUpdates()
 {
@@ -144,9 +144,9 @@ void Updater::checkForUpdates()
     });
 }
 
-// ----------------------------------------------------------------
-// onPrivateVersionReply
-// ----------------------------------------------------------------
+
+
+
 void Updater::onPrivateVersionReply(QNetworkReply* reply)
 {
     reply->deleteLater();
@@ -155,7 +155,7 @@ void Updater::onPrivateVersionReply(QNetworkReply* reply)
         qWarning() << "[Updater] Private server unavailable:"
                    << reply->errorString()
                    << "– falling back to GitHub.";
-        // Fall back to GitHub
+        
         QNetworkRequest req((QUrl(QLatin1String(kGitHubReleasesUrl))));
         req.setRawHeader("User-Agent", kUserAgent);
         req.setRawHeader("Accept",     "application/vnd.github+json");
@@ -189,10 +189,10 @@ void Updater::onPrivateVersionReply(QNetworkReply* reply)
         return;
     }
 
-    // Private server response format:
-    // { "version": "1.5.2", "tag": "v1.5.2",
-    //   "download_url": "...", "sha256": "...",
-    //   "changelog": "...", "prerelease": false }
+    
+    
+    
+    
     const QJsonObject obj = doc.object();
 
     ReleaseInfo info;
@@ -210,7 +210,7 @@ void Updater::onPrivateVersionReply(QNetworkReply* reply)
 
     if (info.version.isEmpty()) {
         qWarning() << "[Updater] Private server returned empty version.";
-        // Fall back to GitHub
+        
         QNetworkRequest req2((QUrl(QLatin1String(kGitHubReleasesUrl))));
         req2.setRawHeader("User-Agent", kUserAgent);
         req2.setRawHeader("Accept",     "application/vnd.github+json");
@@ -223,7 +223,7 @@ void Updater::onPrivateVersionReply(QNetworkReply* reply)
         return;
     }
 
-    // Cache version for offline comparison
+    
     QSettings s((QLatin1String(kOrg)), (QLatin1String(kApp)));
     s.setValue(QLatin1String(kLastVersion), info.version);
 
@@ -240,9 +240,9 @@ void Updater::onPrivateVersionReply(QNetworkReply* reply)
     }
 }
 
-// ----------------------------------------------------------------
-// onGitHubReply
-// ----------------------------------------------------------------
+
+
+
 void Updater::onGitHubReply(QNetworkReply* reply)
 {
     reply->deleteLater();
@@ -262,7 +262,7 @@ void Updater::onGitHubReply(QNetworkReply* reply)
         return;
     }
 
-    // Cache for offline
+    
     QSettings s((QLatin1String(kOrg)), (QLatin1String(kApp)));
     s.setValue(QLatin1String(kLastVersion), info.version);
 
@@ -278,9 +278,9 @@ void Updater::onGitHubReply(QNetworkReply* reply)
     }
 }
 
-// ----------------------------------------------------------------
-// parseGitHubRelease
-// ----------------------------------------------------------------
+
+
+
 ReleaseInfo Updater::parseGitHubRelease(const QByteArray& json) const
 {
     ReleaseInfo info;
@@ -295,7 +295,7 @@ ReleaseInfo Updater::parseGitHubRelease(const QByteArray& json) const
     info.changelog    = obj.value(QStringLiteral("body")).toString();
     info.isPrerelease = obj.value(QStringLiteral("prerelease")).toBool(false);
 
-    // Strip leading 'v' for numeric version
+    
     info.version = info.tagName;
     if (info.version.startsWith(QLatin1Char('v'), Qt::CaseInsensitive))
         info.version = info.version.mid(1);
@@ -304,7 +304,7 @@ ReleaseInfo Updater::parseGitHubRelease(const QByteArray& json) const
         obj.value(QStringLiteral("published_at")).toString();
     info.publishedAt = QDateTime::fromString(pubStr, Qt::ISODate);
 
-    // Find the first zip asset
+    
     const QJsonArray assets = obj.value(QStringLiteral("assets")).toArray();
     for (const QJsonValue& v : assets) {
         const QJsonObject asset = v.toObject();
@@ -312,14 +312,14 @@ ReleaseInfo Updater::parseGitHubRelease(const QByteArray& json) const
         if (name.endsWith(QLatin1String(".zip"), Qt::CaseInsensitive)) {
             info.downloadUrl =
                 asset.value(QStringLiteral("browser_download_url")).toString();
-            // sha256 may be in a separate metadata field if the server adds it
+            
             info.sha256 =
                 asset.value(QStringLiteral("sha256")).toString();
             break;
         }
     }
 
-    // If no zip found, fall back to zipball
+    
     if (info.downloadUrl.isEmpty())
         info.downloadUrl =
             obj.value(QStringLiteral("zipball_url")).toString();
@@ -327,9 +327,9 @@ ReleaseInfo Updater::parseGitHubRelease(const QByteArray& json) const
     return info;
 }
 
-// ================================================================
-// downloadUpdate
-// ================================================================
+
+
+
 
 void Updater::downloadUpdate(const ReleaseInfo& release)
 {
@@ -342,7 +342,7 @@ void Updater::downloadUpdate(const ReleaseInfo& release)
         QStandardPaths::writableLocation(QStandardPaths::TempLocation);
     m_downloadPath = tempDir + QStringLiteral("/voltro_update.zip");
 
-    // Remove any stale previous download
+    
     if (QFile::exists(m_downloadPath))
         QFile::remove(m_downloadPath);
 
@@ -356,8 +356,8 @@ void Updater::downloadUpdate(const ReleaseInfo& release)
 
     QNetworkReply* reply = m_nam->get(req);
 
-    // Open output file
-    QFile* outFile = new QFile(m_downloadPath, reply); // parented to reply
+    
+    QFile* outFile = new QFile(m_downloadPath, reply); 
     if (!outFile->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         emit updateError(
             QStringLiteral("Cannot open temp file for writing: ") +
@@ -392,10 +392,10 @@ void Updater::downloadUpdate(const ReleaseInfo& release)
 
         qInfo() << "[Updater] Download complete:" << m_downloadPath;
 
-        // Verify checksum if one was provided
+        
         if (!expectedSha.isEmpty()) {
             if (!verifyChecksum(m_downloadPath, expectedSha)) {
-                // verifyChecksum already emitted updateError
+                
                 QFile::remove(m_downloadPath);
                 return;
             }
@@ -405,9 +405,9 @@ void Updater::downloadUpdate(const ReleaseInfo& release)
     });
 }
 
-// ================================================================
-// verifyChecksum
-// ================================================================
+
+
+
 
 bool Updater::verifyChecksum(const QString& filePath, const QString& expected)
 {
@@ -443,9 +443,9 @@ bool Updater::verifyChecksum(const QString& filePath, const QString& expected)
     return true;
 }
 
-// ================================================================
-// extractAndReplace
-// ================================================================
+
+
+
 
 void Updater::extractAndReplace(const QString& zipPath)
 {
@@ -455,11 +455,11 @@ void Updater::extractAndReplace(const QString& zipPath)
     const QString exeName  = exeInfo.fileName();
     const QString backupPath = exeDir + QStringLiteral("/voltro_backup.exe");
 
-    // 1. Remove stale backup
+    
     if (QFile::exists(backupPath))
         QFile::remove(backupPath);
 
-    // 2. Backup current executable
+    
     if (!QFile::copy(exePath, backupPath)) {
         emit updateError(
             QStringLiteral("Failed to create backup of current executable."));
@@ -467,13 +467,13 @@ void Updater::extractAndReplace(const QString& zipPath)
     }
     qInfo() << "[Updater] Backup created:" << backupPath;
 
-    // 3. Extract zip using PowerShell Expand-Archive
-    //    Extract to a temp folder, then move the exe into exeDir
+    
+    
     const QString extractDir =
         QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
         QStringLiteral("/voltro_extracted");
 
-    // Clean previous extraction
+    
     QDir(extractDir).removeRecursively();
 
     QProcess psProc;
@@ -488,9 +488,9 @@ void Updater::extractAndReplace(const QString& zipPath)
     });
 
     psProc.start();
-    if (!psProc.waitForFinished(60000)) { // 60-second timeout
+    if (!psProc.waitForFinished(60000)) { 
         psProc.kill();
-        // Restore backup
+        
         QFile::copy(backupPath, exePath);
         emit updateError(QStringLiteral("Extraction timed out."));
         return;
@@ -500,15 +500,15 @@ void Updater::extractAndReplace(const QString& zipPath)
         const QString psErr =
             QString::fromLocal8Bit(psProc.readAllStandardError());
         qCritical() << "[Updater] Expand-Archive failed:" << psErr;
-        // Restore backup
+        
         QFile::copy(backupPath, exePath);
         emit updateError(
             QStringLiteral("Extraction failed: ") + psErr);
         return;
     }
 
-    // 4. Find the new exe in the extracted directory
-    //    Walk the extracted tree looking for exeName (case-insensitive)
+    
+    
     QString newExePath;
     QDirIterator it(extractDir,
                     QStringList{exeName},
@@ -518,7 +518,7 @@ void Updater::extractAndReplace(const QString& zipPath)
         newExePath = it.next();
 
     if (newExePath.isEmpty()) {
-        // Fall back: try any .exe
+        
         QDirIterator it2(extractDir,
                          QStringList{QStringLiteral("*.exe")},
                          QDir::Files,
@@ -535,13 +535,13 @@ void Updater::extractAndReplace(const QString& zipPath)
         return;
     }
 
-    // 5. Replace the running executable
-    //    On Windows we cannot overwrite a running exe directly.
-    //    Schedule via MoveFileExW with MOVEFILE_DELAY_UNTIL_REBOOT as
-    //    a last resort, but prefer a detached helper script.
+    
+    
+    
+    
 
-    // Write a small PowerShell helper that waits for the current process
-    // to exit, replaces the binary, and re-launches.
+    
+    
     const QString helperScript =
         QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
         QStringLiteral("/voltro_updater_helper.ps1");
@@ -576,13 +576,13 @@ void Updater::extractAndReplace(const QString& zipPath)
     qInfo() << "[Updater] Replacement scheduled via helper script:" << helperScript;
     qInfo() << "[Updater] New exe source:" << newExePath;
 
-    // Store download path for applyUpdate()
-    m_downloadPath = helperScript; // re-use field to pass script path
+    
+    m_downloadPath = helperScript; 
 }
 
-// ================================================================
-// applyUpdate
-// ================================================================
+
+
+
 
 void Updater::applyUpdate()
 {
@@ -592,17 +592,17 @@ void Updater::applyUpdate()
         return;
     }
 
-    // If m_downloadPath is still the zip, run extractAndReplace first
+    
     if (m_downloadPath.endsWith(QLatin1String(".zip"), Qt::CaseInsensitive)) {
         extractAndReplace(m_downloadPath);
-        // After extractAndReplace, m_downloadPath is now the helper script
+        
         if (m_downloadPath.endsWith(QLatin1String(".zip"))) {
-            // extractAndReplace emitted the error itself
+            
             return;
         }
     }
 
-    // m_downloadPath is now the PowerShell helper script path
+    
     const bool launched = QProcess::startDetached(
         QStringLiteral("powershell.exe"),
         {
@@ -620,10 +620,10 @@ void Updater::applyUpdate()
     qInfo() << "[Updater] Helper launched. Exiting application for update.";
     emit updateApplied();
 
-    // Give signal delivery a moment then exit
+    
     QTimer::singleShot(500, qApp, []() {
         QCoreApplication::exit(0);
     });
 }
 
-} // namespace Voltro
+} 

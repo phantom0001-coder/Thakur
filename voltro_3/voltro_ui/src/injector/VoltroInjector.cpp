@@ -8,9 +8,9 @@
 namespace Voltro {
 namespace Injector {
 
-// ----------------------------------------------------------
-//  VoltroInjector Implementation
-// ----------------------------------------------------------
+
+
+
 
 VoltroInjector& VoltroInjector::instance() {
     static VoltroInjector inst;
@@ -30,7 +30,7 @@ static BOOL CALLBACK EnumWindowsCallback(HWND hwnd, LPARAM lParam) {
         wchar_t buf[512] = {0};
         if (GetWindowTextW(hwnd, buf, 512) > 0) {
             data->title = buf;
-            return FALSE; // Found primary visible window
+            return FALSE; 
         }
     }
     return TRUE;
@@ -61,17 +61,17 @@ std::vector<ProcessInfo> VoltroInjector::findRobloxProcesses() {
                 info.pid = pe.th32ProcessID;
                 info.name = pe.szExeFile;
 
-                // Query window title
+                
                 WindowEnumData wData = { info.pid, L"" };
                 EnumWindows(EnumWindowsCallback, reinterpret_cast<LPARAM>(&wData));
                 info.windowTitle = wData.title;
 
-                // Query 64-bit architecture
+                
                 HANDLE hProc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, info.pid);
                 if (hProc) {
                     BOOL isWow64 = FALSE;
                     if (IsWow64Process(hProc, &isWow64)) {
-                        // On 64-bit Windows, a 64-bit process returns FALSE for IsWow64Process
+                        
                         SYSTEM_INFO si;
                         GetNativeSystemInfo(&si);
                         if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
@@ -138,7 +138,7 @@ InjectionResult VoltroInjector::inject(DWORD pid, const std::string& dllPath, In
 
     std::vector<BYTE> dllBytes = loadDllFromDisk(dllPath);
     if (dllBytes.empty()) {
-        // Fallback test payload or fail
+        
         res.status = InjectionStatus::DllNotFound;
         res.message = "Could not load DLL file from disk: " + dllPath;
         return res;
@@ -148,7 +148,7 @@ InjectionResult VoltroInjector::inject(DWORD pid, const std::string& dllPath, In
         return processHollow(pid, dllBytes);
     }
 
-    // Route through Solara-hardened injection engine
+    
     auto baseResult = InjectorEngine::injectDll(pid, dllPath);
     if (baseResult.status == Voltro::InjectionStatus::SUCCESS) {
         res.status = InjectionStatus::Success;
@@ -183,7 +183,7 @@ InjectionResult VoltroInjector::manualMap(HANDLE hProcess, const std::vector<BYT
         return res;
     }
 
-    // Allocate memory in target process for PE image
+    
     BYTE* targetBase = reinterpret_cast<BYTE*>(VirtualAllocEx(
         hProcess,
         reinterpret_cast<LPVOID>(nt->OptionalHeader.ImageBase),
@@ -193,7 +193,7 @@ InjectionResult VoltroInjector::manualMap(HANDLE hProcess, const std::vector<BYT
     ));
 
     if (!targetBase) {
-        // Try any available base address
+        
         targetBase = reinterpret_cast<BYTE*>(VirtualAllocEx(
             hProcess,
             nullptr,
@@ -208,14 +208,14 @@ InjectionResult VoltroInjector::manualMap(HANDLE hProcess, const std::vector<BYT
         return res;
     }
 
-    // Copy PE headers
+    
     if (!WriteProcessMemory(hProcess, targetBase, dllData.data(), nt->OptionalHeader.SizeOfHeaders, nullptr)) {
         VirtualFreeEx(hProcess, targetBase, 0, MEM_RELEASE);
         res.message = "Failed to copy PE headers.";
         return res;
     }
 
-    // Copy PE sections
+    
     auto section = IMAGE_FIRST_SECTION(nt);
     for (WORD i = 0; i < nt->FileHeader.NumberOfSections; ++i, ++section) {
         if (section->SizeOfRawData > 0) {
@@ -235,7 +235,7 @@ InjectionResult VoltroInjector::manualMap(HANDLE hProcess, const std::vector<BYT
     }
     resolveImports(hProcess, targetBase, nt);
 
-    // Call entry point via CreateRemoteThread
+    
     uintptr_t entryPoint = reinterpret_cast<uintptr_t>(targetBase) + nt->OptionalHeader.AddressOfEntryPoint;
     HANDLE hThread = CreateRemoteThread(
         hProcess,
@@ -264,7 +264,7 @@ bool VoltroInjector::fixRelocations(BYTE* mappedBase, const IMAGE_NT_HEADERS64* 
         return true;
     }
 
-    // In a full implementation, reloc blocks are read/written into target.
+    
     return true;
 }
 
@@ -299,7 +299,7 @@ InjectionResult VoltroInjector::processHollow(DWORD pid, const std::vector<BYTE>
             GetProcAddress(hNtdll, "NtUnmapViewOfSection")
         );
         if (pfnNtUnmapViewOfSection) {
-            // Unmap existing view
+            
             pfnNtUnmapViewOfSection(pi.hProcess, reinterpret_cast<PVOID>(0x00400000));
         }
     }
@@ -334,9 +334,9 @@ bool VoltroInjector::detach() {
     return true;
 }
 
-// ----------------------------------------------------------
-//  PatternScanner Implementation
-// ----------------------------------------------------------
+
+
+
 
 void PatternScanner::parsePattern(const std::string& pattern, std::vector<BYTE>& bytes, std::vector<BYTE>& mask) {
     bytes.clear();
@@ -442,9 +442,9 @@ std::vector<uintptr_t> PatternScanner::scanAll(HANDLE hProcess, DWORD_PTR start,
     return results;
 }
 
-// ----------------------------------------------------------
-//  IpcBridge Implementation
-// ----------------------------------------------------------
+
+
+
 
 IpcBridge& IpcBridge::instance() {
     static IpcBridge bridge;
@@ -539,7 +539,7 @@ void IpcBridge::clientReadLoop() {
 
 void IpcBridge::dispatchMessage(const std::string& json) {
     if (onOutput) {
-        // Simple extraction for text and level
+        
         std::string text = json;
         std::string level = "print";
         size_t textPos = json.find("\"text\":\"");
@@ -611,5 +611,5 @@ void IpcBridge::disconnect() {
     }
 }
 
-} // namespace Injector
-} // namespace Voltro
+} 
+} 

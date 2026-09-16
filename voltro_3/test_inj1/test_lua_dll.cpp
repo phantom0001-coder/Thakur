@@ -1,40 +1,40 @@
-// ============================================================
-//  test_lua_dll.cpp  - DLL that executes Lua code in Roblox
-//  This attempts to use Roblox's Lua state to run a test script
-//  Compile with: cl.exe /LD /LDd test_lua_dll.cpp /link user32.lib
-// ============================================================
+
+
+
+
+
 
 #include <windows.h>
 #include <stdio.h>
 #include <tlhelp32.h>
 
-// Roblox Lua types
+
 typedef struct lua_State lua_State;
 
 typedef int (*luaL_dostring_t)(lua_State* L, const char* str);
 
-// Global variable for the Lua state
+
 lua_State* g_L = nullptr;
 luaL_dostring_t g_luaL_dostring = nullptr;
 
-// Function to find the Lua state in Roblox process memory
+
 bool FindLuaState()
 {
-    // This is a simplified approach - in a real executor you'd use pattern scanning
-    // For this test, we'll try to use known offsets or symbol lookup
     
-    HMODULE hRoblox = GetModuleHandleA(NULL); // Get the main module
+    
+    
+    HMODULE hRoblox = GetModuleHandleA(NULL); 
     if (!hRoblox)
         return false;
     
-    // Try to find luaL_dostring by scanning exports
-    // This is just a test - actual Roblox Lua functions may be obfuscated
     
-    // For testing purposes, just return true and we'll try a simple approach
+    
+    
+    
     return true;
 }
 
-// Simple function to execute Lua code
+
 void ExecuteLua(const char* code)
 {
     if (g_L && g_luaL_dostring)
@@ -51,7 +51,7 @@ void ExecuteLua(const char* code)
     }
     else
     {
-        // Fallback: write a file that Roblox can load
+        
         FILE* f = fopen("C:\\Users\\Administrator\\Desktop\\roblox_test_script.lua", "w");
         if (f)
         {
@@ -61,7 +61,7 @@ void ExecuteLua(const char* code)
     }
 }
 
-// DLL Entry point
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
@@ -70,7 +70,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
         {
             OutputDebugStringA("[Inj1Injector] Lua DLL loaded!\n");
             
-            // Log to a file
+            
             FILE* f = fopen("C:\\Users\\Administrator\\Desktop\\voltro_lua_test.log", "a");
             if (f)
             {
@@ -79,14 +79,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 fclose(f);
             }
             
-            // Try to find Lua state and execute test code
+            
             if (FindLuaState())
             {
-                // Execute a simple Lua script
+                
                 ExecuteLua("game:GetService(game, \"StarterGui\"):SetCore(\"SendNotification\", {Title = \"Inj1Injector\", Text = \"DLL Injection Successful!\", Duration = 5})");
             }
             
-            // Also show a message box as fallback
+            
             MessageBoxA(NULL, "Lua DLL Injected!\nCheck Roblox for notification", "Inj1Injector Lua Test", MB_OK | MB_ICONINFORMATION);
         }
         break;
@@ -100,7 +100,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     return TRUE;
 }
 
-// Export a function
+
 __declspec(dllexport) void TestLuaExecution()
 {
     ExecuteLua("warn('Inj1Injector: Test function called!')");

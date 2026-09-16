@@ -9,9 +9,9 @@ typedef void        (*QueueScriptFn)(const char*);
 typedef bool        (*IsSolaraHookedFn)();
 
 int main() {
-    // -----------------------------------------------------------------------
-    // Load the Solara runtime DLL locally for version/queue access
-    // -----------------------------------------------------------------------
+    
+    
+    
     std::cout << "[TEST] Loading voltro2_runtime.dll..." << std::endl;
     char exePath[MAX_PATH] = { 0 };
     GetModuleFileNameA(NULL, exePath, MAX_PATH);
@@ -45,9 +45,9 @@ int main() {
     std::cout << "[TEST] Xeno Runtime Version: " << getVersion() << std::endl;
     std::cout << "[TEST] Attached Status     : " << (isAttached() ? "ACTIVE" : "STANDBY") << std::endl;
 
-    // -----------------------------------------------------------------------
-    // Process Scanner
-    // -----------------------------------------------------------------------
+    
+    
+    
     std::cout << "\n[TEST] Running Solara ProcessScanner for active Roblox targets..." << std::endl;
     auto targets = Solara::Injector::ProcessScanner::findRobloxTargets();
     std::cout << "[TEST] Detected Roblox processes: " << targets.size() << std::endl;
@@ -59,14 +59,14 @@ int main() {
     if (!targets.empty()) {
         DWORD targetPid = targets[0].pid;
 
-        // -------------------------------------------------------------------
-        // [STRATEGY 0] Manual PE Map — Hyperion Bypass
-        // -------------------------------------------------------------------
+        
+        
+        
         std::cout << "\n=======================================================" << std::endl;
         std::cout << " [STRATEGY 0] Manual PE Map -> Roblox PID " << targetPid  << std::endl;
         std::cout << "=======================================================" << std::endl;
 
-        // Resolve the DLL path
+        
         char exeDir[MAX_PATH] = { 0 };
         GetModuleFileNameA(NULL, exeDir, MAX_PATH);
         if (char* sl = strrchr(exeDir, '\\')) *sl = '\0';
@@ -91,25 +91,25 @@ int main() {
             std::cout << "[INJECT] Injection failed: " << mmErr << std::endl;
         }
 
-        // -------------------------------------------------------------------
-        // Verify: PEB module list (manual map won't show here — that's correct)
-        // -------------------------------------------------------------------
+        
+        
+        
         bool isLoaded = Solara::Injector::IsModuleLoaded(targetPid, "voltro2_runtime.dll");
         std::cout << "[TEST] IsModuleLoaded (PEB): "
                   << (isLoaded ? "YES (LOADED in module list)"
                                : "NO  (expected for manual map — not in PEB Ldr)")
                   << std::endl;
 
-        // -------------------------------------------------------------------
-        // Verify: VoltroIPC pipe — DllMain starts it if DLL is live in Roblox
-        // -------------------------------------------------------------------
+        
+        
+        
         std::cout << "[TEST] Probing VoltroIPC pipe (DllMain signal)..." << std::endl;
         HANDLE hPipe = CreateFileW(L"\\\\.\\pipe\\VoltroIPC",
                                    GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
         if (hPipe != INVALID_HANDLE_VALUE) {
             std::cout << "[TEST] *** VoltroIPC CONNECTED — DLL is LIVE inside Roblox! ***" << std::endl;
 
-            // Dispatch a real Luau script through the live in-process pipe
+            
             const char* pipeScript = "print('[VOLTRO 2] Manual Map live execution confirmed!')";
             std::string payload = std::string("{\"type\":\"EXECUTE_SCRIPT\",\"code\":\"") + pipeScript + "\"}";
             uint32_t len = static_cast<uint32_t>(payload.size());
@@ -124,7 +124,7 @@ int main() {
             DWORD pipeErr = GetLastError();
             std::cout << "[TEST] VoltroIPC not open (Error " << pipeErr << ")." << std::endl;
 
-            // Try Voltro2IPC fallback
+            
             std::cout << "[TEST] Trying Voltro2IPC fallback pipe..." << std::endl;
             HANDLE hFb = CreateFileW(L"\\\\.\\pipe\\Voltro2IPC",
                                      GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);

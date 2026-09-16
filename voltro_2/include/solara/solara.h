@@ -16,13 +16,13 @@
 
 namespace Solara {
 
-// -----------------------------------------------------------------------------
-// Solara Architecture: Luau VM & Identity Constants (Roblox)
-// -----------------------------------------------------------------------------
+
+
+
 
 typedef void* lua_State_t;
 
-// Capability bitmask enabling all script capabilities (equivalent to Identity 8)
+
 constexpr uint64_t CAPABILITIES_ALL = 0x3FFFFFFFFFFFFFFFULL;
 constexpr int IDENTITY_MAX = 8;
 
@@ -35,9 +35,9 @@ struct RobloxExtraSpace {
 };
 #pragma pack(pop)
 
-// -----------------------------------------------------------------------------
-// Memory Safety & SEH Utilities
-// -----------------------------------------------------------------------------
+
+
+
 inline bool IsMemoryReadable(LPCVOID address, size_t size) {
     if (!address) return false;
     MEMORY_BASIC_INFORMATION mbi;
@@ -49,6 +49,6 @@ inline bool IsMemoryReadable(LPCVOID address, size_t size) {
     return (mbi.Protect & (PAGE_READONLY | PAGE_READWRITE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE)) != 0;
 }
 
-} // namespace Solara
+} 
 
-#endif // SOLARA_CORE_H
+#endif 

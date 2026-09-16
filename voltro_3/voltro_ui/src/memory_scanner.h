@@ -7,10 +7,10 @@
 
 namespace Voltro {
 
-// Pattern scanning for resolving Luau VM memory offsets
+
 class MemoryScanner {
 public:
-    // Scans memory of the specified process for byte signatures with wildcards (?)
+    
     static uintptr_t scanPattern(HANDLE hProcess, uintptr_t baseAddress, size_t regionSize, const std::string& pattern, const std::string& mask) {
         if (!hProcess || pattern.empty() || mask.empty() || pattern.size() != mask.size()) {
             return 0;
@@ -41,4 +41,4 @@ public:
     }
 };
 
-} // namespace Voltro
+} 

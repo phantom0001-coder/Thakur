@@ -11,9 +11,9 @@
 static std::atomic<bool> g_RuntimeActive{false};
 static HANDLE g_PipeClient = INVALID_HANDLE_VALUE;
 
-// -----------------------------------------------------------------------------
-// JSON Helper Utilities
-// -----------------------------------------------------------------------------
+
+
+
 static std::string ExtractJsonString(const std::string& json, const std::string& key) {
     std::string needle = "\"" + key + "\":";
     size_t pos = json.find(needle);
@@ -75,14 +75,14 @@ static bool SendPipeMessage(HANDLE hPipe, const std::string& type, const std::st
     return WriteFile(hPipe, packet.data(), static_cast<DWORD>(packet.size()), &written, nullptr) != FALSE;
 }
 
-// -----------------------------------------------------------------------------
-// Protected Execution Engine (SEH-Guarded, Crash-Proof)
-// -----------------------------------------------------------------------------
+
+
+
 static void ExecuteScriptSafely(HANDLE hPipe, const std::string& script) {
     if (script.empty()) return;
 
     try {
-        // 1. Check for standard executor introspection functions
+        
         if (script.find("identifyexecutor") != std::string::npos) {
             SendPipeMessage(hPipe, "OUTPUT", "[OUTPUT] identifyexecutor() => Voltro-2 (Xeno Backend, Luau v2.5)", "ok");
         }
@@ -93,7 +93,7 @@ static void ExecuteScriptSafely(HANDLE hPipe, const std::string& script) {
             SendPipeMessage(hPipe, "OUTPUT", "[OUTPUT] checkcaller() => true", "ok");
         }
 
-        // 2. Parse and emit print/warn/error statements from script
+        
         std::regex printRegex(R"((print|warn|error)\s*\(\s*["'](.*?)["']\s*\))");
         auto words_begin = std::sregex_iterator(script.begin(), script.end(), printRegex);
         auto words_end = std::sregex_iterator();
@@ -104,7 +104,7 @@ static void ExecuteScriptSafely(HANDLE hPipe, const std::string& script) {
             SendPipeMessage(hPipe, "OUTPUT", "[" + type + "] " + msg, type == "error" ? "error" : "ok");
         }
 
-        // 3. Execution confirmation
+        
         SendPipeMessage(hPipe, "OUTPUT", "[XENO RUNTIME] Script executed cleanly (" + std::to_string(script.size()) + " bytes, Thread: Native).", "ok");
         SendPipeMessage(hPipe, "EXECUTION_RESULT", "Executed payload in Roblox client.", "ok");
     } catch (const std::exception& ex) {
@@ -114,14 +114,14 @@ static void ExecuteScriptSafely(HANDLE hPipe, const std::string& script) {
     }
 }
 
-// -----------------------------------------------------------------------------
-// Runtime Communication Thread
-// -----------------------------------------------------------------------------
+
+
+
 DWORD WINAPI XenoRuntimeThread(LPVOID) {
     const wchar_t* pipeName = L"\\\\.\\pipe\\Voltro2Pipe";
     DWORD pid = GetCurrentProcessId();
 
-    // Loop trying to connect to the UI host pipe server
+    
     HANDLE hPipe = INVALID_HANDLE_VALUE;
     for (int retry = 0; retry < 120; ++retry) {
         hPipe = CreateFileW(
@@ -152,18 +152,18 @@ DWORD WINAPI XenoRuntimeThread(LPVOID) {
     g_PipeClient = hPipe;
     g_RuntimeActive.store(true);
 
-    // Initial Handshake
+    
     SendPipeMessage(hPipe, "ATTACH_STATUS", "Voltro-2 Xeno Runtime Active (PID: " + std::to_string(pid) + ")", "ok");
     SendPipeMessage(hPipe, "OUTPUT", "[XENO RUNTIME] Connected to Voltro UI via \\\\.\\pipe\\Voltro2Pipe", "ok");
 
-    // Listening loop
+    
     while (g_RuntimeActive.load()) {
         uint32_t packetLen = 0;
         DWORD bytesRead = 0;
 
         BOOL ok = ReadFile(hPipe, &packetLen, sizeof(uint32_t), &bytesRead, nullptr);
         if (!ok || bytesRead == 0) {
-            break; // Pipe disconnected
+            break; 
         }
 
         if (bytesRead == sizeof(uint32_t) && packetLen > 0 && packetLen < 64 * 1024 * 1024) {
@@ -194,14 +194,14 @@ DWORD WINAPI XenoRuntimeThread(LPVOID) {
     return 0;
 }
 
-// -----------------------------------------------------------------------------
-// DLL Entry Point
-// -----------------------------------------------------------------------------
+
+
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        // Create runtime worker thread and return immediately to free OS loader lock
+        
         CreateThread(nullptr, 0, XenoRuntimeThread, nullptr, 0, nullptr);
         break;
 
@@ -216,9 +216,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     return TRUE;
 }
 
-// -----------------------------------------------------------------------------
-// Public Status Exports
-// -----------------------------------------------------------------------------
+
+
+
 extern "C" {
     __declspec(dllexport) const char* GetSolaraVersion() {
         return "Voltro-2 Xeno Edition v2.5.0 (RBLX x64)";

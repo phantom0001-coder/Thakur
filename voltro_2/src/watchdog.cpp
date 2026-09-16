@@ -58,13 +58,13 @@ void RobloxWatchdog::monitorLoop() {
 
         HANDLE hProc = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
         if (!hProc) {
-            // Process may not be accessible or already exited
+            
             m_targetPid.store(0);
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             continue;
         }
 
-        // Wait for process termination
+        
         DWORD waitRes = WaitForSingleObject(hProc, 1000);
         if (waitRes == WAIT_OBJECT_0) {
             DWORD exitCode = 0;
@@ -97,12 +97,12 @@ void RobloxWatchdog::stop() {
     }
 }
 
-} // namespace Supervisor
-} // namespace Solara
+} 
+} 
 
-// -----------------------------------------------------------------------------
-// Solara Watchdog C-Exports
-// -----------------------------------------------------------------------------
+
+
+
 extern "C" {
     __declspec(dllexport) void StartWatchdog() {
         Solara::Supervisor::RobloxWatchdog::instance().start();

@@ -1,7 +1,7 @@
-// ============================================================
-//  ThemeManager.cpp  –  Voltro Executor  (Phase 2)
-//  Full implementation of the theme singleton.
-// ============================================================
+
+
+
+
 
 #include "ThemeManager.h"
 
@@ -17,7 +17,7 @@
 
 namespace Voltro {
 
-// ── Singleton ─────────────────────────────────────────────────────────────────
+
 
 ThemeManager& ThemeManager::instance()
 {
@@ -29,16 +29,16 @@ ThemeManager::ThemeManager(QObject* parent)
     : QObject(parent)
 {
     loadBuiltinThemes();
-    // Default to "dark" theme
+    
     if (m_themes.contains("dark"))
         loadTheme("dark");
 }
 
-// ── Built-in theme loading ─────────────────────────────────────────────────────
+
 
 void ThemeManager::loadBuiltinThemes()
 {
-    // Try resource file first; fall back to hard-coded object
+    
     const QStringList builtins = {
         {":/themes/dark.json"},
         {":/themes/midnight.json"},
@@ -53,7 +53,7 @@ void ThemeManager::loadBuiltinThemes()
         }
     }
 
-    // Always guarantee a "dark" theme exists (hardcoded)
+    
     if (!m_themes.contains("dark")) {
         QJsonObject colors;
         colors["background"]  = "#07090c";
@@ -81,7 +81,7 @@ void ThemeManager::loadBuiltinThemes()
         m_themes["dark"] = obj;
     }
 
-    // Guarantee "midnight" if resource was missing
+    
     if (!m_themes.contains("midnight")) {
         QJsonObject colors;
         colors["background"]  = "#020208";
@@ -109,7 +109,7 @@ void ThemeManager::loadBuiltinThemes()
         m_themes["midnight"] = obj;
     }
 
-    // Guarantee "glitched" if resource was missing
+    
     if (!m_themes.contains("glitched")) {
         QJsonObject base = m_themes.value("dark");
         base["name"]             = "Glitched";
@@ -145,7 +145,7 @@ bool ThemeManager::loadThemeFromResource(const QString& resourcePath, const QStr
     return true;
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+
 
 bool ThemeManager::loadTheme(const QString& name)
 {
@@ -198,7 +198,7 @@ QString ThemeManager::currentTheme() const
     return m_currentTheme;
 }
 
-// ── Color helpers ──────────────────────────────────────────────────────────────
+
 
 QColor ThemeManager::color(const QString& key, const QString& fallback) const
 {
@@ -216,7 +216,7 @@ QColor ThemeManager::error()      const { return color("error",      "#ff3b5c");
 QColor ThemeManager::warning()    const { return color("warning",    "#ffb800"); }
 QColor ThemeManager::info()       const { return color("info",       "#00e5ff"); }
 
-// ── Effect queries ─────────────────────────────────────────────────────────────
+
 
 bool ThemeManager::isGlitched()         const { return m_current["glitched"].toBool(false); }
 bool ThemeManager::isAnimated()         const { return m_current["animated"].toBool(false); }
@@ -227,7 +227,7 @@ bool ThemeManager::hasAnimatedBorders() const { return m_current["animatedBorder
 int  ThemeManager::glitchIntervalMs()   const { return m_current["glitchIntervalMs"].toInt(4000); }
 int  ThemeManager::glitchDurationMs()   const { return m_current["glitchDurationMs"].toInt(120); }
 
-// ── Palette builder ────────────────────────────────────────────────────────────
+
 
 QPalette ThemeManager::buildPalette() const
 {
@@ -243,7 +243,7 @@ QPalette ThemeManager::buildPalette() const
     const QColor acc    = accent();
     const QColor err    = error();
 
-    // Window / base backgrounds
+    
     p.setColor(QPalette::Window,          bg);
     p.setColor(QPalette::WindowText,      fg);
     p.setColor(QPalette::Base,            bg2);
@@ -255,22 +255,22 @@ QPalette ThemeManager::buildPalette() const
     p.setColor(QPalette::ButtonText,      fg);
     p.setColor(QPalette::BrightText,      fg);
 
-    // Highlight = accent
+    
     p.setColor(QPalette::Highlight,       acc);
     p.setColor(QPalette::HighlightedText, bg);
 
-    // Link colours
+    
     p.setColor(QPalette::Link,            acc);
     p.setColor(QPalette::LinkVisited,     color("accent2", "#00cc52"));
 
-    // Disabled state
+    
     p.setColor(QPalette::Disabled, QPalette::WindowText, mut);
     p.setColor(QPalette::Disabled, QPalette::Text,       mut);
     p.setColor(QPalette::Disabled, QPalette::ButtonText, mut);
     p.setColor(QPalette::Disabled, QPalette::Base,       bg);
     p.setColor(QPalette::Disabled, QPalette::Button,     bg);
 
-    // Shadow / mid
+    
     p.setColor(QPalette::Shadow,   border);
     p.setColor(QPalette::Mid,      border);
     p.setColor(QPalette::Dark,     bg2);
@@ -283,11 +283,11 @@ QPalette ThemeManager::buildPalette() const
     return p;
 }
 
-// ── Stylesheet builder ────────────────────────────────────────────────────────
+
 
 QString ThemeManager::buildStyleSheet() const
 {
-    // Pull all colours once so the template is readable
+    
     const QString bg      = color("background",  "#07090c").name();
     const QString bg2     = color("background2", "#0c1016").name();
     const QString card    = color("card",        "#10151c").name();
@@ -302,30 +302,30 @@ QString ThemeManager::buildStyleSheet() const
     const QString warn    = color("warning",     "#ffb800").name();
     const QString info    = color("info",        "#00e5ff").name();
 
-    // Derived: semi-transparent accent for glow / selection overlays
-    // QSS does not support rgba() in all places, so we build a hex with alpha via QColor
+    
+    
     auto accentAlpha = [&](int alpha) -> QString {
         QColor c(acc);
         c.setAlpha(alpha);
-        // Hex ARGB for QSS: #AARRGGBB
+        
         return QString("#%1%2%3%4")
                .arg(c.alpha(),  2, 16, QChar('0'))
                .arg(c.red(),    2, 16, QChar('0'))
                .arg(c.green(),  2, 16, QChar('0'))
                .arg(c.blue(),   2, 16, QChar('0'));
     };
-    const QString accGlow  = accentAlpha(40);   // subtle hover glow
-    const QString accSel   = accentAlpha(60);   // selection / active bg
-    const QString accBorder= accentAlpha(180);  // focus border
+    const QString accGlow  = accentAlpha(40);   
+    const QString accSel   = accentAlpha(60);   
+    const QString accBorder= accentAlpha(180);  
 
     QString ss;
     ss.reserve(16384);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Base widget / window
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Global reset ── */
+
 QWidget {
     background-color: %1;
     color: %2;
@@ -343,11 +343,11 @@ QFrame {
 }
 )").arg(bg, fg, acc, bg);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QPushButton
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── QPushButton ── */
+
 QPushButton {
     background-color: %1;
     color: %2;
@@ -391,26 +391,26 @@ QPushButton[class="danger"]:hover {
     color: %9;
 }
 )").arg(
-        card,        // 1 bg
-        fg,          // 2 fg
-        border,      // 3 border
-        accGlow,     // 4 hover bg
-        acc,         // 5 hover / primary bg border
-        acc,         // 6 hover color
-        acc,         // 7 pressed bg
-        acc2,        // 8 pressed border / primary hover
-        bg,          // 9 pressed text / primary text
-        bg2,         // 10 disabled bg
-        mut,         // 11 disabled text
-        border,      // 12 disabled border
-        err          // 13 danger color
+        card,        
+        fg,          
+        border,      
+        accGlow,     
+        acc,         
+        acc,         
+        acc,         
+        acc2,        
+        bg,          
+        bg2,         
+        mut,         
+        border,      
+        err          
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QTabWidget / QTabBar
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── QTabWidget ── */
+
 QTabWidget::pane {
     background-color: %1;
     border: 1px solid %2;
@@ -447,19 +447,19 @@ QTabBar::tab:!selected:hover {
     border-bottom: 2px solid %6;
 }
 )").arg(
-        card,    // 1 pane bg
-        border,  // 2 border
-        bg2,     // 3 tab bar bg
-        mut,     // 4 unselected tab text
-        acc,     // 5 selected / hover text + border
-        accGlow  // 6 unselected hover border
+        card,    
+        border,  
+        bg2,     
+        mut,     
+        acc,     
+        accGlow  
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QPlainTextEdit / QTextEdit  (editor surfaces)
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Text editors ── */
+
 QPlainTextEdit, QTextEdit {
     background-color: %1;
     color: %2;
@@ -475,19 +475,19 @@ QPlainTextEdit:focus, QTextEdit:focus {
     border-color: %6;
 }
 )").arg(
-        bg2,        // 1
-        fg,         // 2
-        border,     // 3
-        accSel,     // 4 selection bg
-        fg,         // 5 selection text
-        acc         // 6 focus border
+        bg2,        
+        fg,         
+        border,     
+        accSel,     
+        fg,         
+        acc         
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QListWidget / QTreeWidget
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── List / Tree views ── */
+
 QListWidget, QTreeWidget, QListView, QTreeView {
     background-color: %1;
     color: %2;
@@ -531,22 +531,22 @@ QHeaderView::section {
     font-weight: 600;
 }
 )").arg(
-        bg2,      // 1 base bg
-        fg,       // 2 text
-        border,   // 3 border
-        card,     // 4 alt bg / header bg
-        accGlow,  // 5 hover bg
-        acc,      // 6 accent text / left border
-        accSel,   // 7 selected bg
-        fg,       // 8 selected text
-        mut       // 9 header text
+        bg2,      
+        fg,       
+        border,   
+        card,     
+        accGlow,  
+        acc,      
+        accSel,   
+        fg,       
+        mut       
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QScrollBar
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Scrollbars ── */
+
 QScrollBar:vertical {
     background-color: %1;
     width: 8px;
@@ -591,16 +591,16 @@ QScrollBar::corner {
     background-color: %1;
 }
 )").arg(
-        bg2,     // 1 track
-        border,  // 2 thumb
-        acc      // 3 thumb hover
+        bg2,     
+        border,  
+        acc      
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QLineEdit / QComboBox / QSpinBox
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Input fields ── */
+
 QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox {
     background-color: %1;
     color: %2;
@@ -659,21 +659,21 @@ QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
     background-color: %4;
 }
 )").arg(
-        bg2,      // 1 bg
-        fg,       // 2 fg
-        border,   // 3 border
-        acc,      // 4 focus border / hover
-        card,     // 5 focus bg
-        mut,      // 6 disabled text
-        bg,       // 7 disabled / readonly bg
-        accSel    // 8 dropdown selection
+        bg2,      
+        fg,       
+        border,   
+        acc,      
+        card,     
+        mut,      
+        bg,       
+        accSel    
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QLabel
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Labels ── */
+
 QLabel {
     background-color: transparent;
     color: %1;
@@ -708,11 +708,11 @@ QLabel[class="info"] {
 }
 )").arg(fg, acc, mut, err, warn, info);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QSplitter
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Splitter ── */
+
 QSplitter::handle {
     background-color: %1;
 }
@@ -727,11 +727,11 @@ QSplitter::handle:hover {
 }
 )").arg(border, acc);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QMenuBar / QMenu
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Menus ── */
+
 QMenuBar {
     background-color: %1;
     color: %2;
@@ -775,20 +775,20 @@ QMenu::indicator {
     height: 14px;
 }
 )").arg(
-        bg2,     // 1 menubar bg
-        fg,      // 2 fg
-        border,  // 3 border
-        accGlow, // 4 selected bg
-        acc,     // 5 selected fg
-        card,    // 6 menu bg
-        mut      // 7 disabled
+        bg2,     
+        fg,      
+        border,  
+        accGlow, 
+        acc,     
+        card,    
+        mut      
     );
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QToolTip
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Tooltip ── */
+
 QToolTip {
     background-color: %1;
     color: %2;
@@ -800,11 +800,11 @@ QToolTip {
 }
 )").arg(card, fg, acc);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QCheckBox / QRadioButton
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Checkbox / Radio ── */
+
 QCheckBox, QRadioButton {
     background-color: transparent;
     color: %1;
@@ -840,11 +840,11 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled {
 }
 )").arg(fg, border, bg2, acc, acc2, mut, bg);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QGroupBox
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── GroupBox ── */
+
 QGroupBox {
     background-color: %1;
     border: 1px solid %2;
@@ -863,11 +863,11 @@ QGroupBox::title {
 }
 )").arg(card, border, fg, acc);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QProgressBar
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── ProgressBar ── */
+
 QProgressBar {
     background-color: %1;
     border: 1px solid %2;
@@ -882,11 +882,11 @@ QProgressBar::chunk {
 }
 )").arg(bg2, border, fg, acc);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QSlider
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Slider ── */
+
 QSlider::groove:horizontal {
     height: 4px;
     background-color: %1;
@@ -910,11 +910,11 @@ QSlider::sub-page:horizontal {
 }
 )").arg(border, acc, bg, acc2);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QStatusBar
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── StatusBar ── */
+
 QStatusBar {
     background-color: %1;
     color: %2;
@@ -925,11 +925,11 @@ QStatusBar::item {
 }
 )").arg(bg2, mut, border);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QToolBar
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── ToolBar ── */
+
 QToolBar {
     background-color: %1;
     border-bottom: 1px solid %2;
@@ -959,11 +959,11 @@ QToolButton:pressed, QToolButton:checked {
 }
 )").arg(bg2, border, fg, accGlow, acc, acc, bg);
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  QDialog / QMessageBox
-    // ─────────────────────────────────────────────────────────────────────────
+    
+    
+    
     ss += QString(R"(
-/* ── Dialogs ── */
+
 QDialog {
     background-color: %1;
     border: 1px solid %2;
@@ -976,4 +976,4 @@ QDialogButtonBox QPushButton {
     return ss;
 }
 
-} // namespace Voltro
+} 

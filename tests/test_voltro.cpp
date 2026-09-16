@@ -62,7 +62,7 @@ void TestVoltro::testPremiumManagerHWID() {
 
 void TestVoltro::testPremiumManagerKeyValidation() {
     auto& pm = Voltro::PremiumManager::instance();
-    // Test key "373438" gives 7-day trial access
+    
     pm.validateKey("373438");
     QVERIFY(pm.isKeyValid());
     QVERIFY(pm.daysRemaining() > 0);

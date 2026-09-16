@@ -30,14 +30,14 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private slots:
-    // Navigation
+    
     void onNavigateWorkspace();
     void onNavigateHub();
     void onNavigatePlans();
     void onNavigateSettings();
     void onNavigateCredits();
 
-    // Editor Actions
+    
     void onNewTab();
     void onCloseTab(int index);
     void onTabRenamed(int index, const QString& newName);
@@ -49,18 +49,18 @@ private slots:
     void onSaveClicked();
     void onOpenClicked();
 
-    // Find & Replace
+    
     void onToggleFindReplace(bool showReplace);
     void onFindNext();
     void onReplace();
     void onReplaceAll();
 
-    // Theme & Settings
+    
     void onThemeChanged(const QString& themeName);
     void onAccentChanged(const QString& hexColor);
     void onIpcModeChanged(const QString& mode);
 
-    // Script Hub Actions
+    
     void onHubSearch();
     void onHubSourceChanged(int index);
     void onScriptSelected(int row);
@@ -83,4 +83,4 @@ private:
     int m_selectedScriptIndex = -1;
 };
 
-} // namespace Voltro
+} 

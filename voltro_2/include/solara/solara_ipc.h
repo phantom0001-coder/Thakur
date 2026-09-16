@@ -9,10 +9,10 @@
 namespace Solara {
 namespace IPC {
 
-// -----------------------------------------------------------------------------
-// Solara IPC Bridge (Bi-directional Named Pipe Client / Server)
-// Compatible with Voltro Native Win32 UI (\\\\.\\pipe\\VoltroIPC)
-// -----------------------------------------------------------------------------
+
+
+
+
 
 class SolaraIpcBridge {
 public:
@@ -55,7 +55,7 @@ private:
     std::function<void(const std::string&)> m_scriptCallback;
 };
 
-} // namespace IPC
-} // namespace Solara
+} 
+} 
 
-#endif // SOLARA_IPC_H
+#endif 

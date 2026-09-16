@@ -44,7 +44,7 @@ bool SolaraIpcBridge::sendPacket(HANDLE pipe, const std::string& payload) {
 }
 
 std::string SolaraIpcBridge::extractScriptCode(const std::string& rawPayload) {
-    // If it's a JSON payload like {"type":"EXECUTE_SCRIPT","code":"..."}
+    
     size_t codeKey = rawPayload.find("\"code\"");
     if (codeKey != std::string::npos) {
         size_t colon = rawPayload.find(':', codeKey);
@@ -67,7 +67,7 @@ std::string SolaraIpcBridge::extractScriptCode(const std::string& rawPayload) {
                     } else if (c == '\\') {
                         escaped = true;
                     } else if (c == '"') {
-                        break; // End of JSON string
+                        break; 
                     } else {
                         code += c;
                     }
@@ -77,7 +77,7 @@ std::string SolaraIpcBridge::extractScriptCode(const std::string& rawPayload) {
         }
     }
 
-    // Otherwise, treat payload as raw script
+    
     return rawPayload;
 }
 
@@ -147,11 +147,11 @@ void SolaraIpcBridge::clientWorkerLoop() {
         while (m_running.load() && m_connected.load()) {
             uint32_t packetLen = 0;
             if (!readExact(m_clientPipe, &packetLen, sizeof(uint32_t))) {
-                break; // Disconnected from UI host
+                break; 
             }
 
             if (packetLen == 0 || packetLen > 64 * 1024 * 1024) {
-                break; // Corrupted length
+                break; 
             }
 
             std::string buffer(packetLen, '\0');
@@ -236,7 +236,7 @@ void SolaraIpcBridge::stop() {
     }
 
     if (m_serverPipe != INVALID_HANDLE_VALUE) {
-        // Trigger dummy connection to unblock accept
+        
         HANDLE dummy = CreateFileW(L"\\\\.\\pipe\\Voltro2IPC", GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
         if (dummy != INVALID_HANDLE_VALUE) CloseHandle(dummy);
         CloseHandle(m_serverPipe);
@@ -247,12 +247,12 @@ void SolaraIpcBridge::stop() {
     if (m_serverThread.joinable()) m_serverThread.detach();
 }
 
-} // namespace IPC
-} // namespace Solara
+} 
+} 
 
-// -----------------------------------------------------------------------------
-// Solara IPC C-Exports
-// -----------------------------------------------------------------------------
+
+
+
 extern "C" {
     __declspec(dllexport) void StartPipeServer() {
         Solara::IPC::SolaraIpcBridge::instance().start();

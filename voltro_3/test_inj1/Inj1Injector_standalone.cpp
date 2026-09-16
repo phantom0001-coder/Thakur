@@ -1,7 +1,7 @@
-// ============================================================
-//  Inj1Injector_standalone.cpp  --  inj-1 Manual Mapping Injection Engine
-//  Standalone implementation - Uses NtSetIoCompletion for stealth execution
-// ============================================================
+
+
+
+
 
 #include "Inj1Injector_standalone.h"
 #include <iostream>
@@ -10,7 +10,7 @@
 
 #pragma comment(lib, "psapi.lib")
 
-// Helper function to check if a module is loaded in a process
+
 bool IsModuleLoaded(DWORD Pid, const char* ModuleName)
 {
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, Pid);
@@ -39,9 +39,9 @@ bool IsModuleLoaded(DWORD Pid, const char* ModuleName)
     return false;
 }
 
-// ----------------------------------------------------------
-//  Inj1Injector Implementation
-// ----------------------------------------------------------
+
+
+
 
 bool Inj1Injector::Inject(DWORD Pid, const std::string& dllPath)
 {
@@ -65,7 +65,7 @@ bool Inj1Injector::Inject(DWORD Pid, const std::string& dllPath)
         return false;
     }
 
-    // Load DLL from path
+    
     auto Raw = LoadTarget(dllPath);
     if (!Raw)
     {
@@ -88,7 +88,7 @@ bool Inj1Injector::Inject(DWORD Pid, const std::string& dllPath)
     ULONG64 TlsRVA = Tls.VirtualAddress;
     ULONG64 TlsSize = Tls.Size;
 
-    // Find a suitable system DLL for section stomping
+    
     auto DllPath = FindTargetDll(Nt);
     if (DllPath.empty())
     {
@@ -98,7 +98,7 @@ bool Inj1Injector::Inject(DWORD Pid, const std::string& dllPath)
         return false;
     }
 
-    // Map the target DLL into the process
+    
     uintptr_t Base = MapTarget(hProcess, Nt, pNt, Raw, DllPath);
     free(Raw);
 
@@ -109,7 +109,7 @@ bool Inj1Injector::Inject(DWORD Pid, const std::string& dllPath)
         return false;
     }
 
-    // Execute the loader
+    
     bool Result = ExecuteLoader(hProcess, Nt, Base, EntryPointRVA,
         ImportRVA, ImportSize, ExceptionRVA, ExceptionSize, TlsRVA, TlsSize);
 
@@ -214,7 +214,7 @@ Inj1Injector::NtFunctions Inj1Injector::GetNtFunctions()
 
 uint8_t* Inj1Injector::LoadTarget(const std::string& dllPath)
 {
-    // Load DLL from file
+    
     std::ifstream file(dllPath, std::ios::binary | std::ios::ate);
     if (!file.is_open())
         return nullptr;
@@ -269,7 +269,7 @@ std::string Inj1Injector::FindTargetDll(const NtFunctions& Nt)
             sprintf_s(Path, "C:\\Windows\\System32\\%s", Ffd.cFileName);
 
             std::string Name = Ffd.cFileName;
-            // Skip runtime DLLs
+            
             if (Name.find("msvcp") == 0 ||
                 Name.find("vcruntime") == 0 ||
                 Name.find("msvcr") == 0 ||

@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-// ============================================================
-//  ScriptCard.h - Voltro Script Hub (Phase 3)
-//  Individual script card widget with hover animation,
-//  safety badge, hub badge, and action buttons.
-// ============================================================
+
+
+
+
+
 
 #include "HubManager.h"
 
@@ -24,7 +24,7 @@ class ScriptCard : public QFrame
 {
     Q_OBJECT
 
-    // Animated border color property
+    
     Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor)
 
 public:
@@ -34,7 +34,7 @@ public:
     const ScriptMeta& meta() const;
     void              updateMeta(const ScriptMeta& meta);
 
-    // Property accessors for animation
+    
     QColor borderColor() const;
     void   setBorderColor(const QColor& color);
 
@@ -56,16 +56,16 @@ private:
     void updateSafetyBadge();
     void startHoverAnimation(bool hovering);
 
-    // -- Helpers --
+    
     static QString safetyLabel(SafetyVerdict v);
     static QColor  safetyColor(SafetyVerdict v);
     static QString verdictIcon(SafetyVerdict v);
 
-    // -- Data --
+    
     ScriptMeta m_meta;
     QColor     m_borderColor { QColor("#1e2530") };
 
-    // -- Widgets --
+    
     QLabel*       m_nameLabel        = nullptr;
     QLabel*       m_descLabel        = nullptr;
     QLabel*       m_authorLabel      = nullptr;
@@ -82,4 +82,4 @@ private:
     QGraphicsDropShadowEffect*  m_shadow       = nullptr;
 };
 
-} // namespace Voltro
+} 

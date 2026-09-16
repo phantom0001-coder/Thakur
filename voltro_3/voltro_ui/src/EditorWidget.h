@@ -1,9 +1,9 @@
 #pragma once
-// ============================================================
-//  EditorWidget.h  –  Voltro Executor  (Phase 2)
-//  Dark Lua code editor with syntax highlighting,
-//  line numbers, auto-indent and current-line highlight.
-// ============================================================
+
+
+
+
+
 
 #ifndef VOLTRO_EDITORWIDGET_H
 #define VOLTRO_EDITORWIDGET_H
@@ -35,15 +35,15 @@ public:
     using QPlainTextEdit::setViewportMargins;
 };
 
-// ============================================================
-//  EditorWidget
-//  A feature-rich Lua source code editor.
-// ============================================================
+
+
+
+
 class EditorWidget : public QWidget
 {
     Q_OBJECT
 
-    // ── Qt properties (accessible from stylesheets / tools) ──
+    
     Q_PROPERTY(QString fontFamily   READ fontFamily   WRITE setFontFamily)
     Q_PROPERTY(int     fontSize     READ fontSize     WRITE setFontSize)
     Q_PROPERTY(bool    wordWrap     READ wordWrap     WRITE setWordWrap)
@@ -55,12 +55,12 @@ public:
     explicit EditorWidget(QWidget* parent = nullptr);
     ~EditorWidget() override = default;
 
-    // ── Content API ──────────────────────────────────────────
+    
     void    setCode(const QString& code);
     QString code() const;
     void    clear();
 
-    // ── Search / Replace ─────────────────────────────────────
+    
     bool findNext(const QString& text,
                   Qt::CaseSensitivity cs = Qt::CaseInsensitive,
                   bool wrapAround        = true);
@@ -73,11 +73,11 @@ public:
                     const QString& replacement,
                     Qt::CaseSensitivity cs = Qt::CaseInsensitive);
 
-    // ── Modification state ───────────────────────────────────
+    
     bool isModified() const;
     void setModified(bool modified);
 
-    // ── Property accessors ───────────────────────────────────
+    
     QString fontFamily()    const;
     int     fontSize()      const;
     bool    wordWrap()      const;
@@ -92,11 +92,11 @@ public:
     void setAutoIndent(bool enabled);
     void setTabSize(int spaces);
 
-    // ── Undo / Redo passthrough ───────────────────────────────
+    
     bool canUndo() const;
     bool canRedo() const;
 
-    // ── Access to the inner editor (for advanced use) ─────────
+    
     QPlainTextEdit* editor() const { return m_editor; }
 
 signals:
@@ -112,7 +112,7 @@ public slots:
     void cutToClipboard();
     void pasteFromClipboard();
 
-    // Re-apply theme colours when ThemeManager emits themeChanged
+    
     void refreshTheme();
 
 protected:
@@ -132,15 +132,15 @@ private:
     void applyEditorColors();
     int  lineNumberAreaWidth() const;
 
-    // Key-press filter for auto-indent / tab expansion
+    
     bool eventFilter(QObject* obj, QEvent* event) override;
 
-    // ── Child widgets ─────────────────────────────────────────
+    
     CodePlainTextEdit* m_editor          {nullptr};
     LineNumberArea* m_lineNumberArea  {nullptr};
     LuaHighlighter* m_highlighter     {nullptr};
 
-    // ── Properties ───────────────────────────────────────────
+    
     QString m_fontFamily   {"JetBrains Mono"};
     int     m_fontSize     {13};
     bool    m_wordWrap     {false};
@@ -152,9 +152,9 @@ private:
 };
 
 
-// ============================================================
-//  LineNumberArea  –  painted inside the left gutter
-// ============================================================
+
+
+
 class LineNumberArea : public QWidget
 {
     Q_OBJECT
@@ -172,16 +172,16 @@ private:
 };
 
 
-// ============================================================
-//  LuaHighlighter  –  QSyntaxHighlighter for Lua / Roblox API
-// ============================================================
+
+
+
 class LuaHighlighter : public QSyntaxHighlighter
 {
     Q_OBJECT
 public:
     explicit LuaHighlighter(QTextDocument* parent = nullptr);
 
-    /// Update palette colours from the current ThemeManager theme.
+    
     void refreshColors();
 
 protected:
@@ -197,11 +197,11 @@ private:
 
     QVector<HighlightRule> m_rules;
 
-    // Long-bracket (multi-line) comment / string state
+    
     QRegularExpression m_longBracketOpen;
     QRegularExpression m_longBracketClose;
 
-    // Formats
+    
     QTextCharFormat m_keywordFmt;
     QTextCharFormat m_builtinFmt;
     QTextCharFormat m_robloxFmt;
@@ -213,6 +213,6 @@ private:
     QTextCharFormat m_selfFmt;
 };
 
-} // namespace Voltro
+} 
 
-#endif // VOLTRO_EDITORWIDGET_H
+#endif 

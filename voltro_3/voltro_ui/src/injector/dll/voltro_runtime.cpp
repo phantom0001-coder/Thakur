@@ -11,9 +11,9 @@
 namespace Voltro {
 namespace Runtime {
 
-// -----------------------------------------------------------------------------
-// LuaHookEngine Implementation
-// -----------------------------------------------------------------------------
+
+
+
 
 LuaHookEngine& LuaHookEngine::instance() {
     static LuaHookEngine inst;
@@ -83,7 +83,7 @@ bool LuaHookEngine::scanSignatures() {
     uintptr_t baseAddr = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
     size_t imageSize = modInfo.SizeOfImage;
 
-    // Try multiple patterns for luaL_dostring with fallbacks
+    
     const std::vector<std::string> dostringPatterns = {
         "48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 20 48 8B F9",
         "48 89 4C 24 ? 55 53 56 57 41 54",
@@ -104,7 +104,7 @@ bool LuaHookEngine::scanSignatures() {
         m_pfnDoString = reinterpret_cast<luaL_dostring_t>(doStringAddr);
     }
 
-    // Try multiple patterns for lua_State / task_scheduler with fallbacks
+    
     const std::vector<std::string> statePatterns = {
         "48 8D 05 ? ? ? ? 48 8B D9 48 8B 00",
         "48 8B 05 ? ? ? ? 48 89 44 24",
@@ -118,11 +118,11 @@ bool LuaHookEngine::scanSignatures() {
     for (const auto& pat : statePatterns) {
         stateAddr = scanMemory(baseAddr, imageSize, pat);
         if (stateAddr) {
-            // Resolve RIP-relative offset: *(stateAddr + 3) + stateAddr + 7
+            
             int32_t relOffset = *reinterpret_cast<const int32_t*>(stateAddr + 3);
             uintptr_t targetPtr = stateAddr + 7 + relOffset;
 
-            // Validate the pointer is readable
+            
             MEMORY_BASIC_INFORMATION mbi;
             if (VirtualQuery(reinterpret_cast<LPCVOID>(targetPtr), &mbi, sizeof(mbi)) &&
                 (mbi.State == MEM_COMMIT) &&
@@ -134,7 +134,7 @@ bool LuaHookEngine::scanSignatures() {
         }
     }
 
-    // Only mark hooked if valid pointers were actually resolved
+    
     if (m_pfnDoString && m_luaState) {
         m_hooked = true;
     } else {
@@ -170,7 +170,7 @@ bool LuaHookEngine::validateScriptSafety(const std::string& script, std::string&
 }
 
 bool LuaHookEngine::initialize() {
-    // Evasion & Anti-Debug check
+    
     if (IsDebuggerPresent()) {
         IpcClientBridge::instance().sendOutput("[SECURITY] Debugger detected via IsDebuggerPresent", "warn");
     }
@@ -210,7 +210,7 @@ bool LuaHookEngine::executeScript(const std::string& script) {
 
     FramedIpcBridge::instance().sendOutput("[VOLTRO ENGINE] Executing script payload (" + std::to_string(script.length()) + " bytes)...", "info");
 
-    // Watchdog thread for 10-second timeout
+    
     std::thread watchdog([this]() {
         auto start = std::chrono::steady_clock::now();
         while (m_executing && !m_abortRequested) {
@@ -225,7 +225,7 @@ bool LuaHookEngine::executeScript(const std::string& script) {
     });
     watchdog.detach();
 
-    // Call Roblox Lua VM if resolved
+    
     if (m_pfnDoString && m_luaState) {
         bool fault = false;
         int status = SafeCallDoString(m_pfnDoString, m_luaState, script.c_str(), fault);
@@ -237,7 +237,7 @@ bool LuaHookEngine::executeScript(const std::string& script) {
             FramedIpcBridge::instance().sendOutput("[LUA ERROR] Execution returned status code: " + std::to_string(status), "error");
         }
     } else {
-        // Queue cleanly to Solara TaskScheduler execution pipeline
+        
         SolaraExecutionEngine::instance().queueScript(script);
     }
 
@@ -364,9 +364,9 @@ void LuaHookEngine::stopExecution() {
     m_executing = false;
 }
 
-// -----------------------------------------------------------------------------
-// IpcClientBridge Implementation
-// -----------------------------------------------------------------------------
+
+
+
 
 IpcClientBridge& IpcClientBridge::instance() {
     static IpcClientBridge inst;
@@ -399,7 +399,7 @@ void IpcClientBridge::communicationLoop() {
     const wchar_t* pipeName = L"\\\\.\\pipe\\VoltroIPC";
 
     while (m_running) {
-        // Attempt connection to Voltro UI Named Pipe
+        
         m_pipe = CreateFileW(
             pipeName,
             GENERIC_READ | GENERIC_WRITE,
@@ -411,16 +411,16 @@ void IpcClientBridge::communicationLoop() {
         );
 
         if (m_pipe == INVALID_HANDLE_VALUE) {
-            // Server not ready, retry after sleep
+            
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             continue;
         }
 
-        // Successfully connected to Voltro UI!
+        
         sendStatus(true, "Voltro DLL hooked and connected to Roblox process.");
         sendOutput("[IPC BRIDGE] Connected to Voltro UI host.", "ok");
 
-        // Trigger in-game "V" animation dropping from above
+        
         LuaHookEngine::instance().playAttachAnimation();
 
         char buffer[8192];
@@ -429,13 +429,13 @@ void IpcClientBridge::communicationLoop() {
         while (m_running) {
             BOOL success = ReadFile(m_pipe, buffer, sizeof(buffer) - 1, &bytesRead, nullptr);
             if (!success || bytesRead == 0) {
-                break; // Disconnected
+                break; 
             }
 
             buffer[bytesRead] = '\0';
             std::string message(buffer, bytesRead);
 
-            // Handle newline-delimited messages
+            
             std::stringstream ss(message);
             std::string line;
             while (std::getline(ss, line)) {
@@ -453,7 +453,7 @@ void IpcClientBridge::communicationLoop() {
 
 void IpcClientBridge::handleMessage(const std::string& json) {
     if (json.find("EXECUTE_SCRIPT") != std::string::npos || json.find("EXECUTE_PAYLOAD") != std::string::npos) {
-        // Extract script code from JSON
+        
         std::string needle = "\"code\":\"";
         size_t pos = json.find(needle);
         std::string code;
@@ -468,7 +468,7 @@ void IpcClientBridge::handleMessage(const std::string& json) {
             code = json;
         }
 
-        // Unescape standard JSON string escapes
+        
         std::string unescaped;
         for (size_t i = 0; i < code.length(); ++i) {
             if (code[i] == '\\' && i + 1 < code.length()) {
@@ -520,20 +520,20 @@ bool IpcClientBridge::sendStatus(bool attached, const std::string& message) {
     return WriteFile(m_pipe, payload.data(), static_cast<DWORD>(payload.length()), &written, nullptr);
 }
 
-} // namespace Runtime
-} // namespace Voltro
+} 
+} 
 
-// -----------------------------------------------------------------------------
-// DLL Entry Point
-// -----------------------------------------------------------------------------
+
+
+
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        // Start runtime initialization on a separate worker thread so loader lock is released immediately
+        
         std::thread([]() {
-            // Modern Solara-like TaskScheduler and Framed IPC
+            
             Voltro::Runtime::SolaraExecutionEngine::instance().initialize();
             Voltro::Runtime::FramedIpcBridge::instance().start();
         }).detach();

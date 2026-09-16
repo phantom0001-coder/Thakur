@@ -24,14 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Frameless window setup with custom titlebar
+    
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
     setAttribute(Qt::WA_TranslucentBackground, false);
 
     setupCustomTitleBar();
     initializeVoltroSandbox();
 
-    // Connect Custom TitleBar buttons
+    
     connect(ui->btnMin, &QPushButton::clicked, this, &MainWindow::showMinimized);
     connect(ui->btnMax, &QPushButton::clicked, this, [this]() {
         if (isMaximized()) {
@@ -44,14 +44,14 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(ui->btnClose, &QPushButton::clicked, this, &MainWindow::close);
 
-    // Connect Navigation sidebar buttons
+    
     connect(ui->btnNavWorkspace, &QPushButton::clicked, this, &MainWindow::onNavigateWorkspace);
     connect(ui->btnNavHub, &QPushButton::clicked, this, &MainWindow::onNavigateHub);
     connect(ui->btnNavPlans, &QPushButton::clicked, this, &MainWindow::onNavigatePlans);
     connect(ui->btnNavSettings, &QPushButton::clicked, this, &MainWindow::onNavigateSettings);
     connect(ui->btnNavCredits, &QPushButton::clicked, this, &MainWindow::onNavigateCredits);
 
-    // Connect Top Action bar buttons
+    
     connect(ui->btnAttach, &QPushButton::clicked, this, &MainWindow::onAttachClicked);
     connect(ui->btnExecute, &QPushButton::clicked, this, &MainWindow::onExecuteClicked);
     connect(ui->btnStop, &QPushButton::clicked, this, &MainWindow::onStopClicked);
@@ -59,10 +59,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->btnFpsBoost, &QPushButton::clicked, this, &MainWindow::onFpsBoostClicked);
     connect(ui->btnNewTab, &QPushButton::clicked, this, &MainWindow::onNewTab);
 
-    // Connect Tab Close
+    
     connect(ui->editorTabs, &QTabWidget::tabCloseRequested, this, &MainWindow::onCloseTab);
 
-    // Initialize Customizable Multi-Hub System
+    
     setupScriptHub();
 
     addOutputLog("[VOLTRO CORE] Native Qt GUI initialized successfully.", "ok");
@@ -74,7 +74,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setupCustomTitleBar() {
-    // Custom window dragging logic handled in mouse events
+    
 }
 
 void MainWindow::initializeVoltroSandbox() {
@@ -100,7 +100,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
-// Navigation Slots
+
 void MainWindow::onNavigateWorkspace() {
     ui->btnNavWorkspace->setChecked(true);
     ui->btnNavHub->setChecked(false);
@@ -154,7 +154,7 @@ void MainWindow::onNavigateCredits() {
     }
 }
 
-// Tab Management
+
 void MainWindow::onNewTab() {
     int tabCount = ui->editorTabs->count();
     QWidget *newTab = new QWidget();
@@ -186,7 +186,7 @@ void MainWindow::onTabRenamed(int index, const QString& newName) {
     }
 }
 
-// Core Execution & Attachment
+
 void MainWindow::onAttachClicked() {
     addOutputLog("[SCANNER] Scanning for Roblox process...", "info");
     auto targets = ProcessManager::findTargetProcesses();
@@ -219,7 +219,7 @@ void MainWindow::onAttachClicked() {
         return;
     }
 
-    // Solara-style Watchdog & Auto-Recovery in Qt MainWindow
+    
     RobloxWatchdog::getInstance().startWatch(pid, [this](DWORD exitCode, const std::string& diag) {
         QMetaObject::invokeMethod(this, [this, exitCode, diag]() {
             if (exitCode != 0) {
@@ -251,7 +251,7 @@ void MainWindow::onExecuteClicked() {
 
     std::string scriptStd = script.toStdString();
 
-    // 1. Security Scan
+    
     auto report = ScriptEngine::scanHeuristics(scriptStd);
     addOutputLog(QString("[SECURITY AUDIT] Verdict: %1").arg(QString::fromStdString(report.verdict)), 
                  report.verdict == "CLEAN" ? "ok" : "warn");
@@ -260,7 +260,7 @@ void MainWindow::onExecuteClicked() {
         addOutputLog(QString("  -> Warning Flag: %1").arg(QString::fromStdString(flag)), "warn");
     }
 
-    // 2. Voltro Environment Execution
+    
     addOutputLog(QString("[RUNTIME] Executing payload (%1 bytes)...").arg(script.length()), "info");
     auto& env = VoltroEnvironment::getInstance();
 
@@ -276,7 +276,7 @@ void MainWindow::onExecuteClicked() {
         addOutputLog(QString("  [OUTPUT] checkcaller() => %1").arg(QString::fromStdString(res)), "info");
     }
 
-    // Capture standard print/warn calls in script
+    
     QRegularExpression printRegex(R"((print|warn|error)\s*\(\s*["'](.*?)["']\s*\))");
     auto matches = printRegex.globalMatch(script);
     while (matches.hasNext()) {
@@ -287,7 +287,7 @@ void MainWindow::onExecuteClicked() {
         addOutputLog(QString("  [%1] %2").arg(type.toUpper(), msg), lvl);
     }
 
-    // Forward script payload to Roblox client via Named Pipe if connected
+    
     Voltro::NamedPipeBridge::getInstance().sendScriptPayload(scriptStd);
 
     addOutputLog("[RUNTIME] Execution finished successfully (Exit Code: 0).", "ok");
@@ -312,11 +312,11 @@ void MainWindow::onFpsBoostClicked() {
     std::string boostScript = VoltroEnvironment::generateFpsBoostScript(240);
     addOutputLog("[BOOSTER] Dispatching In-Game Universal FPS Optimization payload...", "info");
 
-    // Execute through active IPC or internal VM
+    
     auto& env = VoltroEnvironment::getInstance();
     env.invokeGlobal("setfpscap", {"240"});
 
-    // Send through Named Pipe if attached
+    
     if (m_isAttached) {
         NamedPipeBridge::getInstance().sendScriptPayload(boostScript);
         addOutputLog("[BOOSTER] In-game rendering parameters unlocked: FPS limit set to 240, shadows/particles purged.", "ok");
@@ -368,14 +368,14 @@ void MainWindow::onOpenClicked() {
 void MainWindow::setupScriptHub() {
     if (!ui->comboHubSelector || !ui->listHubScripts) return;
 
-    // Populate Hub Selector Dropdown with customizable sources
+    
     ui->comboHubSelector->clear();
     const auto& sources = ScriptEngine::getHubSources();
     for (const auto& src : sources) {
         ui->comboHubSelector->addItem(QString::fromStdString(src.displayName), QString::fromStdString(src.id));
     }
 
-    // Connect Hub Search & Selector signals
+    
     connect(ui->txtHubSearch, &QLineEdit::textChanged, this, &MainWindow::onHubSearch);
     connect(ui->txtHubSearch, &QLineEdit::returnPressed, this, &MainWindow::onHubSearch);
     connect(ui->btnHubRefresh, &QPushButton::clicked, this, &MainWindow::onHubSearch);
@@ -384,11 +384,11 @@ void MainWindow::setupScriptHub() {
     connect(ui->btnLoadToEditor, &QPushButton::clicked, this, &MainWindow::onLoadScriptToEditor);
     connect(ui->btnExecuteDirect, &QPushButton::clicked, this, &MainWindow::onExecuteScriptDirect);
 
-    // Initial query to populate all scripts
+    
     onHubSearch();
 }
 
-void MainWindow::onHubSourceChanged(int /*index*/) {
+void MainWindow::onHubSourceChanged(int ) {
     onHubSearch();
 }
 
@@ -482,7 +482,7 @@ void MainWindow::onExecuteScriptDirect() {
         .arg(QString::fromStdString(item.hub)), "info");
 
     std::string execPayload = item.code;
-    // If raw URL exists, fetch and scan full payload
+    
     if (!item.downloadUrl.empty() && execPayload.find("loadstring") == 0) {
         std::string fetched = ScriptEngine::fetchRemoteScript(item.downloadUrl);
         if (!fetched.empty() && fetched.find("-- [ERROR]") == std::string::npos) {
@@ -490,12 +490,12 @@ void MainWindow::onExecuteScriptDirect() {
         }
     }
 
-    // Run security heuristics scan
+    
     auto report = ScriptEngine::scanHeuristics(execPayload);
     addOutputLog(QString("[SECURITY AUDIT] Verdict: %1").arg(QString::fromStdString(report.verdict)),
         report.verdict == "CLEAN" ? "ok" : "warn");
 
-    // Execute through NamedPipe or active runtime
+    
     if (m_isAttached) {
         NamedPipeBridge::getInstance().sendScriptPayload(execPayload);
         addOutputLog("[RUNTIME] Dispatched script directly to attached Roblox instance.", "ok");
@@ -504,7 +504,7 @@ void MainWindow::onExecuteScriptDirect() {
     }
 }
 
-void MainWindow::onToggleFindReplace(bool /*showReplace*/) {}
+void MainWindow::onToggleFindReplace(bool ) {}
 void MainWindow::onFindNext() {}
 void MainWindow::onReplace() {}
 void MainWindow::onReplaceAll() {}
@@ -512,8 +512,8 @@ void MainWindow::onThemeChanged(const QString& themeName) {
     applyThemePalette(themeName);
 }
 
-void MainWindow::onAccentChanged(const QString& /*hexColor*/) {
-    // Reapply current theme stylesheet
+void MainWindow::onAccentChanged(const QString& ) {
+    
     ThemeManager::instance().applyToWidget(this);
 }
 
@@ -547,4 +547,4 @@ void MainWindow::addOutputLog(const QString& message, const QString& level) {
     ui->txtConsole->appendPlainText(coloredMsg);
 }
 
-} // namespace Voltro
+} 

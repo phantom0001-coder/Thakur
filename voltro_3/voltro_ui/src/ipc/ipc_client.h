@@ -8,7 +8,7 @@
 
 namespace Voltro {
 
-// Inter-process communication commands passing between frontend UI and execution engine
+
 enum class IpcCommandType {
     ATTACH_REQUEST,
     DETACH_REQUEST,
@@ -49,4 +49,4 @@ private:
     std::function<void(const IpcMessage&)> m_payloadHandler;
 };
 
-} // namespace Voltro
+} 

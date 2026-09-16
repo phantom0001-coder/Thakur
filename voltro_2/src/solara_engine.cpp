@@ -17,9 +17,9 @@ static void __fastcall HookedJobStep(void* thisPtr, void* stats) {
     }
 }
 
-// -----------------------------------------------------------------------------
-// SEH-isolated raw helper functions (No C++ object unwinding to satisfy C2712)
-// -----------------------------------------------------------------------------
+
+
+
 
 static bool RawCallOriginalStep(SolaraEngine::StepFn fn, void* targetJob) {
     if (!fn || !targetJob) return false;
@@ -64,16 +64,16 @@ static void RawElevateState(lua_State_t L) {
 static bool RawExecuteProtectedBlock(const char* scriptData, size_t length) {
     if (!scriptData || length == 0) return false;
     __try {
-        // Protected execution barrier: protects host Roblox process from access violations
+        
         return true;
     } __except (EXCEPTION_EXECUTE_HANDLER) {
         return false;
     }
 }
 
-// -----------------------------------------------------------------------------
-// SolaraEngine Implementation
-// -----------------------------------------------------------------------------
+
+
+
 
 SolaraEngine& SolaraEngine::instance() {
     static SolaraEngine inst;
@@ -99,7 +99,7 @@ static bool IsRobloxProcess() {
 
 uintptr_t SolaraEngine::scanTaskScheduler() {
     if (!IsRobloxProcess()) {
-        return 0; // Not running inside Roblox - avoid scanning host memory
+        return 0; 
     }
 
     HMODULE hModule = GetModuleHandleA(nullptr);
@@ -130,7 +130,7 @@ uintptr_t SolaraEngine::scanTaskScheduler() {
             size_t blockSize = mbi.RegionSize;
 
             __try {
-                // TaskScheduler signature: 48 8B 0D ? ? ? ? 48 85 C9 74 ? 48 8B 01
+                
                 for (size_t i = 0; i + 16 <= blockSize; ++i) {
                     if (block[i] == 0x48 && block[i + 1] == 0x8B && block[i + 2] == 0x0D &&
                         block[i + 7] == 0x48 && block[i + 8] == 0x85 && block[i + 9] == 0xC9 &&
@@ -154,7 +154,7 @@ uintptr_t SolaraEngine::scanTaskScheduler() {
                     }
                 }
             } __except (EXCEPTION_EXECUTE_HANDLER) {
-                // Ignore page read faults safely
+                
             }
         }
         current += mbi.RegionSize;
@@ -180,7 +180,7 @@ bool SolaraEngine::hookTaskSchedulerJob(uintptr_t scheduler) {
         }
 
         DWORD oldProtect = 0;
-        // Step function is at index 2 of Roblox TaskScheduler Job vftable
+        
         if (VirtualProtect(&vftable[2], sizeof(uintptr_t), PAGE_EXECUTE_READWRITE, &oldProtect)) {
             m_originalStep = reinterpret_cast<StepFn>(vftable[2]);
             vftable[2] = reinterpret_cast<uintptr_t>(HookedJobStep);
@@ -200,7 +200,7 @@ bool SolaraEngine::hookTaskSchedulerJob(uintptr_t scheduler) {
 
 void SolaraEngine::fallbackStepLoop() {
     while (m_running.load()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(16)); // ~60 Hz simulation
+        std::this_thread::sleep_for(std::chrono::milliseconds(16)); 
         if (!m_hasRealScheduler.load()) {
             onJobStep();
         }
@@ -209,7 +209,7 @@ void SolaraEngine::fallbackStepLoop() {
 
 bool SolaraEngine::initialize() {
     if (m_running.exchange(true)) {
-        return true; // Already initialized
+        return true; 
     }
 
     IPC::SolaraIpcBridge::instance().sendLog("info", "[Solara Backend] Initializing Solara Execution Core...");
@@ -219,7 +219,7 @@ bool SolaraEngine::initialize() {
         IPC::SolaraIpcBridge::instance().sendLog("ok", "[Solara Backend] Roblox TaskScheduler found & hooked (main-thread execution active).");
         IPC::SolaraIpcBridge::instance().sendStatus(true, "Solara Engine: TaskScheduler Hooked");
     } else {
-        // Fallback execution thread for standalone sandbox mode
+        
         m_hasRealScheduler = false;
         m_hooked = true;
         m_fallbackThread = std::thread(&SolaraEngine::fallbackStepLoop, this);
@@ -293,18 +293,18 @@ void SolaraEngine::onJobStep() {
         executeSafeLuau(scriptToExec);
     }
 
-    // Always call original TaskScheduler job step safely so Roblox never hangs or desyncs
+    
     if (m_originalStep && m_targetJob) {
         RawCallOriginalStep(m_originalStep, reinterpret_cast<void*>(m_targetJob));
     }
 }
 
-} // namespace Engine
-} // namespace Solara
+} 
+} 
 
-// -----------------------------------------------------------------------------
-// Solara C-Exports
-// -----------------------------------------------------------------------------
+
+
+
 extern "C" {
     __declspec(dllexport) void InitializeSolara() {
         Solara::Engine::SolaraEngine::instance().initialize();

@@ -1,7 +1,7 @@
-// ============================================================
-//  HubManager.cpp - Voltro Script Hub (Phase 3)
-//  Full Qt6 multi-hub aggregator implementation.
-// ============================================================
+
+
+
+
 
 #include "HubManager.h"
 
@@ -14,48 +14,48 @@
 
 namespace Voltro {
 
-// ============================================================
-//  Singleton
-// ============================================================
+
+
+
 HubManager& HubManager::instance()
 {
     static HubManager s_instance;
     return s_instance;
 }
 
-// ============================================================
-//  Constructor
-// ============================================================
+
+
+
 HubManager::HubManager(QObject* parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
 {
-    m_nam->setTransferTimeout(15000); // 15 s hard timeout
+    m_nam->setTransferTimeout(15000); 
 
     setupDefaultHubs();
     loadFavorites();
 }
 
-// ============================================================
-//  Default hubs
-// ============================================================
+
+
+
 void HubManager::setupDefaultHubs()
 {
     m_hubs = {
         { "rscripts",      "Rscripts.net",        "rscripts.net",
-          "https://api.rscripts.net/v1",          true,  QColor("#00ff66") },
+          "https:
         { "scripthub",     "ScriptHub.net",        "scripthub.net",
-          "https://scripthub.net/api/v2",         true,  QColor("#4fc3f7") },
+          "https:
         { "robloxscripts", "RobloxScripts.com",   "robloxscripts.com",
-          "https://robloxscripts.com/api",        true,  QColor("#ff6b6b") },
+          "https:
         { "scriptblox",    "ScriptBlox.com",      "scriptblox.com",
-          "https://scriptblox.com/api",           true,  QColor("#ce93d8") },
+          "https:
     };
 }
 
-// ============================================================
-//  Hub management
-// ============================================================
+
+
+
 void HubManager::addHub(const HubSource& hub)
 {
     for (auto& h : m_hubs) {
@@ -87,9 +87,9 @@ HubSource HubManager::hubById(const QString& id) const
 
 const QList<ScriptMeta>& HubManager::cachedResults() const { return m_cache; }
 
-// ============================================================
-//  searchScripts
-// ============================================================
+
+
+
 void HubManager::searchScripts(const QString& query, const QString& hubId)
 {
     if (query.trimmed().isEmpty()) return;
@@ -125,9 +125,9 @@ void HubManager::searchScripts(const QString& query, const QString& hubId)
         emit resultsReady({});
 }
 
-// ============================================================
-//  Network request builder
-// ============================================================
+
+
+
 QNetworkRequest HubManager::buildRequest(const QUrl& url) const
 {
     QNetworkRequest req(url);
@@ -139,9 +139,9 @@ QNetworkRequest HubManager::buildRequest(const QUrl& url) const
     return req;
 }
 
-// ============================================================
-//  queryRscripts  ->  GET https://api.rscripts.net/v1/search?q=...
-// ============================================================
+
+
+
 void HubManager::queryRscripts(const QString& q)
 {
     QUrlQuery query;
@@ -149,7 +149,7 @@ void HubManager::queryRscripts(const QString& q)
     query.addQueryItem(QStringLiteral("index"), QStringLiteral("scripts"));
     query.addQueryItem(QStringLiteral("limit"), QStringLiteral("20"));
 
-    QUrl url(QStringLiteral("https://api.rscripts.net/v1/search"));
+    QUrl url(QStringLiteral("https:
     url.setQuery(query);
 
     auto* reply = m_nam->get(buildRequest(url));
@@ -180,16 +180,16 @@ void HubManager::queryRscripts(const QString& q)
     });
 }
 
-// ============================================================
-//  queryScripthub  ->  GET https://scripthub.net/api/v2/scripts?search=...
-// ============================================================
+
+
+
 void HubManager::queryScripthub(const QString& q)
 {
     QUrlQuery query;
     query.addQueryItem(QStringLiteral("search"), q);
     query.addQueryItem(QStringLiteral("limit"),  QStringLiteral("20"));
 
-    QUrl url(QStringLiteral("https://scripthub.net/api/v2/scripts"));
+    QUrl url(QStringLiteral("https:
     url.setQuery(query);
 
     auto* reply = m_nam->get(buildRequest(url));
@@ -206,7 +206,7 @@ void HubManager::queryScripthub(const QString& q)
         const auto doc = QJsonDocument::fromJson(reply->readAll());
         QList<ScriptMeta> items;
 
-        // API may return array at root or { scripts: [...] }
+        
         if (doc.isArray()) {
             const auto arr = doc.array();
             items.reserve(arr.size());
@@ -231,15 +231,15 @@ void HubManager::queryScripthub(const QString& q)
     });
 }
 
-// ============================================================
-//  queryRobloxscripts  ->  GET https://robloxscripts.com/api/scripts?q=...
-// ============================================================
+
+
+
 void HubManager::queryRobloxscripts(const QString& q)
 {
     QUrlQuery query;
     query.addQueryItem(QStringLiteral("q"), q);
 
-    QUrl url(QStringLiteral("https://robloxscripts.com/api/scripts"));
+    QUrl url(QStringLiteral("https:
     url.setQuery(query);
 
     auto* reply = m_nam->get(buildRequest(url));
@@ -256,7 +256,7 @@ void HubManager::queryRobloxscripts(const QString& q)
         const auto doc = QJsonDocument::fromJson(reply->readAll());
         QList<ScriptMeta> items;
 
-        // Typical response: { scripts: [...] } or root array
+        
         auto tryArray = [&](const QJsonArray& arr) {
             for (const auto& val : arr) {
                 auto meta = parseRobloxscriptsItem(val.toObject());
@@ -280,16 +280,16 @@ void HubManager::queryRobloxscripts(const QString& q)
     });
 }
 
-// ============================================================
-//  queryScriptblox  ->  GET https://scriptblox.com/api/script/search?q=...
-// ============================================================
+
+
+
 void HubManager::queryScriptblox(const QString& q)
 {
     QUrlQuery query;
     query.addQueryItem(QStringLiteral("q"),   q);
     query.addQueryItem(QStringLiteral("max"), QStringLiteral("20"));
 
-    QUrl url(QStringLiteral("https://scriptblox.com/api/script/search"));
+    QUrl url(QStringLiteral("https:
     url.setQuery(query);
 
     auto* reply = m_nam->get(buildRequest(url));
@@ -304,7 +304,7 @@ void HubManager::queryScriptblox(const QString& q)
         }
 
         const auto doc  = QJsonDocument::fromJson(reply->readAll());
-        // { result: { scripts: [...] } }
+        
         const auto arr  = doc.object()
                              .value(QStringLiteral("result")).toObject()
                              .value(QStringLiteral("scripts")).toArray();
@@ -322,9 +322,9 @@ void HubManager::queryScriptblox(const QString& q)
     });
 }
 
-// ============================================================
-//  Parsers
-// ============================================================
+
+
+
 ScriptMeta HubManager::parseRscriptsItem(const QJsonObject& obj)
 {
     ScriptMeta m;
@@ -417,7 +417,7 @@ ScriptMeta HubManager::parseScriptbloxItem(const QJsonObject& obj)
     m.isUniversal = obj.value(QStringLiteral("isUniversal")).toBool();
     m.downloadUrl = obj.value(QStringLiteral("rawScript")).toString();
     if (m.downloadUrl.isEmpty())
-        m.downloadUrl = QStringLiteral("https://rawscripts.net/raw/")
+        m.downloadUrl = QStringLiteral("https:
                         + obj.value(QStringLiteral("slug")).toString();
 
     const auto tagsArr = obj.value(QStringLiteral("tags")).toArray();
@@ -427,18 +427,18 @@ ScriptMeta HubManager::parseScriptbloxItem(const QJsonObject& obj)
     return m;
 }
 
-// ============================================================
-//  runHeuristics - static-like safety scanner
-// ============================================================
+
+
+
 ScriptMeta HubManager::runHeuristics(ScriptMeta meta)
 {
     const QString& code = meta.code;
     if (code.isEmpty()) {
-        // No code yet - verdict deferred, stays Clean
+        
         return meta;
     }
 
-    // --- Danger patterns (red) ---
+    
     static const QStringList dangerPatterns = {
         QStringLiteral("getrawmetatable"),
         QStringLiteral("setrawmetatable"),
@@ -453,7 +453,7 @@ ScriptMeta HubManager::runHeuristics(ScriptMeta meta)
         QStringLiteral("discordapp.com/api/webhooks"),
     };
 
-    // --- Caution patterns (yellow) ---
+    
     static const QStringList cautionPatterns = {
         QStringLiteral("HttpGet"),
         QStringLiteral("HttpPost"),
@@ -466,7 +466,7 @@ ScriptMeta HubManager::runHeuristics(ScriptMeta meta)
         QStringLiteral("pcall(loadstring"),
     };
 
-    // --- Obfuscation indicators (purple) ---
+    
     static const QStringList obfuscPatterns = {
         QStringLiteral("\\x"),
         QStringLiteral("\\u00"),
@@ -474,7 +474,7 @@ ScriptMeta HubManager::runHeuristics(ScriptMeta meta)
         QStringLiteral("string.char"),
         QStringLiteral("bit32.bxor"),
         QStringLiteral("local _={}"),
-        // Extremely long single-line strings are a strong obfuscation hint
+        
     };
 
     bool isDanger    = false;
@@ -491,12 +491,12 @@ ScriptMeta HubManager::runHeuristics(ScriptMeta meta)
         }
     }
 
-    // Obfuscation: check patterns + line length heuristic
+    
     int obfuscScore = 0;
     for (const auto& pat : obfuscPatterns) {
         if (code.contains(pat, Qt::CaseSensitive)) obfuscScore++;
     }
-    // If any single line exceeds 1000 chars, flag as possibly obfuscated
+    
     const QStringList lines = code.split(QLatin1Char('\n'));
     for (const auto& line : lines) {
         if (line.size() > 1000) { obfuscScore += 3; break; }
@@ -515,9 +515,9 @@ ScriptMeta HubManager::runHeuristics(ScriptMeta meta)
     return meta;
 }
 
-// ============================================================
-//  fetchScriptContent
-// ============================================================
+
+
+
 void HubManager::fetchScriptContent(const QString& url, const QString& scriptId)
 {
     if (url.isEmpty()) {
@@ -536,11 +536,11 @@ void HubManager::fetchScriptContent(const QString& url, const QString& scriptId)
 
         const QString code = QString::fromUtf8(reply->readAll());
 
-        // Update cache entry if present
+        
         for (auto& cached : m_cache) {
             if (cached.id == scriptId) {
                 cached.code = code;
-                // Re-run heuristics now that we have code
+                
                 cached = runHeuristics(cached);
                 break;
             }
@@ -550,9 +550,9 @@ void HubManager::fetchScriptContent(const QString& url, const QString& scriptId)
     });
 }
 
-// ============================================================
-//  Favorites
-// ============================================================
+
+
+
 void HubManager::setFavorite(const QString& scriptId, bool fav)
 {
     if (fav)
@@ -560,7 +560,7 @@ void HubManager::setFavorite(const QString& scriptId, bool fav)
     else
         m_favorites.remove(scriptId);
 
-    // Keep cache in sync
+    
     for (auto& m : m_cache)
         if (m.id == scriptId) m.favorited = fav;
     for (auto& m : m_pending)
@@ -595,9 +595,9 @@ void HubManager::saveFavorites()
     s.setValue(QLatin1String(kFavKey), QStringList(m_favorites.begin(), m_favorites.end()));
 }
 
-// ============================================================
-//  Internal aggregation helpers
-// ============================================================
+
+
+
 void HubManager::onPartialResultsReady(const QString& hubId,
                                         const QList<ScriptMeta>& partial)
 {
@@ -610,7 +610,7 @@ void HubManager::onPartialResultsReady(const QString& hubId,
 
 void HubManager::mergeAndEmit()
 {
-    // Sort by views descending
+    
     std::sort(m_pending.begin(), m_pending.end(),
               [](const ScriptMeta& a, const ScriptMeta& b) {
                   return a.views > b.views;
@@ -622,4 +622,4 @@ void HubManager::mergeAndEmit()
     emit resultsReady(m_cache);
 }
 
-} // namespace Voltro
+} 

@@ -30,16 +30,16 @@
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "shell32.lib")
 
-// -----------------------------------------------------------------------------
-// Custom UI Messages
-// -----------------------------------------------------------------------------
+
+
+
 #define WM_PIPE_LOG       (WM_APP + 1)
 #define WM_PIPE_STATUS    (WM_APP + 2)
 #define WM_PIPE_ATTACHED  (WM_APP + 3)
 
-// -----------------------------------------------------------------------------
-// Control Identifiers
-// -----------------------------------------------------------------------------
+
+
+
 #define IDC_BTN_ATTACH    1001
 #define IDC_BTN_EXECUTE   1002
 #define IDC_BTN_CLEAR     1003
@@ -55,7 +55,7 @@
 #define IDC_BTN_MINIMIZE  1013
 #define IDC_BTN_CLOSE     1014
 
-// Dark Palette Colors
+
 static const COLORREF CLR_BG          = RGB(15, 15, 18);
 static const COLORREF CLR_TITLEBAR    = RGB(22, 22, 28);
 static const COLORREF CLR_PANEL       = RGB(24, 24, 32);
@@ -68,7 +68,7 @@ static const COLORREF CLR_GREEN       = RGB(16, 185, 129);
 static const COLORREF CLR_RED         = RGB(239, 68, 68);
 static const COLORREF CLR_OUTPUT_BG   = RGB(10, 10, 14);
 
-// Global State
+
 static HWND g_hWnd = NULL;
 static HWND g_hEditor = NULL;
 static HWND g_hOutputList = NULL;
@@ -92,9 +92,9 @@ struct ScriptTab {
 static std::vector<ScriptTab> g_Tabs;
 static int g_ActiveTab = 0;
 
-// -----------------------------------------------------------------------------
-// Solara Open-Security Named Pipe Server
-// -----------------------------------------------------------------------------
+
+
+
 class SolaraHostPipeServer {
 public:
     static SolaraHostPipeServer& instance() {
@@ -273,9 +273,9 @@ void SolaraHostPipeServer::serverLoop() {
     }
 }
 
-// -----------------------------------------------------------------------------
-// UI Helpers
-// -----------------------------------------------------------------------------
+
+
+
 void AddOutputLog(const std::string& text, bool isError) {
     if (!g_hOutputList) return;
     std::wstring wText;
@@ -322,9 +322,9 @@ static void SetEditorText(const std::string& text) {
     SetWindowTextA(g_hEditor, text.c_str());
 }
 
-// -----------------------------------------------------------------------------
-// Core Actions: Attach & Execute (Native C++ execution, 0% WebView2)
-// -----------------------------------------------------------------------------
+
+
+
 static std::string WideToNarrow(const std::wstring& wstr) {
     if (wstr.empty()) return "";
     int size = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), (int)wstr.size(), nullptr, 0, nullptr, nullptr);
@@ -391,7 +391,7 @@ static void PerformExecute() {
 
     bool dispatched = false;
 
-    // 1. Send to Roblox runtime if pipe is connected
+    
     if (SolaraHostPipeServer::instance().isConnected()) {
         dispatched = SolaraHostPipeServer::instance().sendScript(code);
         if (dispatched) {
@@ -399,7 +399,7 @@ static void PerformExecute() {
         }
     }
 
-    // 2. Fallback pipe
+    
     if (!dispatched) {
         HANDLE hFallback = CreateFileW(L"\\\\.\\pipe\\Voltro2IPC", GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
         if (hFallback != INVALID_HANDLE_VALUE) {
@@ -416,7 +416,7 @@ static void PerformExecute() {
         }
     }
 
-    // 3. Built-in Luau evaluation & print extraction
+    
     auto& env = Voltro::VoltroEnvironment::getInstance();
     if (code.find("identifyexecutor") != std::string::npos) {
         std::string res = env.invokeGlobal("identifyexecutor", {});
@@ -430,7 +430,7 @@ static void PerformExecute() {
         AddOutputLog("[OUTPUT] checkcaller() => " + res);
     }
 
-    // Parse print/warn/error calls from code
+    
     std::regex printRegex(R"((print|warn|error)\s*\(\s*["'](.*?)["']\s*\))");
     auto words_begin = std::sregex_iterator(code.begin(), code.end(), printRegex);
     auto words_end = std::sregex_iterator();
@@ -501,28 +501,28 @@ static void ShowScriptHubMenu(HWND hWnd) {
     DestroyMenu(hMenu);
 
     if (cmd == 2001) {
-        SetEditorText("loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()");
+        SetEditorText("loadstring(game:HttpGet('https:
         AddOutputLog("[HUB] Loaded Infinite Yield.");
     } else if (cmd == 2002) {
-        SetEditorText("loadstring(game:HttpGet('https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua'))()");
+        SetEditorText("loadstring(game:HttpGet('https:
         AddOutputLog("[HUB] Loaded Dex Explorer.");
     } else if (cmd == 2003) {
-        SetEditorText("loadstring(game:HttpGet('https://raw.githubusercontent.com/exxtremestuffs/SimpleSpySource/master/SimpleSpy.lua'))()");
+        SetEditorText("loadstring(game:HttpGet('https:
         AddOutputLog("[HUB] Loaded SimpleSpy.");
     } else if (cmd == 2004) {
-        SetEditorText("loadstring(game:HttpGet('https://raw.githubusercontent.com/Nicuse/RobloxScripts/main/Fly.lua'))()");
+        SetEditorText("loadstring(game:HttpGet('https:
         AddOutputLog("[HUB] Loaded Fly Script.");
     } else if (cmd == 2005) {
-        SetEditorText("loadstring(game:HttpGet('https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/ESP.lua'))()");
+        SetEditorText("loadstring(game:HttpGet('https:
         AddOutputLog("[HUB] Loaded Universal ESP.");
     }
 }
 
-// -----------------------------------------------------------------------------
-// Layout & Control Creation
-// -----------------------------------------------------------------------------
+
+
+
 static void CreateControls(HWND hWnd, HINSTANCE hInst) {
-    // 1. Tab Bar
+    
     g_hTabCtrl = CreateWindowExW(
         0, WC_TABCONTROLW, L"",
         WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | TCS_FOCUSNEVER,
@@ -531,7 +531,7 @@ static void CreateControls(HWND hWnd, HINSTANCE hInst) {
     );
     SendMessageW(g_hTabCtrl, WM_SETFONT, (WPARAM)g_hFontUi, TRUE);
 
-    // Initial Tab
+    
     TCITEMW tie = {};
     tie.mask = TCIF_TEXT;
     tie.pszText = (LPWSTR)L"Main.lua";
@@ -542,7 +542,7 @@ static void CreateControls(HWND hWnd, HINSTANCE hInst) {
     t1.content = "-- Voltro 2 Xeno Edition\n-- Click [Attach] then [Execute]\n\nprint(\"Hello from Voltro 2!\")\nprint(identifyexecutor())\n";
     g_Tabs.push_back(t1);
 
-    // [+] New Tab Button
+    
     CreateWindowExW(
         0, L"BUTTON", L"+",
         WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_FLAT,
@@ -550,7 +550,7 @@ static void CreateControls(HWND hWnd, HINSTANCE hInst) {
         hWnd, (HMENU)IDC_BTN_NEWTAB, hInst, NULL
     );
 
-    // 2. Action Bar Buttons
+    
     g_hBtnAttach = CreateWindowExW(
         0, L"BUTTON", L"⚡ Attach",
         WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
@@ -600,7 +600,7 @@ static void CreateControls(HWND hWnd, HINSTANCE hInst) {
         hWnd, (HMENU)IDC_BTN_CLEARLOGS, hInst, NULL
     );
 
-    // 3. RichEdit / Edit Script Editor
+    
     LoadLibraryW(L"Msftedit.dll");
     LoadLibraryW(L"Riched20.dll");
 
@@ -612,7 +612,7 @@ static void CreateControls(HWND hWnd, HINSTANCE hInst) {
     );
 
     if (!g_hEditor) {
-        // Fallback standard Edit control
+        
         g_hEditor = CreateWindowExW(
             WS_EX_CLIENTEDGE, L"EDIT", L"",
             WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN,
@@ -624,7 +624,7 @@ static void CreateControls(HWND hWnd, HINSTANCE hInst) {
     SendMessageW(g_hEditor, WM_SETFONT, (WPARAM)g_hFontCode, TRUE);
     SetEditorText(g_Tabs[0].content);
 
-    // 4. Output Console ListBox
+    
     g_hOutputList = CreateWindowExW(
         WS_EX_CLIENTEDGE, L"LISTBOX", L"",
         WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOTIFY | LBS_NOINTEGRALHEIGHT,
@@ -637,9 +637,9 @@ static void CreateControls(HWND hWnd, HINSTANCE hInst) {
     AddOutputLog("[STATUS] Named Pipe Server active (\\\\.\\pipe\\Voltro2Pipe). Ready.");
 }
 
-// -----------------------------------------------------------------------------
-// Window Procedure
-// -----------------------------------------------------------------------------
+
+
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
     case WM_CREATE: {
@@ -673,7 +673,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         if (hit == HTCLIENT) {
             POINT pt = { LOWORD(lParam), HIWORD(lParam) };
             ScreenToClient(hWnd, &pt);
-            // Draggable custom title bar top area (y < 40)
+            
             if (pt.y < 40 && pt.x < (GetSystemMetrics(SM_CXSCREEN) - 100)) {
                 return HTCAPTION;
             }
@@ -687,22 +687,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         RECT rc;
         GetClientRect(hWnd, &rc);
 
-        // Fill Main Background
+        
         FillRect(hdc, &rc, g_hbrBg);
 
-        // Draw Title Bar Area
+        
         RECT rcTitle = { 0, 0, rc.right, 38 };
         HBRUSH hbrTitle = CreateSolidBrush(CLR_TITLEBAR);
         FillRect(hdc, &rcTitle, hbrTitle);
         DeleteObject(hbrTitle);
 
-        // Title Bar Bottom Border
+        
         RECT rcLine = { 0, 38, rc.right, 39 };
         HBRUSH hbrLine = CreateSolidBrush(CLR_BORDER);
         FillRect(hdc, &rcLine, hbrLine);
         DeleteObject(hbrLine);
 
-        // Title Text
+        
         SetBkMode(hdc, TRANSPARENT);
         SetTextColor(hdc, CLR_PURPLE);
         SelectObject(hdc, g_hFontUi);
@@ -711,7 +711,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         SetTextColor(hdc, CLR_TEXT_MUTED);
         TextOutW(hdc, 105, 10, L"|  Xeno Native Architecture  |  v2.5.0", 37);
 
-        // Attach Status Badge
+        
         RECT rcBadge = { rc.right - 220, 9, rc.right - 90, 30 };
         SetTextColor(hdc, g_IsAttached ? CLR_GREEN : CLR_TEXT_MUTED);
         std::wstring stStr = g_IsAttached ? L"● ATTACHED" : L"○ NOT ATTACHED";
@@ -739,7 +739,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_CTLCOLORLISTBOX: {
         HDC hdc = (HDC)wParam;
         SetBkColor(hdc, CLR_OUTPUT_BG);
-        SetTextColor(hdc, RGB(52, 211, 153)); // Soft emerald terminal text
+        SetTextColor(hdc, RGB(52, 211, 153)); 
         return (LRESULT)g_hbrOutput;
     }
 
@@ -792,7 +792,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     case WM_NOTIFY: {
         NMHDR* pnm = (NMHDR*)lParam;
         if (pnm->idFrom == IDC_TAB_SCRIPTS && pnm->code == TCN_SELCHANGE) {
-            // Save current tab content
+            
             if (g_ActiveTab >= 0 && g_ActiveTab < (int)g_Tabs.size()) {
                 g_Tabs[g_ActiveTab].content = GetEditorText();
             }
@@ -832,18 +832,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     return 0;
 }
 
-// -----------------------------------------------------------------------------
-// Application Entry Point
-// -----------------------------------------------------------------------------
+
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    // 1. Privileges & Protections
+    
     Solara::Injector::EnableDebugPrivilege();
     Voltro::BinaryProtector::enforceSecurityGuards();
 
-    // 2. Start Xeno Named Pipe Server
+    
     SolaraHostPipeServer::instance().start();
 
-    // 3. UI Resources & Fonts
+    
     INITCOMMONCONTROLSEX icex = {};
     icex.dwSize = sizeof(INITCOMMONCONTROLSEX);
     icex.dwICC = ICC_TAB_CLASSES | ICC_STANDARD_CLASSES;
@@ -861,7 +861,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     g_hbrPanel = CreateSolidBrush(CLR_PANEL);
     g_hbrOutput = CreateSolidBrush(CLR_OUTPUT_BG);
 
-    // 4. Register Window Class
+    
     const wchar_t CLASS_NAME[] = L"Voltro2XenoNativeHost";
     WNDCLASSEXW wcex = {};
     wcex.cbSize = sizeof(WNDCLASSEXW);
@@ -878,7 +878,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     RegisterClassExW(&wcex);
 
-    // 5. Create Window
+    
     int screenW = GetSystemMetrics(SM_CXSCREEN);
     int screenH = GetSystemMetrics(SM_CYSCREEN);
     int winW = 800;
@@ -897,17 +897,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     if (!g_hWnd) return 0;
 
-    // Apply Modern Windows 11 / 10 Dark Mode & Rounded Corners
+    
     BOOL darkMode = TRUE;
     DwmSetWindowAttribute(g_hWnd, 20, &darkMode, sizeof(darkMode));
     DwmSetWindowAttribute(g_hWnd, 19, &darkMode, sizeof(darkMode));
-    int cornerPref = 2; // DWMWCP_ROUND
+    int cornerPref = 2; 
     DwmSetWindowAttribute(g_hWnd, 33, &cornerPref, sizeof(cornerPref));
 
     ShowWindow(g_hWnd, nCmdShow);
     UpdateWindow(g_hWnd);
 
-    // 6. Message Loop
+    
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);

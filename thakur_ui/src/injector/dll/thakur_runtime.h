@@ -1,3 +1,14 @@
+#pragma once
+#include <windows.h>
+#include <psapi.h>
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <atomic>
+#include <thread>
+#include <functional>
+#include <algorithm>
 
 
 namespace Thakur {
@@ -18,6 +29,7 @@ public:
 
     bool isHooked() const { return m_hooked; }
     lua_State_t getState() const { return m_luaState; }
+    void* getDoStringPtr() const { return reinterpret_cast<void*>(m_pfnDoString); }
 
 private:
     LuaHookEngine() = default;

@@ -10,14 +10,14 @@ SplashScreen::SplashScreen(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Frameless window with centered position
+    
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     setAttribute(Qt::WA_TranslucentBackground, false);
 
     ui->progressBar->setValue(0);
 
     connect(m_timer, &QTimer::timeout, this, &SplashScreen::updateProgress);
-    m_timer->start(25); // ~2.5 second smooth animation
+    m_timer->start(25); 
 }
 
 SplashScreen::~SplashScreen() {
@@ -41,4 +41,4 @@ void SplashScreen::updateProgress() {
     }
 }
 
-} // namespace Voltro
+} 

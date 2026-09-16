@@ -18,9 +18,9 @@
 namespace Solara {
 namespace Injector {
 
-// -----------------------------------------------------------------------------
-// Privilege Escalation (SeDebugPrivilege)
-// -----------------------------------------------------------------------------
+
+
+
 inline bool EnableDebugPrivilege() {
     HANDLE hToken = NULL;
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
@@ -44,9 +44,9 @@ inline bool EnableDebugPrivilege() {
     return ok && (err != ERROR_NOT_ALL_ASSIGNED);
 }
 
-// -----------------------------------------------------------------------------
-// Target Process Information & Scanner
-// -----------------------------------------------------------------------------
+
+
+
 struct TargetProcessInfo {
     DWORD pid = 0;
     std::wstring processName;
@@ -59,7 +59,7 @@ public:
         std::vector<TargetProcessInfo> results;
         EnableDebugPrivilege();
 
-        // 1. Direct window search
+        
         HWND hRbxWnd = FindWindowW(L"WINDOWSCLIENT", nullptr);
         if (!hRbxWnd) hRbxWnd = FindWindowW(nullptr, L"Roblox");
         if (hRbxWnd) {
@@ -75,7 +75,7 @@ public:
             }
         }
 
-        // 2. Process snapshot scan
+        
         HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         if (snapshot == INVALID_HANDLE_VALUE) {
             return results;
@@ -90,7 +90,7 @@ public:
                 std::wstring lowerName = exeName;
                 std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::towlower);
 
-                // Exclude crash handler, updater, launcher, installer, studio
+                
                 if (lowerName.find(L"crashhandler") != std::wstring::npos ||
                     lowerName.find(L"launcher") != std::wstring::npos ||
                     lowerName.find(L"installer") != std::wstring::npos ||
@@ -98,7 +98,7 @@ public:
                     continue;
                 }
 
-                // Match Roblox game client executables
+                
                 bool isRoblox = (lowerName == L"robloxplayerbeta.exe") ||
                                 (lowerName == L"robloxplayer.exe") ||
                                 (lowerName == L"windows10universal.exe") ||
@@ -110,7 +110,7 @@ public:
                     info.processName = entry.szExeFile;
                     info.is64Bit = true;
 
-                    // Check bitness if query allowed
+                    
                     HANDLE hProc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, entry.th32ProcessID);
                     if (hProc) {
                         BOOL isWow64 = FALSE;
@@ -130,9 +130,9 @@ public:
     }
 };
 
-// -----------------------------------------------------------------------------
-// Check if Module is already loaded in target process
-// -----------------------------------------------------------------------------
+
+
+
 inline bool IsModuleLoaded(DWORD pid, const std::string& moduleName) {
     HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
     if (!hProcess) return false;
@@ -162,28 +162,28 @@ inline bool IsModuleLoaded(DWORD pid, const std::string& moduleName) {
     return found;
 }
 
-// -----------------------------------------------------------------------------
-// Clean Xeno-Style Injection (Standard Win32 / NtCreateThreadEx)
-// Eliminates register-corrupting thread hijacking assembly that trips Byfron
-// -----------------------------------------------------------------------------
+
+
+
+
 inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outError) {
     EnableDebugPrivilege();
 
-    // Check if DLL file exists on disk
+    
     DWORD fileAttr = GetFileAttributesA(dllPath.c_str());
     if (fileAttr == INVALID_FILE_ATTRIBUTES) {
         outError = "DLL file not found: " + dllPath;
         return false;
     }
 
-    // Resolve full path
+    
     char fullPath[MAX_PATH] = { 0 };
     if (!GetFullPathNameA(dllPath.c_str(), MAX_PATH, fullPath, nullptr)) {
         outError = "Could not resolve full path for DLL: " + dllPath;
         return false;
     }
 
-    // If already loaded, return success
+    
     std::string modFileName = fullPath;
     size_t lastSlash = modFileName.find_last_of("\\/");
     if (lastSlash != std::string::npos) {
@@ -194,7 +194,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
         return true;
     }
 
-    // Open target process
+    
     HANDLE hProcess = OpenProcess(
         PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ,
         FALSE,
@@ -202,7 +202,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
     );
 
     if (!hProcess) {
-        // Fallback with query limited information
+        
         hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
     }
 
@@ -211,7 +211,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
         return false;
     }
 
-    // Allocate memory in target for the DLL full path string
+    
     size_t pathLen = strlen(fullPath) + 1;
     LPVOID remoteMemory = VirtualAllocEx(hProcess, nullptr, pathLen, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (!remoteMemory) {
@@ -220,7 +220,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
         return false;
     }
 
-    // Write DLL path into target process
+    
     SIZE_T bytesWritten = 0;
     if (!WriteProcessMemory(hProcess, remoteMemory, fullPath, pathLen, &bytesWritten) || bytesWritten != pathLen) {
         VirtualFreeEx(hProcess, remoteMemory, 0, MEM_RELEASE);
@@ -229,7 +229,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
         return false;
     }
 
-    // Locate LoadLibraryA in kernel32
+    
     HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
     if (!hKernel32) {
         VirtualFreeEx(hProcess, remoteMemory, 0, MEM_RELEASE);
@@ -246,7 +246,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
         return false;
     }
 
-    // Clean CreateRemoteThread injection
+    
     HANDLE hRemoteThread = CreateRemoteThread(
         hProcess,
         nullptr,
@@ -258,7 +258,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
     );
 
     if (!hRemoteThread) {
-        // Fallback: NtCreateThreadEx
+        
         typedef LONG (WINAPI* pfnNtCreateThreadEx)(
             PHANDLE ThreadHandle, ACCESS_MASK DesiredAccess, LPVOID ObjectAttributes,
             HANDLE ProcessHandle, LPTHREAD_START_ROUTINE StartRoutine, LPVOID Argument,
@@ -283,11 +283,11 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
         return false;
     }
 
-    // Wait for thread initialization
+    
     WaitForSingleObject(hRemoteThread, 3000);
     CloseHandle(hRemoteThread);
 
-    // Free remote path string
+    
     VirtualFreeEx(hProcess, remoteMemory, 0, MEM_RELEASE);
     CloseHandle(hProcess);
 
@@ -295,7 +295,7 @@ inline bool InjectDll(DWORD pid, const std::string& dllPath, std::string& outErr
     return true;
 }
 
-} // namespace Injector
-} // namespace Solara
+} 
+} 
 
-#endif // SOLARA_INJECTOR_H
+#endif 

@@ -19,7 +19,7 @@ struct ProcessInfo {
 
 class ProcessManager {
 public:
-    // Callback to check if a process has an actual visible top-level window
+    
     static BOOL CALLBACK EnumWindowsCallback(HWND hWnd, LPARAM lParam) {
         DWORD targetPid = *reinterpret_cast<DWORD*>(lParam);
         DWORD procId = 0;
@@ -28,8 +28,8 @@ public:
             RECT r;
             if (GetWindowRect(hWnd, &r)) {
                 if ((r.right - r.left) > 60 && (r.bottom - r.top) > 60) {
-                    *reinterpret_cast<DWORD*>(lParam) = 0; // Found active window
-                    return FALSE; // Stop enumeration
+                    *reinterpret_cast<DWORD*>(lParam) = 0; 
+                    return FALSE; 
                 }
             }
         }
@@ -43,11 +43,11 @@ public:
         return (checkPid == 0);
     }
 
-    // Scans running processes for target Roblox client with verified active GUI window
+    
     static std::vector<ProcessInfo> findTargetProcesses(const std::wstring& targetName = L"RobloxPlayerBeta.exe") {
         std::vector<ProcessInfo> results;
 
-        // 1. Check for active Roblox game window class directly
+        
         HWND hRbxWnd = FindWindowW(L"WINDOWSCLIENT", nullptr);
         if (!hRbxWnd) {
             hRbxWnd = FindWindowW(nullptr, L"Roblox");
@@ -65,7 +65,7 @@ public:
             }
         }
 
-        // 2. Snapshot scan for process with verified visible window (never attach to headless zombies)
+        
         HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         if (snapshot == INVALID_HANDLE_VALUE) {
             return results;
@@ -81,13 +81,13 @@ public:
                                (_wcsicmp(entry.szExeFile, L"RobloxPlayer.exe") == 0) ||
                                (_wcsicmp(entry.szExeFile, L"Windows10Universal.exe") == 0);
                 if (matches) {
-                    // Ignore headless/crashed zombie processes
+                    
                     if (hasActiveGuiWindow(entry.th32ProcessID)) {
                         ProcessInfo info;
                         info.pid = entry.th32ProcessID;
                         info.processName = entry.szExeFile;
                         
-                        // Check bitness
+                        
                         HANDLE hProc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, entry.th32ProcessID);
                         if (hProc) {
                             BOOL isWow64 = FALSE;
@@ -106,7 +106,7 @@ public:
         return results;
     }
 
-    // Verifies whether a given PID is still active
+    
     static bool isProcessAlive(DWORD pid) {
         if (pid == 0) return false;
         HANDLE hProc = OpenProcess(SYNCHRONIZE, FALSE, pid);
@@ -118,9 +118,9 @@ public:
     }
 };
 
-// -----------------------------------------------------------------------------
-// RobloxWatchdog: Real-time Crash Supervisor & Auto-Recovery
-// -----------------------------------------------------------------------------
+
+
+
 class RobloxWatchdog {
 public:
     static RobloxWatchdog& getInstance() {
@@ -194,4 +194,4 @@ private:
     std::thread m_watchThread;
 };
 
-} // namespace Voltro
+} 

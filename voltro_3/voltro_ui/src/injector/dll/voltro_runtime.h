@@ -12,7 +12,7 @@
 namespace Voltro {
 namespace Runtime {
 
-// Lua VM types and function pointer signatures
+
 typedef void* lua_State_t;
 typedef int (*luaL_dostring_t)(lua_State_t L, const char* str);
 typedef void (*roblox_print_t)(int type, const char* format, ...);
@@ -70,5 +70,5 @@ private:
     std::atomic<bool> m_running{false};
 };
 
-} // namespace Runtime
-} // namespace Voltro
+} 
+} 

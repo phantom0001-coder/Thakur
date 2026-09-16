@@ -14,12 +14,12 @@
 namespace Voltro {
 namespace Runtime {
 
-// -----------------------------------------------------------------------------
-// Roblox Luau Types & Identity Flags (Solara Architecture Reference)
-// -----------------------------------------------------------------------------
+
+
+
 typedef void* lua_State_t;
 
-// Capability bitmask enabling all script capabilities (equivalent to Identity 8)
+
 constexpr uint64_t CAPABILITIES_ALL = 0x3FFFFFFFFFFFFFFFULL;
 
 #pragma pack(push, 1)
@@ -31,9 +31,9 @@ struct RobloxExtraSpace {
 };
 #pragma pack(pop)
 
-// -----------------------------------------------------------------------------
-// Solara-like Execution Engine: Dynamic TaskScheduler & ScriptContext Hook
-// -----------------------------------------------------------------------------
+
+
+
 class SolaraExecutionEngine {
 public:
     static SolaraExecutionEngine& instance();
@@ -41,14 +41,14 @@ public:
     bool initialize();
     void shutdown();
 
-    // Enqueue user script to be stepped synchronously on Roblox main thread
+    
     bool queueScript(const std::string& script);
 
-    // Returns whether the TaskScheduler and ScriptContext hook is established
+    
     bool isHooked() const { return m_hooked.load(); }
     lua_State_t getLuaState() const { return m_luaState; }
 
-    // TaskScheduler step callback
+    
     typedef void(__fastcall* JobStepFn)(void* thisPtr, void* stats);
     void onJobStep();
 
@@ -66,7 +66,7 @@ private:
     uintptr_t m_scriptContext = 0;
     uintptr_t m_targetJob = 0;
 
-    // Original vftable step function pointer
+    
     JobStepFn m_originalJobStep = nullptr;
     uintptr_t* m_vftable = nullptr;
 
@@ -74,9 +74,9 @@ private:
     std::mutex m_queueMutex;
 };
 
-// -----------------------------------------------------------------------------
-// Framed IPC Protocol (4-Byte Length-Prefixed Packets)
-// -----------------------------------------------------------------------------
+
+
+
 class FramedIpcBridge {
 public:
     static FramedIpcBridge& instance();
@@ -103,5 +103,5 @@ private:
     std::function<void(const std::string&)> m_scriptHandler;
 };
 
-} // namespace Runtime
-} // namespace Voltro
+} 
+} 

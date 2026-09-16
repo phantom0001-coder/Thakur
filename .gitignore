@@ -1,13 +1,45 @@
+```
+# Build artifacts and compiled files
+*.o
+*.obj
 *.exe
 *.dll
-*.obj
-*.res
+*.so
+*.a
+*.out
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+
+# Build directories
+dist/
+build/
+coverage/
+htmlcov/
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Logs
 *.log
-*.manifest
-packages/
-installer/
-*.WebView2/
-.vs/
-*.pdb
-*.suo
-*.user
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# System files
+.DS_Store
+Thumbs.db
+```
