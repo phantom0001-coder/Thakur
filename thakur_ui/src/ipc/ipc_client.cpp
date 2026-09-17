@@ -6,6 +6,7 @@
 #include <mutex>
 #include <sstream>
 #include <cstring>
+#include <algorithm>
 #include "ipc_client.h"
 
 namespace Thakur {
@@ -58,7 +59,7 @@ bool readAvailable(HANDLE pipe, void* buffer, DWORD length) {
             continue;
         }
 
-        const DWORD toRead = min<DWORD>(available, length - totalRead);
+        const DWORD toRead = (std::min)(available, length - totalRead);
         DWORD chunkRead = 0;
         if (!ReadFile(pipe, out + totalRead, toRead, &chunkRead, nullptr) || chunkRead == 0) {
             return false;
