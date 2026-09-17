@@ -53,16 +53,18 @@ $webViewPackage = Get-ChildItem $PackagesDir -Directory -Filter "Microsoft.Web.W
 
 if (-not $webViewPackage) {
     Info "Microsoft.Web.WebView2 SDK not found locally."
-    $nuget = Get-Command nuget -ErrorAction SilentlyContinue
-    if (-not $nuget) {
-        $nugetPath = Join-Path $ProjectRoot "nuget.exe"
+
+    $nugetCommand = Get-Command nuget -ErrorAction SilentlyContinue
+    if ($nugetCommand) {
+        $nugetExe = $nugetCommand.Source
+    } else {
+        $nugetExe = Join-Path $ProjectRoot "nuget.exe"
         Info "Downloading NuGet CLI..."
-        Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $nugetPath
-        $nuget = Get-Item $nugetPath
+        Invoke-WebRequest -Uri "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile $nugetExe
     }
 
     Info "Installing Microsoft.Web.WebView2 SDK..."
-    & $nuget.Source install Microsoft.Web.WebView2 -OutputDirectory $PackagesDir -NonInteractive -NoCache
+    & $nugetExe install Microsoft.Web.WebView2 -OutputDirectory $PackagesDir -NonInteractive -NoCache
     if ($LASTEXITCODE -ne 0) {
         Err "WebView2 SDK installation failed."
         exit $LASTEXITCODE
@@ -81,22 +83,23 @@ if (-not $webViewPackage) {
 $webViewRoot = $webViewPackage.FullName
 Info "WebView2 SDK: $webViewRoot"
 
+$cmakeArgs = @(
+    "-S", $ProjectRoot,
+    "-B", $BuildDir,
+    "-G", "Ninja",
+    "-DCMAKE_BUILD_TYPE=$Config",
+    "-DWEBVIEW2_SDK_ROOT=$webViewRoot",
+    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=$BinDir"
+)
+
+Info "Configuring CMake..."
+& cmake @cmakeArgs
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 if ($NoBuild) {
-    cmake -S $ProjectRoot -B $BuildDir -G Ninja `
-        -DCMAKE_BUILD_TYPE=$Config `
-        -DWEBVIEW2_SDK_ROOT="$webViewRoot" `
-        -DCMAKE_RUNTIME_OUTPUT_DIRECTORY="$BinDir"
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     Ok "Configure completed."
     exit 0
 }
-
-Info "Configuring CMake..."
-cmake -S $ProjectRoot -B $BuildDir -G Ninja `
-    -DCMAKE_BUILD_TYPE=$Config `
-    -DWEBVIEW2_SDK_ROOT="$webViewRoot" `
-    -DCMAKE_RUNTIME_OUTPUT_DIRECTORY="$BinDir"
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Info "Building..."
 cmake --build $BuildDir --config $Config --parallel
