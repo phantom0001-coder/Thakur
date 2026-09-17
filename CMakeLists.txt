@@ -2,179 +2,107 @@ cmake_minimum_required(VERSION 3.22)
 
 project(Thakur
     VERSION 1.5.0
-    DESCRIPTION "Thakur Executor - Qt6 Native UI"
+    DESCRIPTION "Thakur - Native Win32 + Microsoft WebView2"
     HOMEPAGE_URL "https://github.com/phantom0001-coder/Thakur"
-    LANGUAGES CXX
+    LANGUAGES CXX RC
 )
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
+if(NOT WIN32)
+    message(FATAL_ERROR "Thakur is a Windows-only application.")
+endif()
 
-set(CMAKE_AUTOUIC_SEARCH_PATHS
-    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/ui"
-)
+set(WEBVIEW2_SDK_ROOT "" CACHE PATH "Root of the Microsoft.Web.WebView2 NuGet package")
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS
-    Core
-    Gui
-    Widgets
-    Network
-)
+if(NOT WEBVIEW2_SDK_ROOT)
+    file(GLOB WEBVIEW2_PACKAGE_DIRS LIST_DIRECTORIES TRUE
+        "${CMAKE_CURRENT_SOURCE_DIR}/packages/Microsoft.Web.WebView2.*")
+    if(WEBVIEW2_PACKAGE_DIRS)
+        list(SORT WEBVIEW2_PACKAGE_DIRS ORDER DESCENDING)
+        list(GET WEBVIEW2_PACKAGE_DIRS 0 WEBVIEW2_SDK_ROOT)
+    endif()
+endif()
 
-qt_standard_project_setup()
+if(NOT WEBVIEW2_SDK_ROOT OR NOT EXISTS "${WEBVIEW2_SDK_ROOT}/build/native/include/WebView2.h")
+    message(FATAL_ERROR
+        "Microsoft WebView2 SDK not found. Install the Microsoft.Web.WebView2 NuGet package "
+        "into ${CMAKE_CURRENT_SOURCE_DIR}/packages or set -DWEBVIEW2_SDK_ROOT=<package-root>."
+    )
+endif()
+
+set(WEBVIEW2_INCLUDE_DIR "${WEBVIEW2_SDK_ROOT}/build/native/include")
+set(WEBVIEW2_LIB_DIR "${WEBVIEW2_SDK_ROOT}/build/native/x64")
+set(WEBVIEW2_LOADER_LIB "${WEBVIEW2_LIB_DIR}/WebView2Loader.dll.lib")
+set(WEBVIEW2_LOADER_DLL "${WEBVIEW2_LIB_DIR}/WebView2Loader.dll")
+
+foreach(_path IN ITEMS "${WEBVIEW2_INCLUDE_DIR}" "${WEBVIEW2_LOADER_LIB}" "${WEBVIEW2_LOADER_DLL}")
+    if(NOT EXISTS "${_path}")
+        message(FATAL_ERROR "Required WebView2 SDK file not found: ${_path}")
+    endif()
+endforeach()
 
 set(THAKUR_SOURCES
-    thakur_ui/src/main_qt.cpp
-    thakur_ui/src/mainwindow.cpp
-    thakur_ui/src/splashscreen.cpp
+    thakur_ui/src/main.cpp
     thakur_ui/src/script_hub.cpp
-    thakur_ui/src/ThemeManager.cpp
-    thakur_ui/src/EditorWidget.cpp
     thakur_ui/src/ipc/ipc_client.cpp
-    thakur_ui/src/hub/HubManager.cpp
-    thakur_ui/src/premium/PremiumManager.cpp
-    thakur_ui/src/updater/Updater.cpp
-    thakur_ui/src/credits.cpp
-    thakur_ui/src/plans.cpp
-    thakur_ui/src/settings.cpp
-    thakur_ui/src/script_editor.cpp
+    thakur_ui/src/injector/ThakurInjector.cpp
+    thakur.rc
 )
 
-set(THAKUR_HEADERS
-    thakur_ui/src/mainwindow.h
-    thakur_ui/src/splashscreen.h
-    thakur_ui/src/script_hub.h
-    thakur_ui/src/ThemeManager.h
-    thakur_ui/src/EditorWidget.h
-    thakur_ui/src/ipc/ipc_client.h
-    thakur_ui/src/hub/HubManager.h
-    thakur_ui/src/premium/PremiumManager.h
-    thakur_ui/src/updater/Updater.h
-    thakur_ui/src/credits.h
-    thakur_ui/src/plans.h
-    thakur_ui/src/settings.h
-    thakur_ui/src/script_editor.h
-)
+add_executable(thakur WIN32 ${THAKUR_SOURCES})
 
-set(THAKUR_RESOURCES "")
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/resources.qrc")
-    list(APPEND THAKUR_RESOURCES thakur_ui/resources.qrc)
-elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/resources/resources.qrc")
-    list(APPEND THAKUR_RESOURCES thakur_ui/resources/resources.qrc)
-endif()
-
-qt_add_executable(thakur
-    ${THAKUR_SOURCES}
-    ${THAKUR_HEADERS}
-    ${THAKUR_RESOURCES}
-)
-
-if(WIN32 AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/resources/thakur.rc")
-    target_sources(thakur PRIVATE thakur_ui/resources/thakur.rc)
-endif()
-
-set_target_properties(thakur PROPERTIES
-    WIN32_EXECUTABLE TRUE
-    OUTPUT_NAME "thakur"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
-    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+target_include_directories(thakur PRIVATE
+    "${WEBVIEW2_INCLUDE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src/ipc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src/injector"
 )
 
 target_compile_definitions(thakur PRIVATE
-    THAKUR_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
-    THAKUR_VERSION_MINOR=${PROJECT_VERSION_MINOR}
-    THAKUR_VERSION_PATCH=${PROJECT_VERSION_PATCH}
-    THAKUR_VERSION_STRING="${PROJECT_VERSION}"
-    QT_USE_QSTRINGBUILDER
-    QT_NO_DEPRECATED_WARNINGS
+    UNICODE
+    _UNICODE
+    WIN32_LEAN_AND_MEAN
+    NOMINMAX
 )
 
-target_include_directories(thakur PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src/ipc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src/hub"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src/premium"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/src/updater"
-    "${CMAKE_CURRENT_SOURCE_DIR}/thakur_ui/ui"
-)
+target_compile_options(thakur PRIVATE /W4 /EHsc /permissive-)
 
 target_link_libraries(thakur PRIVATE
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Widgets
-    Qt6::Network
+    "${WEBVIEW2_LOADER_LIB}"
     user32
+    gdi32
     shell32
-    dwmapi
+    advapi32
+    ole32
+    oleaut32
     wininet
+    dwmapi
     crypt32
     iphlpapi
 )
 
-if(MSVC)
-    target_compile_options(thakur PRIVATE
-        /W4
-        /wd4100
-        /wd4127
-        /wd4251
-        /permissive-
-        /Zc:__cplusplus
-    )
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(thakur PRIVATE
-        -Wall -Wextra -Wpedantic -Wno-unused-parameter
-    )
-endif()
-
-if(WIN32)
-    get_filename_component(_qt6_cmake_dir "${Qt6_DIR}" ABSOLUTE)
-    get_filename_component(_qt6_lib_cmake "${_qt6_cmake_dir}" DIRECTORY)
-    get_filename_component(_qt6_lib       "${_qt6_lib_cmake}" DIRECTORY)
-    get_filename_component(_qt6_root      "${_qt6_lib}"       DIRECTORY)
-    set(_qt6_bin "${_qt6_root}/bin")
-
-    find_program(WINDEPLOYQT6_EXECUTABLE
-        NAMES windeployqt6 windeployqt
-        HINTS "${_qt6_bin}"
-        NO_DEFAULT_PATH
-    )
-
-    if(WINDEPLOYQT6_EXECUTABLE)
-        message(STATUS "Found windeployqt6: ${WINDEPLOYQT6_EXECUTABLE}")
-        add_custom_command(TARGET thakur POST_BUILD
-            COMMAND "${WINDEPLOYQT6_EXECUTABLE}"
-                --no-translations
-                --no-system-d3d-compiler
-                --no-opengl-sw
-                --compiler-runtime
-                "$<TARGET_FILE:thakur>"
-            COMMENT "Running windeployqt6 on thakur.exe..."
-            VERBATIM
-        )
-    else()
-        message(WARNING "windeployqt6 not found — skipping deployment step.")
-    endif()
-endif()
-
-install(TARGETS thakur
-    RUNTIME DESTINATION bin
-    BUNDLE  DESTINATION .
+set_target_properties(thakur PROPERTIES
+    OUTPUT_NAME "thakur"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"
 )
 
-enable_testing()
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
-    add_subdirectory(tests)
-endif()
+add_custom_command(TARGET thakur POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${WEBVIEW2_LOADER_DLL}"
+        "$<TARGET_FILE_DIR:thakur>/WebView2Loader.dll"
+    COMMENT "Staging WebView2Loader.dll"
+)
+
+install(TARGETS thakur RUNTIME DESTINATION bin)
 
 message(STATUS "=== Thakur ${PROJECT_VERSION} ===")
-message(STATUS "  Qt version   : ${Qt6_VERSION}")
-message(STATUS "  Compiler     : ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
-message(STATUS "  Build type   : ${CMAKE_BUILD_TYPE}")
-message(STATUS "  Output dir   : ${CMAKE_BINARY_DIR}/bin")
+message(STATUS "  UI host      : Native Win32 + Microsoft WebView2")
+message(STATUS "  WebView2 SDK  : ${WEBVIEW2_SDK_ROOT}")
+message(STATUS "  Compiler      : ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "  Build type    : ${CMAKE_BUILD_TYPE}")
+message(STATUS "  Output dir    : ${CMAKE_BINARY_DIR}/bin")
