@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 project(Thakur
     VERSION 1.5.0
     DESCRIPTION "Thakur Executor - Qt6 Native UI"
-    HOMEPAGE_URL "https:
+    HOMEPAGE_URL "https://github.com/phantom0001-coder/Thakur"
     LANGUAGES CXX
 )
 
