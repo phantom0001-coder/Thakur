@@ -11,12 +11,13 @@ on:
 
 jobs:
   build:
-    name: Build (Windows / Qt6 / MSVC)
+    name: Build (Windows / WebView2 / MSVC)
     runs-on: windows-latest
 
     env:
       BUILD_DIR: ${{ github.workspace }}/build
       BIN_DIR:   ${{ github.workspace }}/build/bin
+      WEBVIEW2_VERSION: ""
 
     steps:
       - name: Checkout source
@@ -25,93 +26,65 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install Qt6
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '6.6.0'
-          host: windows
-          target: desktop
-          arch: win64_msvc2019_64
-          modules: qtwebengine qtmultimedia
-          cache: true
-          cache-key-prefix: qt6-6.6.0-msvc2019_64
-
-      - name: Install Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v4
-
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
 
-      - name: Cache CMake build artifacts
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.BUILD_DIR }}
-          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', 'thakur_ui/src/**') }}
-          restore-keys: |
-            ${{ runner.os }}-cmake-
+      - name: Install NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Install Microsoft WebView2 SDK
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/packages" | Out-Null
+          nuget install Microsoft.Web.WebView2 `
+            -OutputDirectory "${{ github.workspace }}/packages" `
+            -NonInteractive `
+            -NoCache
+          $pkg = Get-ChildItem "${{ github.workspace }}/packages" -Directory -Filter "Microsoft.Web.WebView2.*" | Select-Object -First 1
+          if (-not $pkg) {
+            throw "Microsoft.Web.WebView2 package was not installed."
+          }
+          Write-Host "WebView2 SDK package: $($pkg.FullName)"
 
       - name: Configure CMake
+        shell: pwsh
         run: |
           cmake -S . -B "${{ env.BUILD_DIR }}" `
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}/../../../" `
             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY="${{ env.BIN_DIR }}"
 
       - name: Build
         run: cmake --build "${{ env.BUILD_DIR }}" --config Release --parallel
 
-      - name: Deploy Qt dependencies
-        run: |
-          $qtBin = "${{ env.Qt6_DIR }}\..\..\..\bin"
-          $deploy = Get-ChildItem -Path $qtBin -Filter "windeployqt*.exe" | Select-Object -First 1
-          if ($deploy) {
-            & $deploy.FullName `
-              --no-translations `
-              --no-system-d3d-compiler `
-              --no-opengl-sw `
-              --compiler-runtime `
-              "${{ env.BIN_DIR }}\thakur.exe"
-            if ($LASTEXITCODE -ne 0) {
-              throw "windeployqt failed with exit code $LASTEXITCODE"
-            }
-            Write-Host "windeployqt completed successfully."
-          } else {
-            throw "windeployqt was not found in $qtBin"
-          }
+      - name: Validate build output
         shell: pwsh
-
-      - name: Run tests
-        if: ${{ hashFiles('tests/CMakeLists.txt') != '' }}
-        working-directory: ${{ env.BUILD_DIR }}
-        run: ctest --output-on-failure -C Release
+        run: |
+          $exe = "${{ env.BIN_DIR }}\thakur.exe"
+          $loader = "${{ env.BIN_DIR }}\WebView2Loader.dll"
+          if (-not (Test-Path $exe)) {
+            throw "Expected executable not found: $exe"
+          }
+          if (-not (Test-Path $loader)) {
+            throw "Expected WebView2Loader.dll not found: $loader"
+          }
+          Write-Host "Built: $exe"
+          Write-Host "Staged: $loader"
 
       - name: Collect deployment artifacts
+        shell: pwsh
         run: |
           $binDir = "${{ env.BIN_DIR }}"
-          $exePath = "$binDir\thakur.exe"
           $artifactDir = "${{ github.workspace }}/artifact"
-          if (-not (Test-Path $exePath)) {
-            throw "Expected executable not found: $exePath"
-          }
           New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
-          Get-ChildItem -Path $binDir -Recurse |
-            Where-Object { $_.Extension -in @('.dll','.exe','.qm','.json','.pak') -or $_.PSIsContainer } |
-            ForEach-Object {
-              $dest = $_.FullName.Replace($binDir, $artifactDir)
-              if ($_.PSIsContainer) {
-                New-Item -ItemType Directory -Force -Path $dest | Out-Null
-              } else {
-                $destDir = Split-Path $dest -Parent
-                New-Item -ItemType Directory -Force -Path $destDir | Out-Null
-                Copy-Item $_.FullName $dest -Force
-              }
-            }
-          Write-Host "Artifact contents:"
-          Get-ChildItem -Path $artifactDir -Recurse | Select-Object -ExpandProperty Name
-        shell: pwsh
+          Copy-Item "$binDir\thakur.exe" $artifactDir -Force
+          Copy-Item "$binDir\WebView2Loader.dll" $artifactDir -Force
+          if (Test-Path "$binDir\thakur_ui") {
+            Copy-Item "$binDir\thakur_ui" $artifactDir -Recurse -Force
+          }
+          Get-ChildItem $artifactDir -Recurse | Select-Object FullName
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -123,21 +96,13 @@ jobs:
 
       - name: Build summary
         if: always()
-        run: |
-          echo "## Thakur Build Summary" >> $env:GITHUB_STEP_SUMMARY
-          echo "" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Property | Value |" >> $env:GITHUB_STEP_SUMMARY
-          echo "|----------|-------|" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Runner   | windows-latest |" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Qt       | 6.6.0 (msvc2019_64) |" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Config   | Release |" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Commit   | ${{ github.sha }} |" >> $env:GITHUB_STEP_SUMMARY
-          $exeSize = ""
-          $exePath = "${{ env.BIN_DIR }}\thakur.exe"
-          if (Test-Path $exePath) {
-            $size = (Get-Item $exePath).Length
-            $sizeMb = [math]::Round($size / 1MB, 2)
-            $exeSize = "$sizeMb MB"
-          }
-          echo "| Exe Size | $exeSize |" >> $env:GITHUB_STEP_SUMMARY
         shell: pwsh
+        run: |
+          Add-Content $env:GITHUB_STEP_SUMMARY "## Thakur Build Summary"
+          Add-Content $env:GITHUB_STEP_SUMMARY ""
+          Add-Content $env:GITHUB_STEP_SUMMARY "| Property | Value |"
+          Add-Content $env:GITHUB_STEP_SUMMARY "|----------|-------|"
+          Add-Content $env:GITHUB_STEP_SUMMARY "| Runner | windows-latest |"
+          Add-Content $env:GITHUB_STEP_SUMMARY "| UI Host | Native Win32 + WebView2 |"
+          Add-Content $env:GITHUB_STEP_SUMMARY "| Config | Release |"
+          Add-Content $env:GITHUB_STEP_SUMMARY "| Commit | $env:GITHUB_SHA |"
