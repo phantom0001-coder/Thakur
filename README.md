@@ -1,69 +1,74 @@
+# Thakur
 
+Thakur is a Windows desktop application with a native Win32 host and a Microsoft WebView2-rendered UI.
 
-High-performance, native Windows-based Roblox script executor designed to provide a modern, secure, and intuitive experience for executing Lua scripts in Roblox games.
+## Desktop architecture
 
----
+- **Native Win32 host:** window creation, lifecycle, Windows integration, IPC, and native application services.
+- **Microsoft WebView2:** renders the HTML/CSS/JavaScript interface inside the desktop window.
+- **WebView2 bridge:** native C++ and the UI communicate through WebView2 web messages.
+- **Web UI:** the project can load the existing HTML prototype without adding a separate UI framework.
 
-- **Native Qt6 C++ Interface**: Frameless, modern dark theme with custom neon-green (`
-- **Advanced Code Editor**: Syntax highlighting for Luau/Roblox APIs, line numbers, multi-tab workspace, auto-indentation, and find/replace.
-- **Dynamic Multi-Hub Aggregator**: Search verified scripts from `rscripts.net`, `scripthub.com`, `robloxscripts.com`, and `scriptblox.com` with real-time exploit security heuristics analysis.
-- **Stealth Injection & Execution Engine**: Manual mapping & process hollowing evasion, dynamic pattern scanning for `lua_State*` and `luaL_dostring`, with Named Pipes (`\\.\pipe\ThakurIPC`) for robust IPC.
-- **Hardware ID (HWID) & Premium Key System**: Tiered access with offline caching, local encryption, and server-side verification.
-- **Background Auto-Updater**: Automated release checks with SHA-256 checksum verification and automatic rollbacks.
+## Repository layout
 
----
-
-```
-thakur/
-├── CMakeLists.txt                 
-├── build_thakur.ps1               
-├── .github/workflows/             
+```text
+Thakur/
+├── CMakeLists.txt
+├── build_thakur.bat
+├── build_thakur.ps1
+├── .github/workflows/windows-build.yml
+├── thakur.rc
+├── thakur.manifest
 ├── thakur_ui/
-│   ├── resources.qrc              
 │   ├── resources/
-│   │   ├── images/                
-│   │   └── themes/                
-│   ├── ui/                        
+│   │   ├── images/
+│   │   └── themes/
 │   └── src/
-│       ├── main_qt.cpp            
-│       ├── mainwindow.h/.cpp      
-│       ├── ThemeManager.h/.cpp    
-│       ├── EditorWidget.h/.cpp    
-│       ├── splashscreen.h/.cpp    
-│       ├── hub/
-│       │   ├── HubManager.h/.cpp  
-│       │   └── ScriptCard.h/.cpp  
+│       ├── main.cpp
+│       ├── script_hub.cpp/.h
+│       ├── ipc/
 │       ├── injector/
-│       │   ├── ThakurInjector.h/.cpp 
-│       │   └── patterns.json      
-│       ├── premium/
-│       │   └── PremiumManager.h/.cpp 
-│       └── updater/
-│           └── Updater.h/.cpp     
-├── tests/
-│   ├── CMakeLists.txt             
-│   └── test_thakur.cpp            
-└── installer/
-    └── thakur_installer.iss       
+│       └── supporting native code
+└── tests/
 ```
 
----
+## Requirements
 
-- Windows 10 / 11 (64-bit)
-- Visual Studio 2022 (MSVC v143 C++ x64 build tools)
-- Qt 6.4+ (Components: Core, Gui, Widgets, Network, WebEngineWidgets, Multimedia)
-- CMake 3.22+ & Ninja
+- Windows 10/11 (64-bit)
+- Visual Studio 2022 C++ build tools
+- CMake 3.22+
+- Ninja
+- Microsoft WebView2 Runtime
+- Microsoft.Web.WebView2 SDK (the build scripts can install it into `packages/`)
 
-Open PowerShell in the repository root and run:
+## Build
+
+### Batch build
+
+```bat
+build_thakur.bat
+```
+
+### PowerShell/CMake build
+
 ```powershell
 .\build_thakur.ps1 -Config Release
 ```
-The compiled executable and all runtime dependencies deployed by `windeployqt` will be in `build/bin/thakur.exe`.
 
----
+For a clean rebuild:
 
-Yes. DLL injection and remote process memory manipulation (`VirtualAllocEx`, `WriteProcessMemory`, `CreateRemoteThread`) require administrator access.
+```powershell
+.\build_thakur.ps1 -Config Release -Clean
+```
 
-During pre-release testing, entering key **`373438`** in the Key Modal provides an immediate 7-day trial unlocking all features.
+The executable is produced as:
 
-The internal heuristic scanner inspects payloads for risky patterns (such as obfuscated bit manipulation, untrusted HTTP calls, or file system modifications) and marks them with visual badges: `Clean`, `Caution`, `Danger`, or `Obfuscated`.
+```text
+build\bin\thakur.exe
+```
+
+`WebView2Loader.dll` is staged beside the executable.
+
+## Notes
+
+`index.html` is kept as a UI prototype. It is not converted into a backend and is not modified by the native build migration.
